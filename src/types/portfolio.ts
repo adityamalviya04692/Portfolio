@@ -6,7 +6,7 @@ export interface Profile {
   name: string; shortName: string; role: string; tagline: string;
   specialization: string; location: string; yearsOfExperience: string;
   availability: string; bio: string; bioSecondary: string;
-  avatar: string; resume: string; social: Social;
+  avatar: string; resume: string; resumeDocx: string; social: Social;
 }
 export interface Stat { value: string; label: string }
 export interface SkillCategory { name: string; items: string[] }

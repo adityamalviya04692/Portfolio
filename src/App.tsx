@@ -242,6 +242,9 @@ function Portfolio() {
                 >
                   Download resume <Download size={17} />
                 </a>
+                <a className="resume-docx-link" href={asset(profile.resumeDocx)} download>
+                  Download DOCX for applications
+                </a>
               </Reveal>
             </div>
             <div className="stats">

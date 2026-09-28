@@ -390,6 +390,17 @@ h2 {
   background: var(--cream);
   color: var(--blue);
 }
+.resume-docx-link {
+  display: inline-block;
+  margin-left: 14px;
+  color: #e4e6ef;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.resume-docx-link:hover {
+  color: #f2bd83;
+}
 .button:hover {
   background: #ebae73;
 }

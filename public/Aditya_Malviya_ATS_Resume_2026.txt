@@ -1,0 +1,43 @@
+ADITYA MALVIYA
+SENIOR DATA ENGINEER
+
+Mumbai, Maharashtra, India | +91 8555981411 | adityamalviya04692@gmail.com
+LinkedIn: https://linkedin.com/in/adityamalviya04692 | GitHub: https://github.com/adityamalviya04692
+Portfolio: https://adityamalviya04692.github.io/aditya-portfolio/
+
+PROFESSIONAL SUMMARY
+Senior Data Engineer with 4 years and 9 months at Tata Consultancy Services Limited (TCS) on the Rolls-Royce Digital account. Builds Azure lakehouse pipelines with PySpark, SQL/T-SQL, Python, Databricks, Azure Data Factory, Delta Lake, and Unity Catalog. Cut Spark runtime from 52 to 14 minutes, lowered Azure costs by approximately 40%, and improved backend performance by approximately 30%.
+
+TECHNICAL SKILLS
+Data engineering: PySpark, Apache Spark, Spark SQL, SQL, T-SQL, Python, Data Engineering, Data Pipelines, ETL, ELT, Batch Processing, Apache Kafka, Data Warehousing, Dimensional Data Modeling, Medallion Architecture
+Azure data platform: Azure Databricks, Azure Data Factory (ADF), Azure Synapse Analytics, Azure Data Lake Storage Gen2 (ADLS Gen2), Azure Blob Storage, Azure Event Hubs, Delta Lake, Unity Catalog
+Governance and quality: Data Governance, Data Quality Frameworks, Data Quality Validation, Data Lineage, Access Control, Role-Based Access Control (RBAC)
+Delivery and engineering tools: Git, GitHub, Azure DevOps, YAML, Docker, Apache Airflow, CI/CD for data pipelines (working knowledge through DevOps team collaboration), SonarQube, Pytest, Agile, Scrum
+Databases and backend: Microsoft SQL Server, PostgreSQL, MySQL, Redis, FastAPI, REST APIs, Azure API Management
+
+PROFESSIONAL EXPERIENCE
+Tata Consultancy Services Limited (TCS) | Mumbai, India
+Senior Data Engineer (promoted from Data Engineer) | Dec 2021 - Present
+Client account: Rolls-Royce Digital
+- Promoted to Senior Data Engineer in March 2026 after serving as Data Engineer from December 2021.
+- Project: Engine History Analysis
+- Built Azure Data Factory and Azure Databricks ETL and ELT pipelines with PySpark across Delta Lake Bronze, Silver, and Gold layers for raw ingestion, cleansing, normalization, validation, business logic, dimensional models, reporting, and insights.
+- Implemented data quality checks across medallion layers to detect invalid, incomplete, and duplicate records before publishing curated datasets.
+- Used Unity Catalog for centralized data governance, fine-grained access control, and lineage across Databricks workspaces.
+- Cut Spark runtime by approximately 73% (52 to 14 minutes) through key salting and Adaptive Query Execution, eliminating recurring executor out-of-memory failures.
+- Reduced Azure costs by approximately 40% through Databricks cluster right-sizing, resource optimization, and reusable parameterized Azure Data Factory workflows.
+- Collaborated with the DevOps team on Azure DevOps CI/CD releases for Azure Data Factory and Databricks; developed working knowledge of YAML, Git branching, and environment promotion.
+- Project: Assumptions Management
+- Developed FastAPI services with role-based access control and Azure API Management, and used Docker to standardize service deployment across environments.
+- Improved backend performance by approximately 30% using Redis caching and database logic optimization with Microsoft SQL Server and Azure Blob Storage.
+- Resolved SonarQube findings, wrote Pytest unit tests, and worked with cross-functional teams using Azure DevOps Boards and Agile delivery practices.
+
+CERTIFICATIONS
+- Microsoft Certified: Fabric Data Engineer Associate (DP-700)
+- Microsoft Certified: Azure Data Fundamentals (DP-900)
+
+EDUCATION
+Bachelor of Technology in Mechanical Engineering | Bhilai Institute of Technology, Durg | 2021 | 71%
+
+LANGUAGES
+English, Hindi, Telugu, Bengali

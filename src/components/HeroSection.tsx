@@ -45,7 +45,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.18 }}
               className="mt-6 max-w-xl text-[15px] leading-relaxed text-neutral-400 sm:text-base"
             >
-              {profile.tagline} {profile.yearsOfExperience} years on Microsoft Azure, most of it on
+              {profile.tagline} {profile.yearsOfExperience} on Microsoft Azure, most of it on
               pipelines that other people depend on before breakfast.
             </motion.p>
 

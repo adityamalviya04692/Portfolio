@@ -2,16 +2,17 @@
   "profile": {
     "name": "Aditya Malviya",
     "shortName": "Aditya",
-    "role": "Azure Data Engineer",
+    "role": "Senior Data Engineer",
     "tagline": "I build data pipelines that hold up in production.",
     "specialization": "Data Engineering · Azure · PySpark",
     "location": "Mumbai, Maharashtra, India",
-    "yearsOfExperience": "4.5+",
+    "yearsOfExperience": "4 years and 9 months",
     "availability": "Open to Data Engineer roles",
-    "bio": "Azure Data Engineer with 4.5+ years architecting and productionizing large-scale ETL/ELT pipelines on Microsoft Azure for enterprise clients, including Rolls-Royce. Core expertise in PySpark, Azure Databricks, Azure Data Factory and SQL/T-SQL, with hands-on experience building medallion-architecture lakehouses, Unity Catalog governance, and production data quality checks. I collaborate with DevOps colleagues on CI/CD for data pipelines and have working knowledge of Docker.",
+    "bio": "Senior Data Engineer with 4 years and 9 months at Tata Consultancy Services on the Rolls-Royce Digital account. I build Azure lakehouse pipelines with PySpark, SQL/T-SQL, Python, Databricks, Azure Data Factory, Delta Lake, and Unity Catalog. My work spans Bronze-to-Gold data processing, quality checks, governance, and performance tuning. I collaborate with DevOps colleagues on CI/CD releases and have used Docker to standardize backend service deployment.",
     "bioSecondary": "I care about the unglamorous parts — the skewed join that quietly costs an hour a night, the cluster that is three sizes too big, the pipeline nobody can redeploy safely. Fixing those is most of the job.",
     "avatar": "assets/aditya-portrait.png",
     "resume": "Aditya_Malviya_Resume.pdf",
+    "resumeDocx": "Aditya_Malviya_ATS_Resume_2026.docx",
     "social": {
       "linkedin": "https://www.linkedin.com/in/adityamalviya04692/",
       "github": "https://github.com/adityamalviya04692",
@@ -23,7 +24,7 @@
   },
   "stats": [
     {
-      "value": "4.5+",
+      "value": "4y 9m",
       "label": "Years in data engineering"
     },
     {
@@ -58,7 +59,8 @@
           "Medallion Architecture",
           "Data Quality Frameworks",
           "CI/CD collaboration for data pipelines",
-          "Docker"
+          "Docker",
+          "Apache Kafka"
         ]
       },
       {
@@ -70,12 +72,10 @@
           "Delta Lake",
           "Azure Data Lake",
           "Azure Blob Storage",
-          "Azure DevOps"
+          "Azure DevOps",
+          "Azure Synapse Analytics",
+          "Azure Event Hubs"
         ]
-      },
-      {
-        "name": "Learning exposure",
-        "items": ["Azure Synapse Analytics", "Azure Event Hubs", "Apache Kafka", "Apache Airflow", "PostgreSQL"]
       },
       {
         "name": "Backend & APIs",
@@ -86,7 +86,8 @@
           "Azure API Management",
           "Redis Cache",
           "MS SQL Server",
-          "MySQL"
+          "MySQL",
+          "PostgreSQL"
         ]
       },
       {
@@ -94,6 +95,7 @@
         "items": [
           "Git",
           "YAML",
+          "Apache Airflow",
           "SonarQube",
           "Pytest",
           "Agile / Scrum",
