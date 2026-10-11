@@ -19,7 +19,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 
 const MotionContext = createContext({ reduced: false });
 export const useMotionPreference = () => useContext(MotionContext);
@@ -31,8 +31,6 @@ export function MotionSystem({ children }: { children: ReactNode }) {
     () => localStorage.getItem("portfolio-motion") === "paused",
   );
   const reduced = Boolean(systemReduced || paused);
-  const [sound, setSound] = useState(false);
-  const soundRef = useRef<AudioContext | null>(null);
   const [ready, setReady] = useState(false);
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 160, damping: 30 });
@@ -61,48 +59,6 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       clearTimeout(timeout);
     };
   }, []);
-  useEffect(() => {
-    if (!sound) return;
-    const tick = (event: Event) => {
-      if (
-        !(event.target instanceof Element) ||
-        !event.target.closest("a,button,summary")
-      )
-        return;
-      const ctx = soundRef.current;
-      if (!ctx || document.hidden) return;
-      const tone = ctx.createOscillator(),
-        gain = ctx.createGain();
-      tone.type = "sine";
-      tone.frequency.setValueAtTime(520, ctx.currentTime);
-      tone.frequency.exponentialRampToValueAtTime(850, ctx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.025, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-      tone.connect(gain);
-      gain.connect(ctx.destination);
-      tone.start();
-      tone.stop(ctx.currentTime + 0.13);
-    };
-    document.addEventListener("click", tick);
-    return () => document.removeEventListener("click", tick);
-  }, [sound]);
-  useEffect(
-    () => () => {
-      void soundRef.current?.close();
-    },
-    [],
-  );
-  async function toggleSound() {
-    try {
-      if (!sound) {
-        soundRef.current ??= new AudioContext();
-        await soundRef.current.resume();
-      } else await soundRef.current?.suspend();
-      setSound(!sound);
-    } catch {
-      setSound(false);
-    }
-  }
   return (
     <MotionContext.Provider value={{ reduced }}>
       <MotionConfig reducedMotion={reduced ? "always" : "never"}>
@@ -141,13 +97,6 @@ export function MotionSystem({ children }: { children: ReactNode }) {
             aria-pressed={paused}
           >
             {paused ? <Play size={15} /> : <Pause size={15} />}
-          </button>
-          <button
-            onClick={toggleSound}
-            aria-label={sound ? "Disable sounds" : "Enable sounds"}
-            aria-pressed={sound}
-          >
-            {sound ? <Volume2 size={16} /> : <VolumeX size={16} />}
           </button>
         </div>
         {ready && children}
