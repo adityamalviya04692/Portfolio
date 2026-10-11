@@ -318,7 +318,7 @@ function Portfolio() {
                 <div>
                   <h3>Tata Consultancy Services</h3>
                   <p>
-                    Senior Data Engineer (Mar 2026–present) · Data Engineer (Dec 2021–Feb 2026)
+                    Senior Data Engineer & Scrum Master (Mar 2026–present) · Data Engineer (Dec 2021–Feb 2026)
                   </p>
                 </div>
                 <span>
@@ -327,7 +327,7 @@ function Portfolio() {
                   Mumbai, India
                 </span>
               </div>
-              <p className="experience-intro">Rolls-Royce Digital account</p>
+              <p className="experience-intro">Rolls-Royce Digital account · Feb 2022 – present</p>
             </Reveal>
             <div className="professional-grid">
               {data.experience[0].projects.map((p, i) => (
@@ -341,7 +341,7 @@ function Portfolio() {
                     <p>
                       {i === 0
                         ? "End-to-end Azure lakehouse engineering, governance, and Spark performance optimization."
-                        : "Enterprise FastAPI services, access control, and reliable cloud deployments."}
+                        : "Production FastAPI data services, access control, and reliable cloud deployments."}
                     </p>
                     <ProjectArt type={i === 0 ? "pipeline" : "backend"} />
                     <div className="assignment-impact">
@@ -375,18 +375,19 @@ function Portfolio() {
             <Reveal>
               <Accordion title="Additional professional experience">
                 <div className="detail-content">
-                  <h3>TCS · Avery Dennison account</h3>
-                  <p>Full Stack Developer — Cloud & Generative AI</p>
+                  <h3>TCS · Avery Dennison account · Smartrac RFID division</h3>
+                  <p>Data Engineer & Backend Developer · Dec 2021 – Jan 2022</p>
                   <ul>
                     <li>
-                      Built cloud-native applications with Python, React, Gemini
-                      Pro, and Vertex AI; developed RAG systems using Vector
-                      Search, Cloud SQL, and Firestore with OAuth.
+                      Built Databricks data engineering pipelines on Google
+                      Cloud Platform to ingest, cleanse and prepare Smartrac RFID
+                      R&amp;D datasets used to train machine learning models for an
+                      AI-powered research tool, now live in production.
                     </li>
                     <li>
-                      Deployed containerized services through Cloud Run, Cloud
-                      Functions, and Artifact Registry, with Pytest and
-                      SonarQube checks.
+                      Developed backend services and AI components with Vertex
+                      AI (Google pre-trained models), Google Cloud Functions and a vector database for
+                      semantic search over the client’s R&amp;D data.
                     </li>
                   </ul>
                   <h3>BYJU’S · Python Developer (Intern)</h3>

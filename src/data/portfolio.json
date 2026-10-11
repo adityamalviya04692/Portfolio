@@ -6,13 +6,13 @@
     "tagline": "I build data pipelines that hold up in production.",
     "specialization": "Data Engineering · Azure · PySpark",
     "location": "Mumbai, Maharashtra, India",
-    "yearsOfExperience": "4 years and 9 months",
-    "availability": "Open to Data Engineer roles",
-    "bio": "Senior Data Engineer with 4 years and 9 months at Tata Consultancy Services on the Rolls-Royce Digital account. I build Azure lakehouse pipelines with PySpark, SQL/T-SQL, Python, Databricks, Azure Data Factory, Delta Lake, and Unity Catalog. My work spans Bronze-to-Gold data processing, quality checks, governance, and performance tuning. I collaborate with DevOps colleagues on CI/CD releases and have used Docker to standardize backend service deployment.",
+    "yearsOfExperience": "nearly 5 years",
+    "availability": "Open to Senior Data Engineer roles · Mumbai · Hybrid",
+    "bio": "Senior Data Engineer at Tata Consultancy Services with nearly 5 years across two client accounts, Rolls-Royce Digital and Avery Dennison (Smartrac). I design and own production lakehouse pipelines with PySpark, SQL/T-SQL, Python, Azure Databricks, Azure Data Factory, Delta Lake and Unity Catalog, processing ~27 GB/day of streaming data (Event Hubs, Kafka, Structured Streaming) and 5-7 GB/day of batch data. I lead a 6-member offshore team as Scrum Master: stand-ups, boards, pull-request approvals and delivery to the client.",
     "bioSecondary": "I care about the unglamorous parts — the skewed join that quietly costs an hour a night, the cluster that is three sizes too big, the pipeline nobody can redeploy safely. Fixing those is most of the job.",
     "avatar": "assets/aditya-portrait.png",
-    "resume": "Aditya_Malviya_Resume.pdf",
-    "resumeDocx": "Aditya_Malviya_ATS_Resume_2026.docx",
+    "resume": "Aditya_Malviya_Senior_Data_Engineer_Azure_Databricks.pdf",
+    "resumeDocx": "Aditya_Malviya_Senior_Data_Engineer_Azure_Databricks.docx",
     "social": {
       "linkedin": "https://www.linkedin.com/in/adityamalviya04692/",
       "github": "https://github.com/adityamalviya04692",
@@ -24,8 +24,8 @@
   },
   "stats": [
     {
-      "value": "4y 9m",
-      "label": "Years in data engineering"
+      "value": "~5 yrs",
+      "label": "Production data engineering"
     },
     {
       "value": "73%",
@@ -36,8 +36,8 @@
       "label": "Azure cloud cost reduced"
     },
     {
-      "value": "30%",
-      "label": "Backend performance gain"
+      "value": "27 GB/day",
+      "label": "Streaming data processed"
     }
   ],
   "skills": {
@@ -47,59 +47,84 @@
         "items": [
           "PySpark",
           "SQL / T-SQL",
-          "Data Engineering",
-          "ETL / ELT",
           "Python",
-          "Azure Databricks",
-          "Azure Data Factory (ADF)",
-          "Data Warehousing",
-          "Data Modeling",
-          "Unity Catalog",
-          "Data Governance",
-          "Medallion Architecture",
-          "Data Quality Frameworks",
-          "CI/CD collaboration for data pipelines",
-          "Docker",
-          "Apache Kafka"
-        ]
-      },
-      {
-        "name": "Azure Data Platform",
-        "items": [
-          "Microsoft Azure",
           "Apache Spark",
           "Spark SQL",
+          "Spark Structured Streaming",
+          "ETL / ELT",
+          "Spark Performance Tuning",
+          "Data Warehousing",
+          "Dimensional Data Modeling",
+          "Medallion Architecture",
+          "SCD Type 2"
+        ]
+      },
+      {
+        "name": "Azure & Databricks",
+        "items": [
+          "Azure Databricks",
+          "Azure Data Factory (ADF)",
+          "ADLS Gen2",
+          "Apache Kafka",
+          "Azure Event Hubs",
           "Delta Lake",
-          "Azure Data Lake",
-          "Azure Blob Storage",
+          "Unity Catalog",
+          "Databricks Workflows",
+          "Auto Loader",
+          "Azure Key Vault",
           "Azure DevOps",
-          "Azure Synapse Analytics",
-          "Azure Event Hubs"
+          "Azure Blob Storage"
         ]
       },
       {
-        "name": "Backend & APIs",
+        "name": "Google Cloud & AI",
         "items": [
-          "FastAPI",
-          "REST API Development",
+          "Google Cloud Platform (GCP)",
+          "Databricks on Google Cloud",
+          "Vertex AI",
+          "Google Cloud Functions",
+          "Vector Databases"
+        ]
+      },
+      {
+        "name": "Governance, Quality & Delivery",
+        "items": [
+          "Data Governance",
+          "Data Quality Frameworks",
+          "Data Lineage",
           "RBAC",
-          "Azure API Management",
-          "Redis Cache",
-          "MS SQL Server",
-          "MySQL",
-          "PostgreSQL"
-        ]
-      },
-      {
-        "name": "Engineering Practice",
-        "items": [
+          "CI/CD",
           "Git",
           "YAML",
-          "Apache Airflow",
-          "SonarQube",
+          "Docker",
           "Pytest",
-          "Agile / Scrum",
-          "Azure DevOps Boards"
+          "SonarQube",
+          "Scrum Master",
+          "Code Reviews",
+          "GitHub Copilot",
+          "Claude",
+          "ChatGPT"
+        ]
+      },
+      {
+        "name": "Databases, APIs & BI",
+        "items": [
+          "MS SQL Server",
+          "MySQL",
+          "PostgreSQL",
+          "Redis Cache",
+          "FastAPI",
+          "REST APIs",
+          "Azure API Management",
+          "Power BI"
+        ]
+      },
+      {
+        "name": "Working knowledge",
+        "items": [
+          "Apache Airflow",
+          "Azure Synapse Analytics",
+          "Delta Live Tables"
         ]
       }
     ]
@@ -110,8 +135,8 @@
       "summary": "End-to-end ETL/ELT on Azure — ingestion through to modelled, query-ready tables.",
       "points": [
         "Medallion-architecture lakehouses (Bronze / Silver / Gold) on Delta Lake",
-        "Layer-wise data quality validation and dimensional modelling",
-        "Unity Catalog governance, access control and lineage"
+        "Streaming ingestion with Event Hubs, Kafka and Structured Streaming (~27 GB/day); batch loads with Delta MERGE and SCD Type 2 (5-7 GB/day)",
+        "Layer-wise data quality checks and Unity Catalog governance, access control and lineage"
       ]
     },
     {
@@ -119,7 +144,7 @@
       "summary": "Making existing pipelines cheaper and faster rather than just bigger.",
       "points": [
         "Data-skew remediation via key salting and Adaptive Query Execution",
-        "Databricks cluster right-sizing and resource optimisation",
+        "Databricks cluster right-sizing plus Delta OPTIMIZE, Z-ORDER and partitioning",
         "Reusable, parameterised ADF workflows built for maintainability"
       ]
     },
@@ -133,12 +158,12 @@
       ]
     },
     {
-      "title": "Backend Development",
-      "summary": "Production Python services — a complementary strength to the data work.",
+      "title": "Team Leadership & Delivery",
+      "summary": "Leading a 6-member offshore team as Scrum Master since 2025.",
       "points": [
-        "FastAPI services with RBAC and Azure API Management",
-        "Redis caching and database logic optimisation",
-        "SonarQube remediation and Pytest coverage"
+        "Run daily stand-ups and sprint planning; maintain Azure DevOps boards",
+        "Mentor juniors and approve their PySpark and SQL pull requests",
+        "AI-assisted delivery with GitHub Copilot, Claude and ChatGPT in VS Code"
       ]
     }
   ],
@@ -146,30 +171,33 @@
     {
       "company": "Tata Consultancy Services",
       "role": "Senior Data Engineer (Mar 2026–present); Data Engineer (Dec 2021–Feb 2026)",
-      "account": "Rolls-Royce Digital Account",
+      "account": "Rolls-Royce Digital account (Feb 2022–present)",
       "period": "Dec 2021 — Present",
       "location": "Mumbai, India",
-      "summary": "Architecting and productionizing large-scale ETL/ELT pipelines on Microsoft Azure for the Rolls-Royce Digital account.",
+      "summary": "Designing, running and leading production lakehouse data engineering on Microsoft Azure for the Rolls-Royce Digital account.",
       "projects": [
         {
           "name": "Engine History Analysis",
           "period": "2024 — Present",
           "highlights": [
-            "Architected end-to-end ETL/ELT pipelines using Azure Data Factory, Azure Databricks and PySpark, building a medallion-architecture (Bronze/Silver/Gold) lakehouse with layer-wise data quality validation and dimensional data models for downstream reporting.",
-            "Implemented Unity Catalog for centralized data governance, fine-grained access control and lineage tracking across Databricks workspaces.",
-            "Diagnosed and resolved severe data skew in high-volume Spark joins using key salting and Adaptive Query Execution (AQE), cutting pipeline runtime by ~73% (52 to 14 minutes) and eliminating recurring executor out-of-memory failures.",
-            "Reduced Azure cloud costs by ~40% through resource optimisation, Databricks cluster right-sizing and reusable parameterised ADF workflows.",
-            "Collaborated with the DevOps team during builds and releases of ADF and Databricks pipelines; gained working knowledge of Azure DevOps, YAML and Git branching."
+            "Design and own production ADF and Azure Databricks ETL/ELT pipelines in PySpark and Spark SQL on a Medallion Architecture (Bronze, Silver, Gold) over Delta Lake and ADLS Gen2, processing ~27 GB/day of streaming and 5-7 GB/day of batch engine data into star-schema models for Power BI reporting.",
+            "Built real-time ingestion with Azure Event Hubs, Apache Kafka and Spark Structured Streaming into Delta Lake, alongside incremental batch loads using Delta MERGE, SCD Type 2 and Auto Loader, orchestrated with Databricks Workflows.",
+            "Cut a critical Spark job's runtime by ~73% (52 to 14 minutes) by fixing join skew with key salting and Adaptive Query Execution, eliminating recurring executor out-of-memory failures.",
+            "Reduced Azure costs by ~40% through cluster right-sizing, Delta OPTIMIZE, Z-ORDER and partitioning, and parameterized ADF pipelines.",
+            "Implemented data quality checks at every medallion layer and Unity Catalog governance (RBAC, fine-grained permissions, lineage); secrets via Azure Key Vault-backed scopes and service principals.",
+            "Since 2025, lead a 6-member offshore team as Scrum Master: daily stand-ups, sprint planning, Azure DevOps boards, mentoring juniors and approving their pull requests, and owning delivery commitments to the client.",
+            "Use AI-assisted development (GitHub Copilot, Claude and ChatGPT in VS Code) to automate repetitive coding and test writing and raise code quality across the team.",
+            "Collaborate with the DevOps team on Azure DevOps CI/CD releases for ADF and Databricks code; working knowledge of YAML pipelines and Git branching."
           ]
         },
         {
           "name": "Assumptions Management",
-          "period": "2022 — 2024",
+          "period": "Feb 2022 — 2024",
           "highlights": [
-            "Delivered production-grade FastAPI backend services with Role-Based Access Control (RBAC) and Azure API Management, containerised with Docker to standardise deployment across environments.",
-            "Improved application performance by ~30% via Redis caching, optimised backend and database logic, and structured logging.",
-            "Ensured code quality and security by resolving SonarQube hotspots and technical debt, with high coverage through Pytest unit testing.",
-            "Collaborated within Agile/Scrum teams, managing tasks in Azure DevOps Boards with cross-functional stakeholders."
+            "Built production FastAPI (Python) data services with RBAC and Azure API Management over MS SQL Server and Azure Blob Storage, containerized with Docker.",
+            "Improved performance by ~30% via Redis caching and SQL/T-SQL and database-logic optimization.",
+            "Resolved SonarQube findings and wrote Pytest unit tests within Agile/Scrum sprints on Azure DevOps Boards.",
+            "Early on, shadowed client technical walkthroughs and leadership reviews to learn the Rolls-Royce domain."
           ]
         }
       ]
@@ -212,13 +240,13 @@
   ],
   "certifications": [
     {
-      "name": "Microsoft Certified: Azure Data Fundamentals",
-      "code": "DP-900",
+      "name": "Microsoft Certified: Fabric Data Engineer Associate",
+      "code": "DP-700",
       "issuer": "Microsoft"
     },
     {
-      "name": "Microsoft Certified: Fabric Data Engineer Associate",
-      "code": "DP-700",
+      "name": "Microsoft Certified: Azure Data Fundamentals",
+      "code": "DP-900",
       "issuer": "Microsoft"
     }
   ],
