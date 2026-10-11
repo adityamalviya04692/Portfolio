@@ -314,8 +314,9 @@ function Portfolio() {
                 Built in production<span className="orange">.</span>
               </h2>
               <div className="employer-heading">
-                <img className="employer-client-mark" src={`${import.meta.env.BASE_URL}assets/rolls-royce-plc.svg`} alt="Rolls-Royce plc logo" />
+                <img className="employer-logo" src={asset("assets/tcs-logo.jpg")} alt="Tata Consultancy Services logo" />
                 <div>
+                  <span className="employer-label">EMPLOYER</span>
                   <h3>Tata Consultancy Services</h3>
                   <p>
                     Senior Data Engineer & Scrum Master (Mar 2026–present) · Data Engineer (Dec 2021–Feb 2026)
@@ -333,6 +334,10 @@ function Portfolio() {
               {data.experience[0].projects.map((p, i) => (
                 <Reveal key={p.name} delay={i * 0.12}>
                   <article className="professional-card">
+                    <div className="experience-account">
+                      <div className="account-logo rolls-royce-logo"><img src={asset("assets/rolls-royce-plc.svg")} alt="Rolls-Royce plc logo" /></div>
+                      <div><strong>Rolls-Royce Digital</strong><span>TCS client account · Feb 2022 – present</span></div>
+                    </div>
                     <div className="assignment-meta">
                       <span>0{i + 1} / TCS · ROLLS-ROYCE DIGITAL</span>
                       <span>{p.period}</span>
@@ -374,15 +379,15 @@ function Portfolio() {
             </div>
             <Reveal className="earlier-experience-heading">
               <span className="label-sticker light">EARLIER EXPERIENCE</span>
-              <h3>More accounts. More foundations.</h3>
-              <p>Google Cloud data engineering and an earlier Python development internship.</p>
+              <h3>Earlier experience, in full.</h3>
+              <p>Avery Dennison client work at TCS and a separate earlier BYJU’S internship.</p>
             </Reveal>
             <div className="professional-grid earlier-experience-grid">
               <Reveal>
                 <article className="professional-card">
                   <div className="experience-account">
                     <div className="account-logo"><img src={asset("assets/avery-dennison-logo.png")} alt="Avery Dennison logo" /></div>
-                    <div><strong>TCS · Avery Dennison</strong><span>Smartrac RFID division</span></div>
+                    <div><strong>Avery Dennison</strong><span>TCS client account · Smartrac RFID division</span></div>
                   </div>
                   <div className="assignment-meta">
                     <span>DATA ENGINEER &amp; BACKEND DEVELOPER</span>
@@ -405,7 +410,7 @@ function Portfolio() {
                 <article className="professional-card">
                   <div className="experience-account">
                     <div className="account-logo"><img src={asset("assets/byjus-logo.png")} alt="BYJU’S logo" /></div>
-                    <div><strong>BYJU’S</strong><span>GradeUp · Remote from Hyderabad</span></div>
+                    <div><strong>BYJU’S</strong><span>Separate internship · GradeUp · Remote from Hyderabad</span></div>
                   </div>
                   <div className="assignment-meta">
                     <span>PYTHON DEVELOPER INTERN</span>
