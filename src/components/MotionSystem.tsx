@@ -276,14 +276,19 @@ export function Counter({ value }: { value: string }) {
       setDisplay(value);
       return;
     }
-    const number = parseFloat(value),
-      suffix = value.replace(/^[\d.]+/, "");
+    const parts = value.match(/^([^\d]*)(\d+(?:\.\d+)?)(.*)$/);
+    if (!parts) {
+      setDisplay(value);
+      return;
+    }
+    const [, prefix, numeric, suffix] = parts,
+      number = Number(numeric);
     const control = animate(0, number, {
       duration: 1.5,
       ease: "easeOut",
       onUpdate: (v) =>
         setDisplay(
-          (Number.isInteger(number) ? Math.round(v) : v.toFixed(1)) + suffix,
+          prefix + (Number.isInteger(number) ? Math.round(v) : v.toFixed(1)) + suffix,
         ),
     });
     return () => control.stop();
