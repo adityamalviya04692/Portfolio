@@ -372,33 +372,55 @@ function Portfolio() {
                 </Reveal>
               ))}
             </div>
-            <Reveal>
-              <Accordion title="Additional professional experience">
-                <div className="detail-content">
-                  <h3>TCS · Avery Dennison account · Smartrac RFID division</h3>
-                  <p>Data Engineer & Backend Developer · Dec 2021 – Jan 2022</p>
-                  <ul>
-                    <li>
-                      Built Databricks data engineering pipelines on Google
-                      Cloud Platform to ingest, cleanse and prepare Smartrac RFID
-                      R&amp;D datasets used to train machine learning models for an
-                      AI-powered research tool, now live in production.
-                    </li>
-                    <li>
-                      Developed backend services and AI components with Vertex
-                      AI (Google pre-trained models), Google Cloud Functions and a vector database for
-                      semantic search over the client’s R&amp;D data.
-                    </li>
-                  </ul>
-                  <h3>BYJU’S · Python Developer (Intern)</h3>
-                  <p>July–November 2021 · Hyderabad · Remote</p>
-                  <p>
-                    Python development for GradeUp following its acquisition by
-                    BYJU’S.
-                  </p>
-                </div>
-              </Accordion>
+            <Reveal className="earlier-experience-heading">
+              <span className="label-sticker light">EARLIER EXPERIENCE</span>
+              <h3>More accounts. More foundations.</h3>
+              <p>Google Cloud data engineering and an earlier Python development internship.</p>
             </Reveal>
+            <div className="professional-grid earlier-experience-grid">
+              <Reveal>
+                <article className="professional-card">
+                  <div className="experience-account">
+                    <div className="account-logo"><img src={asset("assets/avery-dennison-logo.png")} alt="Avery Dennison logo" /></div>
+                    <div><strong>TCS · Avery Dennison</strong><span>Smartrac RFID division</span></div>
+                  </div>
+                  <div className="assignment-meta">
+                    <span>DATA ENGINEER &amp; BACKEND DEVELOPER</span>
+                    <span>DEC 2021 — JAN 2022</span>
+                  </div>
+                  <h3>Smartrac R&amp;D Data and AI Platform</h3>
+                  <p>Prepared RFID research data for an AI-powered tool using Databricks on Google Cloud Platform.</p>
+                  <ProjectArt type="smartrac" />
+                  <div className="assignment-impact">
+                    <strong>GCP + Databricks</strong>
+                    <span>Data pipelines, backend services and semantic search</span>
+                  </div>
+                  <ul className="experience-highlights">
+                    <li>Ingested, cleansed and prepared Smartrac RFID R&amp;D datasets used to train machine learning models.</li>
+                    <li>Built backend and AI components with Vertex AI (Google pre-trained models), Cloud Functions and a vector database.</li>
+                  </ul>
+                </article>
+              </Reveal>
+              <Reveal delay={0.12}>
+                <article className="professional-card">
+                  <div className="experience-account">
+                    <div className="account-logo"><img src={asset("assets/byjus-logo.png")} alt="BYJU’S logo" /></div>
+                    <div><strong>BYJU’S</strong><span>GradeUp · Remote from Hyderabad</span></div>
+                  </div>
+                  <div className="assignment-meta">
+                    <span>PYTHON DEVELOPER INTERN</span>
+                    <span>JUL — NOV 2021</span>
+                  </div>
+                  <h3>Python development for GradeUp</h3>
+                  <p>Contributed Python development for GradeUp following its acquisition by BYJU’S.</p>
+                  <ProjectArt type="byjus" />
+                  <div className="assignment-impact">
+                    <strong>Python development</strong>
+                    <span>BYJU’S · GradeUp · internship</span>
+                  </div>
+                </article>
+              </Reveal>
+            </div>
           </div>
         </section>
         <section id="projects" className="projects freelance-section">

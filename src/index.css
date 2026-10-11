@@ -1801,6 +1801,60 @@ footer > a:not(.monogram) {
   gap: 30px;
   margin: 25px 0;
 }
+.earlier-experience-heading {
+  margin-top: 56px;
+  padding-top: 36px;
+  border-top: 1px solid #ffffff26;
+}
+.earlier-experience-heading h3 {
+  margin-top: 18px;
+  font-size: clamp(27px, 3vw, 38px);
+  letter-spacing: -1.3px;
+}
+.earlier-experience-heading p {
+  margin-top: 8px;
+  color: #b8c8e3;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.earlier-experience-grid {
+  align-items: stretch;
+}
+.experience-account {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 23px;
+}
+.account-logo {
+  width: 132px;
+  height: 54px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  padding: 9px;
+  border-radius: 9px;
+  background: #fff;
+}
+.account-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.experience-account strong,
+.experience-account span {
+  display: block;
+}
+.experience-account strong {
+  font-size: 14px;
+  color: #fff;
+}
+.experience-account span {
+  margin-top: 4px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: #adc2e2;
+}
 .professional-card {
   border: 1px solid #7697c94a;
   background: #ffffff05;
@@ -1880,6 +1934,69 @@ footer > a:not(.monogram) {
 .visual-dots i:nth-child(2) { background: #81acc3; }
 .visual-dots i:nth-child(3) { background: #b2c1d1; }
 .visual-topline img { width: 18px; height: 28px; object-fit: contain; margin-left: auto; }
+.visual-topline .account-visual-logo {
+  width: 75px;
+  height: 24px;
+  border-radius: 3px;
+  padding: 3px;
+  background: #fff;
+}
+.account-visual.byjus .visual-dashboard {
+  background: linear-gradient(145deg, #211338, #2f2058 65%, #49307c);
+}
+.account-visual.byjus .visual-orbit {
+  border-color: #dfb6ff2b;
+}
+.account-visual.byjus .visual-topline {
+  color: #e0c6f5;
+}
+.account-visual.byjus .visual-title-row small {
+  color: #d6a8f5;
+}
+.account-visual.byjus .visual-title-row svg,
+.python-symbol {
+  color: #d6a8f5;
+}
+.python-symbol {
+  font: 700 22px "Space Mono", monospace;
+}
+.account-visual-note {
+  margin-left: auto;
+  color: #f7be87;
+  font: 8px "Space Mono", monospace;
+  white-space: nowrap;
+}
+.byjus-visual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 18px;
+}
+.byjus-visual-grid div {
+  border: 1px solid #ffffff2c;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff0b;
+}
+.byjus-visual-grid small,
+.byjus-visual-grid strong,
+.byjus-visual-grid span {
+  display: block;
+}
+.byjus-visual-grid small {
+  color: #d6a8f5;
+  font: 8px "Space Mono", monospace;
+}
+.byjus-visual-grid strong {
+  margin-top: 7px;
+  color: white;
+  font-size: 13px;
+}
+.byjus-visual-grid span {
+  margin-top: 5px;
+  color: #d5c4e6;
+  font-size: 9px;
+}
 .visual-body { padding: 12px 15px; }
 .visual-title-row { display: flex; justify-content: space-between; align-items: center; color: #f8f5ef; }
 .visual-title-row small { display: block; color: #88bbdd; font: 7px "Space Mono", monospace; letter-spacing: 1px; }
@@ -1934,6 +2051,16 @@ footer > a:not(.monogram) {
   color: #abc3df;
   display: block;
   margin-top: 5px;
+}
+.experience-highlights {
+  margin: 19px 0 0;
+  padding-left: 17px;
+  color: #b8c8e3;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.experience-highlights li + li {
+  margin-top: 8px;
 }
 .professional-card .motion-accordion h4 > button {
   font-size: 11px;
