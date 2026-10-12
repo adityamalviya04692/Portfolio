@@ -46,7 +46,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       if (alive) setReady(true);
     }, 3500);
     const image = new Image();
-    image.src = asset("workspace-aditya-headless.png");
+    image.src = asset("workspace-aditya.png");
     image
       .decode()
       .catch(() => {})
