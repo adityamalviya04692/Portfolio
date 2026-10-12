@@ -4,6 +4,19 @@ import { useMotionPreference } from "./MotionSystem";
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 const MOTION_START = 5;
 const MOTION_END = 7;
+// Face center and beard bottom, measured in every source frame from 5s to 7s.
+const HEAD_ANCHORS: [number, number][] = [
+  [394, 661], [400, 666], [411, 671], [424, 676], [439, 676],
+  [455, 670], [471, 662], [485, 653], [497, 639], [507, 628],
+  [514, 621], [518, 616], [522, 611], [524, 612], [526, 611],
+  [527, 610], [529, 609], [529, 608], [531, 607], [531, 607],
+  [533, 608], [532, 609], [532, 611], [530, 611], [528, 611],
+  [525, 610], [525, 609], [526, 609], [526, 609], [526, 610],
+  [526, 610], [526, 610], [524, 610], [524, 612], [524, 614],
+  [523, 618], [520, 623], [513, 630], [503, 637], [491, 649],
+  [478, 660], [466, 670], [454, 678], [445, 685], [437, 686],
+  [431, 687], [427, 687], [425, 686], [423, 686],
+];
 
 export default function ScrubVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -38,6 +51,14 @@ export default function ScrubVideo() {
         video.videoHeight,
         (video.videoWidth * canvas.height) / canvas.width,
       );
+      const frameIndex = Math.max(
+        0,
+        Math.min(HEAD_ANCHORS.length - 1, Math.round((video.currentTime - MOTION_START) * 24)),
+      );
+      const [faceCenter, beardBottom] = HEAD_ANCHORS[frameIndex];
+      const scale = canvas.width / video.videoWidth;
+      const offsetX = (420 - faceCenter) * scale;
+      const offsetY = (650 - beardBottom) * scale;
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(
         video,
@@ -45,16 +66,23 @@ export default function ScrubVideo() {
         0,
         video.videoWidth,
         sourceHeight,
-        0,
-        0,
+        offsetX,
+        offsetY,
         canvas.width,
         canvas.height,
       );
       const frame = context.getImageData(0, 0, canvas.width, canvas.height);
       for (let i = 0; i < frame.data.length; i += 4) {
+        const pixel = i / 4;
+        const sourceX = ((pixel % canvas.width) - offsetX) / scale;
+        const sourceY = (Math.floor(pixel / canvas.width) - offsetY) / scale;
         const white = Math.min(frame.data[i], frame.data[i + 1], frame.data[i + 2]);
         if (white > 225)
           frame.data[i + 3] *= Math.max(0, (242 - white) / 17);
+        const headRadius = sourceY < 450 ? 300 : Math.max(135, 300 - (sourceY - 450) * 0.6);
+        const sideFade = Math.max(0, Math.min(1, (headRadius - Math.abs(sourceX - faceCenter)) / 18));
+        const collarFade = Math.max(0, Math.min(1, (beardBottom + 20 - sourceY) / 28));
+        frame.data[i + 3] *= sideFade * collarFade;
       }
       context.putImageData(frame, 0, 0);
     }
@@ -100,7 +128,7 @@ export default function ScrubVideo() {
         <canvas
           ref={canvasRef}
           width="400"
-          height="304"
+          height="348"
           role="img"
           aria-label="Animated face of Aditya Malviya"
         />

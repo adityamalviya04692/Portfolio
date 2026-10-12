@@ -2884,12 +2884,11 @@ html[data-motion="off"] .scan-beam {
 .scrub-head-mask {
   position: absolute;
   left: 26.8%;
-  top: 17.3%;
+  top: 16%;
   width: 18%;
-  height: 20.5%;
+  height: 23.5%;
   overflow: hidden;
   background: transparent;
-  mask-image: radial-gradient(ellipse 48% 50% at 50% 50%, #000 68%, transparent 100%);
 }
 .scrub-head-mask video {
   position: absolute;

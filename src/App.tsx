@@ -179,8 +179,8 @@ function Portfolio() {
             >
               <Tilt className="desk-parallax seated-scene">
                 <img
-                  src={asset("assets/workspace-aditya.png")}
-                  alt="Aditya seated at his data engineering workspace"
+                  src={asset("assets/workspace-aditya-headless.png")}
+                  alt="Seated data engineer at his workspace, with an animated portrait"
                   loading="eager"
                   draggable={false}
                 />
