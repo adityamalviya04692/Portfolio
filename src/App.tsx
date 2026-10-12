@@ -177,7 +177,15 @@ function Portfolio() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <ScrubVideo />
+              <Tilt className="desk-parallax seated-scene">
+                <img
+                  src={asset("assets/workspace-aditya.png")}
+                  alt="Aditya seated at his data engineering workspace"
+                  loading="eager"
+                  draggable={false}
+                />
+                <ScrubVideo />
+              </Tilt>
             </motion.div>
             <div className="hero-bottom">
               <span>
