@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import data from "./data/portfolio.json";
 import ProjectArt from "./components/ProjectArt";
-import ScrubVideo from "./components/ScrubVideo";
 import {
   Accordion,
   AvatarPortal,
@@ -177,15 +176,17 @@ function Portfolio() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Tilt className="desk-parallax seated-scene">
+              <Tilt className="desk-parallax">
                 <img
                   src={asset("assets/workspace-aditya.png")}
-                  alt="Aditya seated at his data engineering workspace"
+                  alt="Personalized avatar of Aditya Malviya at his data engineering workspace"
                   loading="eager"
-                  draggable={false}
                 />
-                <ScrubVideo />
               </Tilt>
+              <div className="scene-note">
+                <span className="status-dot" /> PIPELINES RUNNING. IDEAS
+                FLOWING.
+              </div>
             </motion.div>
             <div className="hero-bottom">
               <span>
