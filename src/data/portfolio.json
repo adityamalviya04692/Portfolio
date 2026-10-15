@@ -205,6 +205,93 @@
   ],
   "projects": [
     {
+      "id": "datalens",
+      "title": "DataLens",
+      "subtitle": "Browser-native data profiling and quality workspace",
+      "category": "Data Quality · Analytics Engineering",
+      "description": "Privacy-first workspace for profiling CSV, Parquet, JSON and Excel files entirely in the browser. DuckDB-WASM powers set-based profiling, explainable quality scoring, adaptive visualizations, a SQL console and reproducible cleaning exports without uploading source data.",
+      "stack": [
+        "DuckDB-WASM",
+        "TypeScript",
+        "React 19",
+        "Apache ECharts",
+        "Apache Arrow",
+        "Vitest",
+        "GitHub Actions"
+      ],
+      "metrics": [
+        {
+          "value": "4 formats",
+          "label": "CSV · Parquet · JSON · Excel"
+        },
+        {
+          "value": "0 uploads",
+          "label": "Runs locally in the browser"
+        }
+      ],
+      "year": "2026",
+      "link": "https://adityamalviya04692.github.io/datalens/",
+      "highlight": true
+    },
+    {
+      "id": "flowforge",
+      "title": "FlowForge",
+      "subtitle": "Visual ETL builder with production-code export",
+      "category": "Data Engineering · Developer Tooling",
+      "description": "Graph-based ETL designer with live DuckDB-WASM execution, schema-aware joins and data-quality checks. A single pipeline graph exports equivalent DuckDB SQL, Spark SQL, PySpark and a ready-to-run dbt project.",
+      "stack": [
+        "DuckDB-WASM",
+        "TypeScript",
+        "React Flow",
+        "Spark SQL",
+        "PySpark",
+        "dbt",
+        "Vitest"
+      ],
+      "metrics": [
+        {
+          "value": "12",
+          "label": "Pipeline step types"
+        },
+        {
+          "value": "4 targets",
+          "label": "SQL · Spark · PySpark · dbt"
+        }
+      ],
+      "year": "2026",
+      "link": "https://adityamalviya04692.github.io/flowforge/",
+      "highlight": true
+    },
+    {
+      "id": "pipescope",
+      "title": "PipeScope",
+      "subtitle": "Spark diagnostics and column-level lineage",
+      "category": "Spark Performance · Data Lineage",
+      "description": "Browser-based Spark event-log doctor and SQL/dbt lineage explorer. It combines evidence-backed tuning findings, stage and SQL timelines, column-level impact analysis and a critical-path overlay while keeping logs and SQL local.",
+      "stack": [
+        "Apache Spark",
+        "TypeScript",
+        "Web Workers",
+        "Pyodide",
+        "sqlglot",
+        "React Flow",
+        "Apache ECharts"
+      ],
+      "metrics": [
+        {
+          "value": "17 rules",
+          "label": "Evidence-backed Spark findings"
+        },
+        {
+          "value": "10 dialects",
+          "label": "SQL lineage coverage"
+        }
+      ],
+      "year": "2026",
+      "link": "https://adityamalviya04692.github.io/pipescope/",
+      "highlight": true
+    },
+    {
       "id": "moriveda",
       "title": "Moriveda",
       "subtitle": "Pan-India D2C commerce platform · freelance",
