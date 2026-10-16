@@ -13,6 +13,7 @@ import {
   Check,
   Copy,
   X,
+  FileText,
 } from "lucide-react";
 import data from "./data/portfolio.json";
 import ProjectArt from "./components/ProjectArt";
@@ -30,7 +31,8 @@ import {
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 const profile = data.profile,
   email = `mailto:${profile.social.email}`;
-const moriveda = data.projects[0];
+const moriveda = data.projects.find((project) => project.id === "moriveda")!;
+const skillProjects = data.projects.filter((project) => project.id !== "moriveda");
 
 function Portfolio() {
   const [active, setActive] = useState("home"),
@@ -55,7 +57,7 @@ function Portfolio() {
         if (section.getBoundingClientRect().top <= window.innerHeight * 0.35)
           current = section.id;
       }
-      setActive(current === "profile" ? "about" : current);
+      setActive(current === "profile" ? "about" : current === "freelance" ? "projects" : current);
     };
     const schedule = () => {
       if (!scheduled) scheduled = requestAnimationFrame(update);
@@ -101,7 +103,7 @@ function Portfolio() {
           a<span>m.</span>
         </a>
         <nav aria-label="Main navigation">
-          {["about", "experience", "projects", "contact"].map((id) => (
+          {["about", "experience", "projects", "research", "contact"].map((id) => (
             <a
               key={id}
               href={`#${id}`}
@@ -428,7 +430,78 @@ function Portfolio() {
             </div>
           </div>
         </section>
-        <section id="projects" className="projects freelance-section">
+        <section id="projects" className="projects showcase-section" aria-labelledby="projects-heading">
+          <div className="section-wrap">
+            <Reveal className="section-heading">
+              <div>
+                <span className="label-sticker">PERSONAL PROJECTS</span>
+                <h2 id="projects-heading">Built to explore<span className="orange">.</span></h2>
+              </div>
+              <p>Tools I built to explore data quality, <br />pipeline design and Spark diagnostics.</p>
+            </Reveal>
+            <div className="showcase-grid">
+              {skillProjects.map((project, index) => (
+                <Reveal key={project.id}>
+                  <article className={`showcase-card showcase-${project.id}`} id={`project-${project.id}`}>
+                    <a className="showcase-visual" href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>
+                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}</span><span>OPEN DEMO <ArrowUpRight size={14} /></span></div>
+                      <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="700" loading="lazy" />
+                    </a>
+                    <div className="showcase-copy">
+                      <span className="showcase-category">{project.category}</span>
+                      <h3>{project.title}</h3>
+                      <p className="showcase-subtitle">{project.subtitle}</p>
+                      <p>{project.description}</p>
+                      <div className="tags">{project.stack.slice(0, 5).map((item) => <span key={item}>{item}</span>)}</div>
+                      <details className="showcase-details">
+                        <summary>Problem &amp; approach</summary>
+                        <p><strong>The problem.</strong> {project.problem}</p>
+                        <p><strong>What I built.</strong> {project.approach}</p>
+                      </details>
+                      <div className="showcase-links">
+                        <a className="showcase-primary" href={asset(project.document || "")} target="_blank" rel="noreferrer"><FileText size={17} /> View case study <span>PDF</span></a>
+                        <a href={project.github} target="_blank" rel="noreferrer"><Github size={16} /> Code <ArrowUpRight size={14} /></a>
+                        <a href={asset(project.presentation || "")} download><Download size={16} /> Slides <span>PPTX</span></a>
+                      </div>
+                    </div>
+                  </article>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+        <section id="research" className="research-section" aria-labelledby="research-heading">
+          <div className="section-wrap">
+            <Reveal className="section-heading">
+              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading">A closer look<span className="orange">.</span></h2></div>
+              <p>Testing the assumptions behind <br />Spark performance tuning.</p>
+            </Reveal>
+            <Reveal>
+              <article className="research-feature">
+                <div className="research-figure">
+                  <span className="research-kicker">SKEWBENCH / {data.research.year}</span>
+                  <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1400" height="1112" loading="lazy" /></a>
+                  <p>A figure from the paper. Results describe the measured experimental setup.</p>
+                </div>
+                <div className="research-copy">
+                  <span className="showcase-category">RESEARCH PAPER / {data.research.pages}</span>
+                  <h3>{data.research.title}</h3>
+                  <p className="research-subtitle">{data.research.subtitle}</p>
+                  <p>{data.research.description}</p>
+                  <p>{data.research.finding}</p>
+                  <p className="research-limit">{data.research.limitation}</p>
+                  <div className="tags">{data.research.stack.map((item) => <span key={item}>{item}</span>)}</div>
+                  <div className="showcase-links">
+                    <a className="showcase-primary" href={asset(data.research.document)} target="_blank" rel="noreferrer"><FileText size={17} /> Read paper <span>PDF</span></a>
+                    <a href={data.research.github} target="_blank" rel="noreferrer"><Github size={16} /> Research code <ArrowUpRight size={14} /></a>
+                    <a href={asset(data.research.presentation)} download><Download size={16} /> Presentation <span>PPTX</span></a>
+                  </div>
+                </div>
+              </article>
+            </Reveal>
+          </div>
+        </section>
+        <section id="freelance" className="projects freelance-section">
           <div className="section-wrap">
             <Reveal className="section-heading">
               <div>

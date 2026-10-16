@@ -1,5 +1,21 @@
 # Portfolio source alignment — 12 September 2026
 
+## Project and research update — 16 October 2026
+
+- DataLens, FlowForge and PipeScope are personal skill projects, rendered in Projects.
+- AQE vs Salting is independent research, rendered in Research. Moriveda remains
+  freelance work. Project lookup uses its stable ID rather than array position.
+- App visuals are screenshots captured from the live GitHub Pages applications.
+- The research visual is the paper's `fig_straggler.pdf`, rendered for the web.
+- Case-study PDFs use the six reviewed slides from each project presentation.
+  Original PPTX downloads are retained alongside the viewable PDFs.
+- The research paper is the verified 13-page revision. Its single-node results and
+  unvalidated theoretical optimum are described with their limits.
+- The research presentation is the user-provided `AQE vs Salting in Apache Spark.pptx`.
+- Public document assets live in `public/documents/`; preview images in
+  `public/assets/projects/`. Application and repository links use each project's
+  actual GitHub owner/repository, rather than reusing Moriveda's link.
+
 ## Sources reviewed
 
 - LinkedIn: https://www.linkedin.com/in/adityamalviya04692/ — live About, Experience, Projects, and certifications/education context.

@@ -206,6 +206,13 @@
   "projects": [
     {
       "id": "datalens",
+      "image": "assets/projects/datalens.webp",
+      "imageAlt": "DataLens quality score and computed insights in its yellow and black profiling workspace",
+      "github": "https://github.com/adityamalviya04692/datalens",
+      "document": "documents/datalens-case-study.pdf",
+      "presentation": "documents/datalens-case-study.pptx",
+      "problem": "A file can look ready for analysis while duplicates, missing values and type problems distort the result.",
+      "approach": "I built a local DuckDB profiling engine with explainable quality scores, adaptive charts and cleaning steps that generate reproducible SQL.",
       "title": "DataLens",
       "subtitle": "Browser-native data profiling and quality workspace",
       "category": "Data Quality · Analytics Engineering",
@@ -235,10 +242,17 @@
     },
     {
       "id": "flowforge",
+      "image": "assets/projects/flowforge.webp",
+      "imageAlt": "FlowForge green terminal-style workspace with a visual transformation graph and step inspector",
+      "github": "https://github.com/adityamalviya04692/flowforge",
+      "document": "documents/flowforge-case-study.pdf",
+      "presentation": "documents/flowforge-case-study.pptx",
+      "problem": "A visual pipeline is hard to trust when its transformations, intermediate results and exported code are hidden.",
+      "approach": "I built a graph-based workspace with step previews, topology validation, schema-aware joins and readable exports for SQL, PySpark and dbt.",
       "title": "FlowForge",
       "subtitle": "Visual ETL builder with production-code export",
       "category": "Data Engineering · Developer Tooling",
-      "description": "Graph-based ETL designer with live DuckDB-WASM execution, schema-aware joins and data-quality checks. A single pipeline graph exports equivalent DuckDB SQL, Spark SQL, PySpark and a ready-to-run dbt project.",
+      "description": "Graph-based ETL designer with local DuckDB-WASM execution, schema-aware joins and data-quality checks. A pipeline graph generates DuckDB SQL, Spark SQL, PySpark and dbt project files that can be inspected before deployment.",
       "stack": [
         "DuckDB-WASM",
         "TypeScript",
@@ -264,6 +278,13 @@
     },
     {
       "id": "pipescope",
+      "image": "assets/projects/pipescope.webp",
+      "imageAlt": "PipeScope Spark Doctor with execution metrics and warm plum and cream interface",
+      "github": "https://github.com/adityamalviya04692/pipescope",
+      "document": "documents/pipescope-case-study.pdf",
+      "presentation": "documents/pipescope-case-study.pptx",
+      "problem": "Spark performance evidence and SQL dependencies often live in separate tools, making it difficult to prioritize a bottleneck and assess its impact.",
+      "approach": "I connected event-log diagnostics with column-level lineage and table build times in a browser workspace. Demo performance figures use synthetic logs.",
       "title": "PipeScope",
       "subtitle": "Spark diagnostics and column-level lineage",
       "category": "Spark Performance · Data Lineage",
@@ -325,6 +346,22 @@
       "highlight": true
     }
   ],
+  "research": {
+    "id": "aqe-vs-salting",
+    "title": "AQE vs Salting",
+    "subtitle": "A cost model and decision procedure for skewed joins in Apache Spark",
+    "description": "My independent research investigates when Spark's Adaptive Query Execution handles join skew and when explicit salting helps. I built SKEWBENCH to compare six join strategies using reproducible workloads and Spark event logs.",
+    "finding": "On the measured workload, the skew-join rule did not engage until the advisory partition size was lowered in configuration probes. The paper examines the evidence, replication costs and measurement uncertainty.",
+    "limitation": "Single-node evaluation. The salt-cardinality optimum is a theoretical result that these experiments do not validate.",
+    "image": "assets/projects/aqe-salting.webp",
+    "imageAlt": "Research figure comparing the longest join-stage task across baseline, AQE and selective salting",
+    "document": "documents/aqe-vs-salting-paper.pdf",
+    "presentation": "documents/aqe-vs-salting-presentation.pptx",
+    "github": "https://github.com/adityamalviya04692/spark-skew-bench",
+    "stack": ["Apache Spark", "PySpark", "Python", "Benchmarking", "Event-log analysis"],
+    "year": "2026",
+    "pages": "13 pages"
+  },
   "certifications": [
     {
       "name": "Microsoft Certified: Fabric Data Engineer Associate",
