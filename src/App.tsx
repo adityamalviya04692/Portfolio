@@ -14,6 +14,7 @@ import {
   Copy,
   X,
   FileText,
+  ChevronDown,
 } from "lucide-react";
 import data from "./data/portfolio.json";
 import ProjectArt from "./components/ProjectArt";
@@ -57,7 +58,7 @@ function Portfolio() {
         if (section.getBoundingClientRect().top <= window.innerHeight * 0.35)
           current = section.id;
       }
-      setActive(current === "profile" ? "about" : current === "freelance" ? "projects" : current);
+      setActive(current === "profile" ? "about" : current);
     };
     const schedule = () => {
       if (!scheduled) scheduled = requestAnimationFrame(update);
@@ -103,7 +104,7 @@ function Portfolio() {
           a<span>m.</span>
         </a>
         <nav aria-label="Main navigation">
-          {["about", "experience", "projects", "research", "contact"].map((id) => (
+          {["about", "experience", "projects", "research", "freelance", "contact"].map((id) => (
             <a
               key={id}
               href={`#${id}`}
@@ -454,7 +455,14 @@ function Portfolio() {
                       <p>{project.description}</p>
                       <div className="tags">{project.stack.slice(0, 5).map((item) => <span key={item}>{item}</span>)}</div>
                       <details className="showcase-details">
-                        <summary>Problem &amp; approach</summary>
+                        <summary>
+                          <span>Problem &amp; approach</span>
+                          <span className="details-affordance">
+                            <span className="details-expand">Expand</span>
+                            <span className="details-collapse">Collapse</span>
+                            <ChevronDown size={18} aria-hidden="true" />
+                          </span>
+                        </summary>
                         <p><strong>The problem.</strong> {project.problem}</p>
                         <p><strong>What I built.</strong> {project.approach}</p>
                       </details>
@@ -473,15 +481,15 @@ function Portfolio() {
         <section id="research" className="research-section" aria-labelledby="research-heading">
           <div className="section-wrap">
             <Reveal className="section-heading">
-              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading">A closer look<span className="orange">.</span></h2></div>
+              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading">Research paper<span className="orange">.</span></h2></div>
               <p>Testing the assumptions behind <br />Spark performance tuning.</p>
             </Reveal>
             <Reveal>
               <article className="research-feature">
                 <div className="research-figure">
                   <span className="research-kicker">SKEWBENCH / {data.research.year}</span>
-                  <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1400" height="1112" loading="lazy" /></a>
-                  <p>A figure from the paper. Results describe the measured experimental setup.</p>
+                  <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1536" height="1024" loading="lazy" /></a>
+                  <p>A conceptual illustration of adaptive splitting and selective salting. Read the paper for measured results and limitations.</p>
                 </div>
                 <div className="research-copy">
                   <span className="showcase-category">RESEARCH PAPER / {data.research.pages}</span>

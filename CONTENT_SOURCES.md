@@ -6,7 +6,11 @@
 - AQE vs Salting is independent research, rendered in Research. Moriveda remains
   freelance work. Project lookup uses its stable ID rather than array position.
 - App visuals are screenshots captured from the live GitHub Pages applications.
-- The research visual is the paper's `fig_straggler.pdf`, rendered for the web.
+- The research visual is an original conceptual illustration generated with the
+  built-in image tool after reviewing the paper, presentation and cost-model code.
+  It contrasts adaptive partition splitting with selective hot-key salting and
+  matching-row replication. It is labeled as an illustration, not measured data.
+  Generation prompt: `assets/research-image-prompt.md`.
 - Case-study PDFs use the six reviewed slides from each project presentation.
   Original PPTX downloads are retained alongside the viewable PDFs.
 - The research paper is the verified 13-page revision. Its single-node results and
