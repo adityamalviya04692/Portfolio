@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useId,
   useRef,
   useState,
   type ReactNode,
@@ -379,13 +380,15 @@ export function AvatarPortal() {
 export function Accordion({
   title,
   children,
+  className = "",
 }: {
   title: string;
   children: ReactNode;
+  className?: string;
 }) {
   const [open, setOpen] = useState(false),
     { reduced } = useMotionPreference();
-  const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const id = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}${useId().replace(/:/g, "")}`;
   useEffect(() => {
     const syncHash = () => {
       if (
@@ -399,7 +402,7 @@ export function Accordion({
     return () => window.removeEventListener("hashchange", syncHash);
   }, [title]);
   return (
-    <div className="motion-accordion">
+    <div className={`motion-accordion ${className}`.trim()}>
       <h4>
         <button
           aria-expanded={open}
@@ -407,7 +410,7 @@ export function Accordion({
           onClick={() => setOpen(!open)}
         >
           {title}
-          <motion.span animate={{ rotate: open ? 45 : 0 }}>+</motion.span>
+          <motion.span aria-hidden="true" animate={{ rotate: open ? 45 : 0 }}>+</motion.span>
         </button>
       </h4>
       <AnimatePresence initial={false}>

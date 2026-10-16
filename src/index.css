@@ -2082,8 +2082,12 @@ footer > a:not(.monogram) {
 .experience-highlights li + li {
   margin-top: 8px;
 }
-.professional-card .motion-accordion h4 > button {
-  font-size: 11px;
+.professional-card .motion-accordion h4 > button,
+.showcase-details.motion-accordion h4 > button {
+  font-size: 13px;
+}
+.motion-accordion h4 > button:hover > span {
+  color: var(--orange);
 }
 .professional-card .chart-bars i {
   transform-origin: 50% 100%;
@@ -2106,37 +2110,32 @@ footer > a:not(.monogram) {
 .research-section .section-heading h2 { font-size: clamp(42px, 6vw, 76px); letter-spacing: -3px; }
 .showcase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
 .showcase-grid > div:last-child { grid-column: 1 / -1; }
-.showcase-card { overflow: hidden; border: 1px solid #d8d2c4; border-radius: 20px; background: #fffdf7; }
-.showcase-grid > div:last-child .showcase-card { display: grid; grid-template-columns: 1.05fr 1fr; }
+.showcase-card { display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid #d8d2c4; border-radius: 20px; background: #fffdf7; }
 .showcase-visual { display: flex; flex-direction: column; background: #eee8dc; }
 .showcase-browser { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px; font: 11px "Space Mono", monospace; }
 .showcase-browser > span:last-child { display: inline-flex; align-items: center; gap: 6px; }
 .showcase-datalens .showcase-browser { background: #efe904; color: #111; }
 .showcase-flowforge .showcase-browser { background: #0b160d; color: #a4efaa; }
 .showcase-pipescope .showcase-browser { background: #251c2b; color: #faf7ef; }
-.showcase-visual img { width: 100%; height: auto; aspect-ratio: 1440 / 700; object-fit: contain; }
-.showcase-pipescope .showcase-visual { justify-content: center; background: #faf7ef; }
-.showcase-copy { padding: 30px; }
+.showcase-visual img { display: block; width: 100%; height: auto; aspect-ratio: 1440 / 645; object-fit: cover; object-position: top center; }
+.showcase-copy { display: flex; flex: 1; flex-direction: column; padding: 30px; }
+.showcase-meta { margin-top: auto; }
+/* Full-width card: screenshot spans the card, copy splits into two columns below it */
+.showcase-grid > div:last-child .showcase-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; padding: 36px 40px 30px; }
+.showcase-grid > div:last-child .showcase-meta > .tags:first-child { margin-top: 0; }
 .showcase-category { font: 10px "Space Mono", monospace; text-transform: uppercase; letter-spacing: 1px; color: #635e54; }
 .showcase-copy h3 { margin-top: 13px; font-size: 37px; letter-spacing: -1.5px; }
 .showcase-copy p, .research-copy > p { font-size: 15px; line-height: 1.75; color: #59564e; }
 .showcase-copy .showcase-subtitle { margin: 6px 0 16px; font-size: 17px; color: var(--ink); }
 .showcase-copy .tags, .research-copy .tags { margin: 22px 0; gap: 7px; }
 .showcase-copy .tags span, .research-copy .tags span { font-size: 10px; padding: 6px 9px; background: #f1ede3; border: 1px solid #e3ddcf; }
-.showcase-details { border-top: 1px solid #e6e0d5; padding: 16px 0; }
-.showcase-details summary { display: flex; align-items: center; justify-content: space-between; gap: 15px; min-height: 48px; font-size: 13px; font-weight: 700; list-style: none; }
-.showcase-details summary::-webkit-details-marker { display: none; }
-.details-affordance { display: inline-flex; align-items: center; gap: 7px; color: var(--blue); font-size: 11px; font-weight: 600; }
-.details-collapse { display: none; }
-.showcase-details[open] .details-expand { display: none; }
-.showcase-details[open] .details-collapse { display: inline; }
-.showcase-details[open] .details-affordance svg { transform: rotate(180deg); }
-.showcase-details summary:hover .details-affordance { color: #b95d1d; }
-.showcase-details p { margin-top: 14px; font-size: 14px; }
+.showcase-details.motion-accordion { border-top: 1px solid #e6e0d5; border-bottom: 1px solid #e6e0d5; }
+.showcase-details .accordion-panel p { margin-top: 0; font-size: 14px; }
+.showcase-details .accordion-panel p + p { margin-top: 12px; }
 .showcase-links { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 14px; }
 .showcase-links a { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; min-height: 44px; }
 .showcase-links a > span { font: 9px "Space Mono", monospace; opacity: .7; }
-.showcase-links .showcase-primary { padding: 11px 16px; background: var(--blue); color: white; border-radius: 8px; }
+.showcase-links .showcase-primary { padding: 11px 18px; background: var(--blue); color: white; border-radius: 30px; }
 .showcase-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .research-section { padding: 100px 0; background: #e9e4d8; border-top: 1px solid #d8d2c4; border-bottom: 1px solid #d8d2c4; }
 .research-feature { display: grid; grid-template-columns: .95fr 1.05fr; gap: 55px; align-items: center; }
@@ -2149,7 +2148,9 @@ footer > a:not(.monogram) {
 .research-copy .research-limit { padding-left: 14px; border-left: 3px solid var(--orange); font-size: 13px; }
 @media (max-width: 800px) {
   .showcase-grid { grid-template-columns: 1fr; gap: 26px; }
-  .showcase-grid > div:last-child .showcase-card, .research-feature { display: block; }
+  .research-feature { display: block; }
+  .showcase-grid > div:last-child .showcase-copy { display: block; padding: 24px; }
+  .showcase-grid > div:last-child .showcase-meta > .tags:first-child { margin-top: 22px; }
   .showcase-copy { padding: 24px; }
   .research-copy { margin-top: 35px; }
   .showcase-section, .research-section { padding: 75px 20px; }
@@ -2159,7 +2160,7 @@ footer > a:not(.monogram) {
   .site-header nav { gap: 1px; }
   .site-header nav a { padding-left: 8px; padding-right: 8px; font-size: 10px; }
   .showcase-browser { font-size: 9px; padding: 12px 14px; }
-  .showcase-copy { padding: 22px 18px; }
+  .showcase-copy, .showcase-grid > div:last-child .showcase-copy { padding: 22px 18px; }
   .showcase-links { gap: 12px; }
 }
 .freelance-section .section-heading h2 {

@@ -14,7 +14,6 @@ import {
   Copy,
   X,
   FileText,
-  ChevronDown,
 } from "lucide-react";
 import data from "./data/portfolio.json";
 import ProjectArt from "./components/ProjectArt";
@@ -446,30 +445,26 @@ function Portfolio() {
                   <article className={`showcase-card showcase-${project.id}`} id={`project-${project.id}`}>
                     <a className="showcase-visual" href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>
                       <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}</span><span>OPEN DEMO <ArrowUpRight size={14} /></span></div>
-                      <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="700" loading="lazy" />
+                      <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
                     </a>
                     <div className="showcase-copy">
+                      <div className="showcase-intro">
                       <span className="showcase-category">{project.category}</span>
                       <h3>{project.title}</h3>
                       <p className="showcase-subtitle">{project.subtitle}</p>
                       <p>{project.description}</p>
+                      </div>
+                      <div className="showcase-meta">
                       <div className="tags">{project.stack.slice(0, 5).map((item) => <span key={item}>{item}</span>)}</div>
-                      <details className="showcase-details">
-                        <summary>
-                          <span>Problem &amp; approach</span>
-                          <span className="details-affordance">
-                            <span className="details-expand">Expand</span>
-                            <span className="details-collapse">Collapse</span>
-                            <ChevronDown size={18} aria-hidden="true" />
-                          </span>
-                        </summary>
+                      <Accordion title="Problem & approach" className="showcase-details">
                         <p><strong>The problem.</strong> {project.problem}</p>
                         <p><strong>What I built.</strong> {project.approach}</p>
-                      </details>
+                      </Accordion>
                       <div className="showcase-links">
                         <a className="showcase-primary" href={asset(project.document || "")} target="_blank" rel="noreferrer"><FileText size={17} /> View case study <span>PDF</span></a>
                         <a href={project.github} target="_blank" rel="noreferrer"><Github size={16} /> Code <ArrowUpRight size={14} /></a>
                         <a href={asset(project.presentation || "")} download><Download size={16} /> Slides <span>PPTX</span></a>
+                      </div>
                       </div>
                     </div>
                   </article>
