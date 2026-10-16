@@ -2109,7 +2109,6 @@ footer > a:not(.monogram) {
 .showcase-section .section-heading h2,
 .research-section .section-heading h2 { font-size: clamp(42px, 6vw, 76px); letter-spacing: -3px; }
 .showcase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
-.showcase-grid > div:last-child { grid-column: 1 / -1; }
 .showcase-card { display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid #d8d2c4; border-radius: 20px; background: #fffdf7; }
 .showcase-visual { display: flex; flex-direction: column; background: #eee8dc; }
 .showcase-browser { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px; font: 11px "Space Mono", monospace; }
@@ -2117,12 +2116,11 @@ footer > a:not(.monogram) {
 .showcase-datalens .showcase-browser { background: #efe904; color: #111; }
 .showcase-flowforge .showcase-browser { background: #0b160d; color: #a4efaa; }
 .showcase-pipescope .showcase-browser { background: #251c2b; color: #faf7ef; }
+.showcase-queryroom .showcase-browser { background: #18392f; color: #c9f16c; }
 .showcase-visual img { display: block; width: 100%; height: auto; aspect-ratio: 1440 / 645; object-fit: cover; object-position: top center; }
 .showcase-copy { display: flex; flex: 1; flex-direction: column; padding: 30px; }
 .showcase-meta { margin-top: auto; }
 /* Full-width card: screenshot spans the card, copy splits into two columns below it */
-.showcase-grid > div:last-child .showcase-copy { display: grid; grid-template-columns: 1fr 1fr; gap: 0 56px; padding: 36px 40px 30px; }
-.showcase-grid > div:last-child .showcase-meta > .tags:first-child { margin-top: 0; }
 .showcase-category { font: 10px "Space Mono", monospace; text-transform: uppercase; letter-spacing: 1px; color: #635e54; }
 .showcase-copy h3 { margin-top: 13px; font-size: 37px; letter-spacing: -1.5px; }
 .showcase-copy p, .research-copy > p { font-size: 15px; line-height: 1.75; color: #59564e; }
@@ -2149,8 +2147,6 @@ footer > a:not(.monogram) {
 @media (max-width: 800px) {
   .showcase-grid { grid-template-columns: 1fr; gap: 26px; }
   .research-feature { display: block; }
-  .showcase-grid > div:last-child .showcase-copy { display: block; padding: 24px; }
-  .showcase-grid > div:last-child .showcase-meta > .tags:first-child { margin-top: 22px; }
   .showcase-copy { padding: 24px; }
   .research-copy { margin-top: 35px; }
   .showcase-section, .research-section { padding: 75px 20px; }
@@ -2160,7 +2156,7 @@ footer > a:not(.monogram) {
   .site-header nav { gap: 1px; }
   .site-header nav a { padding-left: 8px; padding-right: 8px; font-size: 10px; }
   .showcase-browser { font-size: 9px; padding: 12px 14px; }
-  .showcase-copy, .showcase-grid > div:last-child .showcase-copy { padding: 22px 18px; }
+  .showcase-copy { padding: 22px 18px; }
   .showcase-links { gap: 12px; }
 }
 .freelance-section .section-heading h2 {
