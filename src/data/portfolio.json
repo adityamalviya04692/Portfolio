@@ -208,7 +208,7 @@
       "id": "datalens",
       "image": "assets/projects/datalens.webp",
       "imageAlt": "DataLens quality score and computed insights in its yellow and black profiling workspace",
-      "github": "https://github.com/adityamalviya04692/datalens",
+      "github": "https://github.com/adityamalviya04692/Project-DataLens",
       "document": "documents/datalens-case-study.pdf",
       "presentation": "documents/datalens-case-study.pptx",
       "problem": "A file can look ready for analysis while duplicates, missing values and type problems distort the result.",
@@ -237,14 +237,14 @@
         }
       ],
       "year": "2026",
-      "link": "https://adityamalviya04692.github.io/datalens/",
+      "link": "https://adityamalviya04692.github.io/Project-DataLens/",
       "highlight": true
     },
     {
       "id": "flowforge",
       "image": "assets/projects/flowforge.webp",
       "imageAlt": "FlowForge green terminal-style workspace with a visual transformation graph and step inspector",
-      "github": "https://github.com/adityamalviya04692/flowforge",
+      "github": "https://github.com/adityamalviya04692/Project-FlowForge",
       "document": "documents/flowforge-case-study.pdf",
       "presentation": "documents/flowforge-case-study.pptx",
       "problem": "A visual pipeline is hard to trust when its transformations, intermediate results and exported code are hidden.",
@@ -273,14 +273,14 @@
         }
       ],
       "year": "2026",
-      "link": "https://adityamalviya04692.github.io/flowforge/",
+      "link": "https://adityamalviya04692.github.io/Project-FlowForge/",
       "highlight": true
     },
     {
       "id": "pipescope",
       "image": "assets/projects/pipescope.webp",
       "imageAlt": "PipeScope Spark Doctor with execution metrics and warm plum and cream interface",
-      "github": "https://github.com/adityamalviya04692/pipescope",
+      "github": "https://github.com/adityamalviya04692/Project-PipeScope",
       "document": "documents/pipescope-case-study.pdf",
       "presentation": "documents/pipescope-case-study.pptx",
       "problem": "Spark performance evidence and SQL dependencies often live in separate tools, making it difficult to prioritize a bottleneck and assess its impact.",
@@ -309,7 +309,7 @@
         }
       ],
       "year": "2026",
-      "link": "https://adityamalviya04692.github.io/pipescope/",
+      "link": "https://adityamalviya04692.github.io/Project-PipeScope/",
       "highlight": true
     },
     {
@@ -391,7 +391,7 @@
     "imageAlt": "AQE vs Salting research illustration: adaptive partition splitting alongside selective hot-key salting with replicated matching rows",
     "document": "documents/aqe-vs-salting-paper.pdf",
     "presentation": "documents/aqe-vs-salting-presentation.pptx",
-    "github": "https://github.com/adityamalviya04692/spark-skew-bench",
+    "github": "https://github.com/adityamalviya04692/Reseach_Paper-AQE-vs-Salting",
     "stack": [
       "Apache Spark",
       "PySpark",
