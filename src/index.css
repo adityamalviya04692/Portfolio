@@ -2108,7 +2108,7 @@ footer > a:not(.monogram) {
 .showcase-section { padding: 110px 0 100px; }
 .showcase-section .section-heading h2,
 .research-section .section-heading h2 { font-size: clamp(42px, 6vw, 76px); letter-spacing: -3px; }
-.showcase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
+.showcase-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 36px; }
 .showcase-card { display: flex; flex-direction: column; height: 100%; overflow: hidden; border: 1px solid #d8d2c4; border-radius: 20px; background: #fffdf7; }
 .showcase-visual { display: flex; flex-direction: column; background: #eee8dc; }
 .showcase-browser { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px; font: 11px "Space Mono", monospace; }
@@ -2145,7 +2145,7 @@ footer > a:not(.monogram) {
 .research-copy .research-subtitle { font-size: 20px; line-height: 1.45; color: var(--ink); }
 .research-copy .research-limit { padding-left: 14px; border-left: 3px solid var(--orange); font-size: 13px; }
 @media (max-width: 800px) {
-  .showcase-grid { grid-template-columns: 1fr; gap: 26px; }
+  .showcase-grid { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 26px; }
   .research-feature { display: block; }
   .showcase-copy { padding: 24px; }
   .research-copy { margin-top: 35px; }
