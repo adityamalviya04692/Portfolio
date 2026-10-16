@@ -20,7 +20,7 @@ Open the `/aditya-portfolio/` path displayed by Vite.
 - `src/index.css`: responsive layout, typography, palette, hover motion, and reduced-motion support.
 - `public/assets/workspace-aditya.png`: personalized hero avatar based on the supplied photo, generated using the built-in image generation tool. See `AVATAR.md` for its identity reference and edit prompt.
 - `public/assets/aditya-portrait.png`: unaltered supplied photo used in the About section.
-- `public/Aditya_Malviya_Resume.pdf`: existing resume.
+- `public/Aditya_Malviya_Senior_Data_Engineer.pdf` / `.docx`: current resume, downloaded from the site.
 
 `#experience` links to the dedicated professional section; `#skills` opens the skills disclosure. Social links, mail, telephone and resume links remain available. Contact actions use the user's email client; there is no simulated form submission.
 

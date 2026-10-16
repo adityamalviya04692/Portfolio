@@ -11,8 +11,8 @@
     "bio": "Senior Data Engineer at Tata Consultancy Services with nearly 5 years across two client accounts, Rolls-Royce Digital and Avery Dennison (Smartrac). I design and own production lakehouse pipelines with PySpark, SQL/T-SQL, Python, Azure Databricks, Azure Data Factory, Delta Lake and Unity Catalog, processing ~27 GB/day of streaming data (Event Hubs, Kafka, Structured Streaming) and 5-7 GB/day of batch data. I lead a 6-member offshore team as Scrum Master: stand-ups, boards, pull-request approvals and delivery to the client.",
     "bioSecondary": "I care about the unglamorous parts — the skewed join that quietly costs an hour a night, the cluster that is three sizes too big, the pipeline nobody can redeploy safely. Fixing those is most of the job.",
     "avatar": "assets/aditya-portrait.png",
-    "resume": "Aditya_Malviya_Senior_Data_Engineer_Azure_Databricks.pdf",
-    "resumeDocx": "Aditya_Malviya_Senior_Data_Engineer_Azure_Databricks.docx",
+    "resume": "Aditya_Malviya_Senior_Data_Engineer.pdf",
+    "resumeDocx": "Aditya_Malviya_Senior_Data_Engineer.docx",
     "social": {
       "linkedin": "https://www.linkedin.com/in/adityamalviya04692/",
       "github": "https://github.com/adityamalviya04692",
@@ -205,42 +205,6 @@
   ],
   "projects": [
     {
-      "id": "datalens",
-      "image": "assets/projects/datalens.webp",
-      "imageAlt": "DataLens quality score and computed insights in its yellow and black profiling workspace",
-      "github": "https://github.com/adityamalviya04692/Project-DataLens",
-      "document": "documents/datalens-case-study.pdf",
-      "presentation": "documents/datalens-case-study.pptx",
-      "problem": "A file can look ready for analysis while duplicates, missing values and type problems distort the result.",
-      "approach": "I built a local DuckDB profiling engine with explainable quality scores, adaptive charts and cleaning steps that generate reproducible SQL.",
-      "title": "DataLens",
-      "subtitle": "Browser-native data profiling and quality workspace",
-      "category": "Data Quality · Analytics Engineering",
-      "description": "Privacy-first workspace for profiling CSV, Parquet, JSON and Excel files entirely in the browser. DuckDB-WASM powers set-based profiling, explainable quality scoring, adaptive visualizations, a SQL console and reproducible cleaning exports without uploading source data.",
-      "stack": [
-        "DuckDB-WASM",
-        "TypeScript",
-        "React 19",
-        "Apache ECharts",
-        "Apache Arrow",
-        "Vitest",
-        "GitHub Actions"
-      ],
-      "metrics": [
-        {
-          "value": "4 formats",
-          "label": "CSV · Parquet · JSON · Excel"
-        },
-        {
-          "value": "0 uploads",
-          "label": "Runs locally in the browser"
-        }
-      ],
-      "year": "2026",
-      "link": "https://adityamalviya04692.github.io/Project-DataLens/",
-      "highlight": true
-    },
-    {
       "id": "flowforge",
       "image": "assets/projects/flowforge.webp",
       "imageAlt": "FlowForge green terminal-style workspace with a visual transformation graph and step inspector",
@@ -272,7 +236,7 @@
           "label": "SQL · Spark · PySpark · dbt"
         }
       ],
-      "year": "2026",
+      "year": "Oct 2026 — Present",
       "link": "https://adityamalviya04692.github.io/Project-FlowForge/",
       "highlight": true
     },
@@ -308,8 +272,44 @@
           "label": "SQL lineage coverage"
         }
       ],
-      "year": "2026",
+      "year": "Aug 2025 — Present",
       "link": "https://adityamalviya04692.github.io/Project-PipeScope/",
+      "highlight": true
+    },
+    {
+      "id": "datalens",
+      "image": "assets/projects/datalens.webp",
+      "imageAlt": "DataLens quality score and computed insights in its yellow and black profiling workspace",
+      "github": "https://github.com/adityamalviya04692/Project-DataLens",
+      "document": "documents/datalens-case-study.pdf",
+      "presentation": "documents/datalens-case-study.pptx",
+      "problem": "A file can look ready for analysis while duplicates, missing values and type problems distort the result.",
+      "approach": "I built a local DuckDB profiling engine with explainable quality scores, adaptive charts and cleaning steps that generate reproducible SQL.",
+      "title": "DataLens",
+      "subtitle": "Browser-native data profiling and quality workspace",
+      "category": "Data Quality · Analytics Engineering",
+      "description": "Privacy-first workspace for profiling CSV, Parquet, JSON and Excel files entirely in the browser. DuckDB-WASM powers set-based profiling, explainable quality scoring, adaptive visualizations, a SQL console and reproducible cleaning exports without uploading source data.",
+      "stack": [
+        "DuckDB-WASM",
+        "TypeScript",
+        "React 19",
+        "Apache ECharts",
+        "Apache Arrow",
+        "Vitest",
+        "GitHub Actions"
+      ],
+      "metrics": [
+        {
+          "value": "4 formats",
+          "label": "CSV · Parquet · JSON · Excel"
+        },
+        {
+          "value": "0 uploads",
+          "label": "Runs locally in the browser"
+        }
+      ],
+      "year": "Jul 2024 — Present",
+      "link": "https://adityamalviya04692.github.io/Project-DataLens/",
       "highlight": true
     },
     {
@@ -342,7 +342,7 @@
           "label": "Tables to explore"
         }
       ],
-      "year": "2026",
+      "year": "Apr 2023 — Present",
       "link": "https://adityamalviya04692.github.io/Project-QueryRoom/",
       "highlight": true
     },
@@ -399,7 +399,7 @@
       "Benchmarking",
       "Event-log analysis"
     ],
-    "year": "2026",
+    "year": "Aug 2026",
     "pages": "13 pages"
   },
   "certifications": [

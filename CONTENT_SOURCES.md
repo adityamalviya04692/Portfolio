@@ -1,5 +1,13 @@
 # Portfolio source alignment — 12 September 2026
 
+## Resume and project dates — 16 October 2026
+
+- The downloadable resume is now `public/Aditya_Malviya_Senior_Data_Engineer.pdf` (and `.docx`),
+  built from the resume in Latest_Resumes. Older resume files were removed from `public/`.
+- Project dates follow the LinkedIn Projects section: QueryRoom Apr 2023, DataLens Jul 2024,
+  PipeScope Aug 2025, FlowForge Oct 2026 (all to present). Projects are listed newest first.
+  The AQE vs Salting research is dated Aug 2026, when its repository was created.
+
 ## Project and research update — 16 October 2026
 
 - DataLens, FlowForge and PipeScope are personal skill projects, rendered in Projects.
