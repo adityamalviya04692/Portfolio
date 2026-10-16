@@ -481,7 +481,7 @@ function Portfolio() {
         <section id="research" className="research-section" aria-labelledby="research-heading">
           <div className="section-wrap">
             <Reveal className="section-heading">
-              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading">Research paper<span className="orange">.</span></h2></div>
+              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading">Built on evidence<span className="orange">.</span></h2></div>
               <p>Testing the assumptions behind <br />Spark performance tuning.</p>
             </Reveal>
             <Reveal>
@@ -517,7 +517,7 @@ function Portfolio() {
                   <Scramble text="INDEPENDENT WORK" />
                 </span>
                 <h2>
-                  Freelance<span className="orange">.</span>
+                  Built end to end<span className="orange">.</span>
                 </h2>
               </div>
               <p>
