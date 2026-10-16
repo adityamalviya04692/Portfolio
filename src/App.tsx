@@ -437,7 +437,7 @@ function Portfolio() {
                 <span className="label-sticker">PERSONAL PROJECTS</span>
                 <h2 id="projects-heading">Built to explore<span className="orange">.</span></h2>
               </div>
-              <p>Tools I built to explore data quality, <br />pipeline design and Spark diagnostics.</p>
+              <p>Tools I built to explore data quality, <br />pipeline design, Spark diagnostics and SQL learning.</p>
             </Reveal>
             <div className="showcase-grid">
               {skillProjects.map((project, index) => (
@@ -461,9 +461,9 @@ function Portfolio() {
                         <p><strong>What I built.</strong> {project.approach}</p>
                       </Accordion>
                       <div className="showcase-links">
-                        <a className="showcase-primary" href={asset(project.document || "")} target="_blank" rel="noreferrer"><FileText size={17} /> View case study <span>PDF</span></a>
+                        {project.document ? (<a className="showcase-primary" href={asset(project.document || "")} target="_blank" rel="noreferrer"><FileText size={17} /> View case study <span>PDF</span></a>) : (<a className="showcase-primary" href={project.link} target="_blank" rel="noreferrer">Try Queryroom <ArrowUpRight size={17} /></a>)}
                         <a href={project.github} target="_blank" rel="noreferrer"><Github size={16} /> Code <ArrowUpRight size={14} /></a>
-                        <a href={asset(project.presentation || "")} download><Download size={16} /> Slides <span>PPTX</span></a>
+                        {project.presentation && (<a href={asset(project.presentation || "")} download><Download size={16} /> Slides <span>PPTX</span></a>)}
                       </div>
                       </div>
                     </div>

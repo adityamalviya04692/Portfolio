@@ -313,6 +313,40 @@
       "highlight": true
     },
     {
+      "id": "queryroom",
+      "image": "assets/projects/queryroom.png",
+      "imageAlt": "Queryroom SQL learning studio with forest-green navigation, an ivory workspace, and a live SQL practice preview",
+      "github": "https://github.com/adityamalviya04692/Project-QueryRoom",
+      "document": "",
+      "presentation": "",
+      "problem": "Students can read SQL concepts without having a clear way to practise queries, inspect real data, or understand why an answer is wrong.",
+      "approach": "I built an interactive learning studio with embedded SQLite execution, progressive hints, reference-answer checks, a database browser, and chapter-based book practice.",
+      "title": "Queryroom",
+      "subtitle": "Interactive SQL learning studio for students",
+      "category": "EdTech · SQL Learning",
+      "description": "An edtech portfolio project that turns SQL study into hands-on practice. Students can explore 332 interview-style questions, execute queries against 37 SQLite tables, reveal progressive hints, and verify answers. Book Practice includes exercises and example tables from Sams Teach Yourself SQL in 24 Hours, alongside a separate bank covering common industry SQL patterns. Progress is saved locally, with a standalone offline edition.",
+      "stack": [
+        "JavaScript",
+        "SQLite",
+        "WebAssembly",
+        "HTML5 / CSS3",
+        "sql.js"
+      ],
+      "metrics": [
+        {
+          "value": "332",
+          "label": "Interview practice questions"
+        },
+        {
+          "value": "37",
+          "label": "Tables to explore"
+        }
+      ],
+      "year": "2026",
+      "link": "https://adityamalviya04692.github.io/Project-QueryRoom/",
+      "highlight": true
+    },
+    {
       "id": "moriveda",
       "title": "Moriveda",
       "subtitle": "Pan-India D2C commerce platform · freelance",
@@ -358,7 +392,13 @@
     "document": "documents/aqe-vs-salting-paper.pdf",
     "presentation": "documents/aqe-vs-salting-presentation.pptx",
     "github": "https://github.com/adityamalviya04692/spark-skew-bench",
-    "stack": ["Apache Spark", "PySpark", "Python", "Benchmarking", "Event-log analysis"],
+    "stack": [
+      "Apache Spark",
+      "PySpark",
+      "Python",
+      "Benchmarking",
+      "Event-log analysis"
+    ],
     "year": "2026",
     "pages": "13 pages"
   },
