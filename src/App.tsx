@@ -472,7 +472,7 @@ function Portfolio() {
                 <span className="label-sticker">PERSONAL PROJECTS</span>
                 <h2 id="projects-heading">Built to explore<span className="orange">.</span></h2>
               </div>
-              <p>Tools I built to explore data quality, <br />pipeline design, Spark diagnostics and SQL learning.</p>
+              <p>Tools I built to explore document AI, data quality, <br />pipeline design, Spark diagnostics and SQL learning.</p>
             </Reveal>
             <ProjectMasonry>
               {skillProjects.map((project, index) => (
@@ -482,7 +482,7 @@ function Portfolio() {
                       <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a></div>
                       <button className="showcase-film-preview" onClick={(event) => playProject(project.id, event.currentTarget)} aria-label={`Play ${project.title} walkthrough`} aria-haspopup="dialog">
                         <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
-                        <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "datalens" || project.id === "queryroom" ? "13" : "14"}s</span></span>
+                        <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "corpus" ? "2:07" : project.id === "datalens" || project.id === "queryroom" ? "13s" : "14s"}</span></span>
                       </button>
                     </div>
                     <div className="showcase-copy">

@@ -205,6 +205,42 @@
   ],
   "projects": [
     {
+      "id": "corpus",
+      "image": "assets/projects/corpus.webp",
+      "imageAlt": "Corpus landing page: 'Ask your documents. Query your data.' beside a chat preview with citations and a SQL bar chart",
+      "github": "https://github.com/adityamalviya04692/Project-Corpus",
+      "document": "documents/corpus-case-study.pdf",
+      "presentation": "documents/corpus-case-study.pptx",
+      "problem": "Document chat tools give fluent answers you cannot verify, keep reports and datasets in separate tools, and need files uploaded to a paid API.",
+      "approach": "I built a browser-native RAG and analytics workspace: hybrid retrieval with intent routing and sentence-level citations, plus DuckDB tables with profiling, natural-language SQL and dbt contract export.",
+      "title": "Corpus",
+      "subtitle": "Ask your documents, query your data — RAG + DuckDB in the browser",
+      "category": "AI Engineering · Data Engineering",
+      "description": "Cited answers across PDFs, Word and Markdown, side-by-side document comparison, and plain-English questions over CSV and Parquet that become guarded, self-correcting DuckDB SQL. Gemma 4 runs free on WebGPU; retrieval is scored live with hit@k and MRR.",
+      "stack": [
+        "Gemma 4",
+        "WebGPU",
+        "Transformers.js",
+        "DuckDB-WASM",
+        "React",
+        "TypeScript",
+        "ECharts"
+      ],
+      "metrics": [
+        {
+          "value": "1.00 MRR",
+          "label": "Hybrid retrieval on golden set"
+        },
+        {
+          "value": "0 servers",
+          "label": "Files never leave the browser"
+        }
+      ],
+      "year": "Oct 2026 — Present",
+      "link": "https://adityamalviya04692.github.io/Project-Corpus/",
+      "highlight": true
+    },
+    {
       "id": "flowforge",
       "image": "assets/projects/flowforge.webp",
       "imageAlt": "FlowForge green terminal-style workspace with a visual transformation graph and step inspector",

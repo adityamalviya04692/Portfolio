@@ -1,0 +1,53 @@
+WEBVTT
+
+1
+00:00:00.467 --> 00:00:09.033
+This is Corpus: one workspace to ask your documents and query your data, running entirely in your browser.
+
+2
+00:00:09.767 --> 00:00:17.500
+There's no sign-up and no API key. Open the app, and try it with the sample files.
+
+3
+00:00:18.233 --> 00:00:31.967
+Three design documents and a pipeline-runs dataset load in seconds. On the right, the pipeline panel shows every stage: parsing, chunking, embeddings on the GPU, and the index.
+
+4
+00:00:32.700 --> 00:00:41.433
+Ask what the post-mortem is about, and Corpus explains the document in plain words, instead of just listing topics.
+
+5
+00:00:42.167 --> 00:00:49.033
+Every claim is cited. Hover a citation to see the exact sentence behind it.
+
+6
+00:00:49.767 --> 00:00:54.967
+Click it, and the source passage opens with that sentence highlighted.
+
+7
+00:00:55.700 --> 00:01:07.800
+Questions about numbers go to DuckDB. Ask how many runs failed per pipeline: Corpus writes the SQL, runs it on your machine, and charts the result.
+
+8
+00:01:08.533 --> 00:01:18.167
+The data tab profiles each table as it arrives: missing values, outliers, unique keys, and charts chosen from the column types.
+
+9
+00:01:18.900 --> 00:01:24.933
+Ask in plain English, then read, edit and re-run the SQL yourself.
+
+10
+00:01:25.667 --> 00:01:34.433
+From that profile, Corpus writes a data contract: a dbt schema file with tests, ready to drop into a pipeline.
+
+11
+00:01:35.167 --> 00:01:46.900
+And retrieval is measured, not assumed. Golden questions score keyword, vector and hybrid search, and the hybrid finds every answer first time.
+
+12
+00:01:47.633 --> 00:01:58.467
+For written answers, run Google's Gemma 4 free on your own GPU, or bring a free key. Your files never leave your device.
+
+13
+00:01:59.200 --> 00:02:05.900
+That's Corpus, built by Aditya Malviya. Try it live, at the link below.
