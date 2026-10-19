@@ -3069,3 +3069,14 @@ html[data-motion="off"] .scan-beam {
   .showcase-film-preview:hover .showcase-film-play { box-shadow: 5px 7px 0 var(--ink); }
 }
 .showcase-film-preview:focus-visible .showcase-film-play { box-shadow: 5px 7px 0 var(--ink); background: #f5a15e; }
+
+/* Keep the hover target still: only the visual label moves, without a spring. */
+.showcase-film-play { pointer-events: none; transform: translateX(-50%) translateY(0); transition: transform 180ms var(--ease-out), background-color 150ms ease, box-shadow 180ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .showcase-film-preview:hover .showcase-film-play { transform: translateX(-50%) translateY(-3px); box-shadow: 4px 5px 0 var(--ink); }
+  .showcase-film-preview:active .showcase-film-play { transform: translateX(-50%) translateY(0); box-shadow: 2px 2px 0 var(--ink); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .showcase-film-preview:hover .showcase-film-play, .showcase-film-preview:active .showcase-film-play { transform: translateX(-50%); }
+}
+html[data-motion="off"] .showcase-film-preview .showcase-film-play { transform: translateX(-50%); }

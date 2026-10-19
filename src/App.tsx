@@ -455,10 +455,10 @@ function Portfolio() {
                   <article className={`showcase-card showcase-${project.id}`} id={`project-${project.id}`}>
                     <div className="showcase-visual">
                       <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a></div>
-                      <motion.button className="showcase-film-preview" whileHover={reduced ? undefined : "hover"} whileTap={reduced ? undefined : "press"} initial="rest" animate="rest" onClick={(event) => playProject(project.id, event.currentTarget)} aria-label={`Play ${project.title} walkthrough`} aria-haspopup="dialog">
+                      <button className="showcase-film-preview" onClick={(event) => playProject(project.id, event.currentTarget)} aria-label={`Play ${project.title} walkthrough`} aria-haspopup="dialog">
                         <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
-                        <motion.span className="showcase-film-play" variants={{ rest: { transform: "translateX(-50%) translateY(0px) scale(1)" }, hover: { transform: "translateX(-50%) translateY(-4px) scale(1.04)" }, press: { transform: "translateX(-50%) translateY(1px) scale(.98)" } }} transition={{ type: "spring", duration: .3, bounce: .2 }}><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "datalens" || project.id === "queryroom" ? "13" : "14"}s</span></motion.span>
-                      </motion.button>
+                        <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "datalens" || project.id === "queryroom" ? "13" : "14"}s</span></span>
+                      </button>
                     </div>
                     <div className="showcase-copy">
                       <div className="showcase-intro">
