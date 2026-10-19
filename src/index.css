@@ -3060,3 +3060,12 @@ html[data-motion="off"] .scan-beam {
   .project-video-dialog { transform: none; transition: opacity 150ms var(--ease-out); }
   .project-video-dialog::backdrop { transition-duration: 150ms; }
 }
+
+/* The image is the single video entry point; documents stay in the link row. */
+.showcase-card .showcase-links { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.showcase-film-play { transition: background-color 150ms ease, box-shadow 250ms var(--ease-out); }
+.showcase-film-preview:focus-visible { outline-offset: -4px; }
+@media (hover: hover) and (pointer: fine) {
+  .showcase-film-preview:hover .showcase-film-play { box-shadow: 5px 7px 0 var(--ink); }
+}
+.showcase-film-preview:focus-visible .showcase-film-play { box-shadow: 5px 7px 0 var(--ink); background: #f5a15e; }
