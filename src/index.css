@@ -3727,3 +3727,57 @@ html[data-theme="dark"] .showcase-film-play {
   background: #1a2035e0;
   color: #f4dfa8;
 }
+
+/* ======================================================================
+   Meet the engineer: particle hologram (ParticleEngineer.tsx).
+   ====================================================================== */
+.portal-avatar {
+  mix-blend-mode: normal;
+}
+.pe-stage {
+  position: absolute;
+  inset: 0;
+}
+.pe-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* A blurred half-resolution copy underneath gives the particles their glow. */
+.pe-glow {
+  filter: blur(6px) saturate(1.4);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+}
+.pe-main {
+  mix-blend-mode: screen;
+}
+
+/* Energy motes rising off the platform. */
+.eng-particles {
+  position: absolute;
+  bottom: 13%;
+  left: 50%;
+  width: 300px;
+  margin-left: -150px;
+  height: 62%;
+  pointer-events: none;
+  z-index: 2;
+}
+.eng-particles i {
+  position: absolute;
+  bottom: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #8ff1ff;
+  box-shadow: 0 0 8px #4edeff;
+  opacity: 0;
+  animation: eng-rise 4s ease-in infinite;
+}
+@keyframes eng-rise {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  15% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-340px) scale(0.4); }
+}

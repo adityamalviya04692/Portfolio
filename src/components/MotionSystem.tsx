@@ -22,6 +22,7 @@ import {
 } from "framer-motion";
 import { Pause, Play } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import ParticleEngineer from "./ParticleEngineer";
 
 const MotionContext = createContext({ reduced: false });
 export const useMotionPreference = () => useContext(MotionContext);
@@ -285,20 +286,15 @@ export function AvatarPortal() {
     target: ref,
     offset: ["start end", "end start"],
   });
-  const scan = useTransform(
-    p,
-    [0.2, 0.65],
-    ["inset(100% 0 0 0)", "inset(0% 0 0 0)"],
-  );
-  const scanY = useTransform(p, [0.2, 0.65], ["100%", "0%"]);
-  const scale = useTransform(p, [0, 0.3, 0.8, 1], [0.6, 1, 1, 0.85]),
-    rotate = useTransform(p, [0, 0.3, 0.7, 1], [-16, 0, 0, 12]);
-  const left = useTransform(p, [0.22, 0.34], [0, 1]),
-    right = useTransform(p, [0.4, 0.52], [0, 1]),
-    bottom = useTransform(p, [0.5, 0.62], [0, 1]);
+  // ParticleEngineer assembles the figure between 0.14 and 0.5 of this progress.
+  const scale = useTransform(p, [0, 0.3, 0.85, 1], [0.82, 1, 1, 0.9]),
+    lift = useTransform(p, [0, 0.3], [40, 0]);
+  const left = useTransform(p, [0.54, 0.6], [0, 1]),
+    right = useTransform(p, [0.62, 0.68], [0, 1]),
+    bottom = useTransform(p, [0.7, 0.76], [0, 1]);
   const count = useTransform(p, (v) =>
     String(
-      Math.round(Math.max(0, Math.min(1, (v - 0.2) / 0.45)) * 100),
+      Math.round(Math.max(0, Math.min(1, (v - 0.14) / 0.36)) * 100),
     ).padStart(3, "0"),
   );
   return (
@@ -316,27 +312,20 @@ export function AvatarPortal() {
         </div>
         <motion.div
           className="portal-avatar"
-          style={reduced ? {} : { scale, rotate }}
+          style={reduced ? {} : { scale, y: lift }}
         >
-          <img
+          <ParticleEngineer
+            progress={p}
             src={asset("aditya-standing.png")}
-            alt="Aditya's personalized full-body avatar"
-          />
-          <motion.div
-            className="avatar-hologram"
-            style={reduced ? { opacity: 0 } : { clipPath: scan }}
-          >
-            <img src={asset("aditya-standing.png")} alt="" />
-            <div
-              className="holo-scanlines"
-              style={{ maskImage: `url(${asset("aditya-standing.png")})` }}
-            />
-          </motion.div>
-          <motion.div
-            className="scan-beam"
-            style={reduced ? { display: "none" } : { top: scanY }}
+            alt="Aditya as a particle hologram"
+            reduced={reduced}
           />
         </motion.div>
+        <div className="eng-particles" aria-hidden="true">
+          {Array.from({ length: 14 }, (_, i) => (
+            <i key={i} style={{ left: `${8 + ((i * 37) % 84)}%`, animationDelay: `${-((i * 0.53) % 4)}s` }} />
+          ))}
+        </div>
         <div className="portal-base">
           <i />
           <i />
