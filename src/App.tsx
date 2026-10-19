@@ -45,7 +45,10 @@ function Portfolio() {
     if (trigger) videoTrigger.current = trigger;
     setActiveVideo((previous) => ({ id, request: previous.request + 1 }));
   };
-  const videoProject = skillProjects.find((project) => project.id === activeVideo.id);
+  // The 70-second profile intro plays in the same dialog as the project walkthroughs.
+  const intro = { id: "intro", title: "Meet Aditya", link: "" };
+  const videoProject =
+    activeVideo.id === "intro" ? intro : skillProjects.find((project) => project.id === activeVideo.id);
   const [active, setActive] = useState("home"),
     [copied, setCopied] = useState(false),
     [slide, setSlide] = useState(0),
@@ -178,9 +181,18 @@ function Portfolio() {
               </Reveal>
               <Reveal delay={0.4}>
                 <p>{profile.tagline}</p>
-                <a className="text-link" href="#experience">
-                  Explore my work <ArrowUpRight size={20} />
-                </a>
+                <div className="hero-links">
+                  <a className="text-link" href="#experience">
+                    Explore my work <ArrowUpRight size={20} />
+                  </a>
+                  <button
+                    className="text-link intro-link"
+                    onClick={(event) => playProject("intro", event.currentTarget)}
+                    aria-haspopup="dialog"
+                  >
+                    <Play size={15} fill="currentColor" /> Watch my 70-sec intro
+                  </button>
+                </div>
               </Reveal>
             </div>
             <motion.div
@@ -221,11 +233,24 @@ function Portfolio() {
                     <div className="portrait-caption">
                       THE HUMAN BEHIND THE CODE ↘
                     </div>
-                    <img
-                      src={asset(profile.avatar)}
-                      alt="Aditya Malviya"
-                      loading="lazy"
-                    />
+                    <button
+                      className="portrait-play"
+                      onClick={(event) => playProject("intro", event.currentTarget)}
+                      aria-label="Play Aditya's 70-second video intro"
+                      aria-haspopup="dialog"
+                    >
+                      <img
+                        src={asset(profile.avatar)}
+                        alt="Aditya Malviya"
+                        loading="lazy"
+                      />
+                      <span className="portrait-play-badge">
+                        <span className="portrait-play-icon">
+                          <Play size={16} fill="currentColor" />
+                        </span>
+                        Watch my intro <small>1:10</small>
+                      </span>
+                    </button>
                     <div className="photo-bottom">
                       <strong>Aditya.</strong>
                       <span>
@@ -699,7 +724,7 @@ function Portfolio() {
           </div>
         </section>
       </main>
-      {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onActivate={() => playProject(videoProject.id)} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request }))} />}
+      {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onActivate={() => playProject(videoProject.id)} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request }))} />}
       <footer>
         <a className="monogram" href="#home" aria-label="Back to top">
           a<span>m.</span>

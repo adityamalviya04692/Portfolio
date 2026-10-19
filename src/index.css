@@ -3781,3 +3781,104 @@ html[data-theme="dark"] .showcase-film-play {
   15% { opacity: 0.9; }
   100% { opacity: 0; transform: translateY(-340px) scale(0.4); }
 }
+
+/* ======================================================================
+   Profile video intro: a play badge on the About portrait and a link in the
+   hero, both opening the shared video dialog (id "intro").
+   ====================================================================== */
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 28px;
+}
+.intro-link {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  gap: 9px;
+}
+.intro-link svg {
+  color: var(--orange);
+}
+.hero-copy .intro-link:hover svg {
+  transform: scale(1.15);
+}
+.portrait-play {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+.portrait-play img {
+  transition: filter 0.3s ease;
+}
+.portrait-play:hover img,
+.portrait-play:focus-visible img {
+  filter: saturate(1);
+}
+.portrait-play-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 13px 6px 6px;
+  border: 1px solid #292820;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #20170c;
+  box-shadow: 3px 3px 0 #292820;
+  font: 700 11px "Space Mono", monospace;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.portrait-play-badge small {
+  font-size: 10px;
+  opacity: 0.7;
+}
+.portrait-play-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fffdf7;
+  color: #20170c;
+}
+.portrait-play-icon svg {
+  margin-left: 2px;
+}
+/* A soft ring pulses out of the play icon so the badge reads as "press me". */
+.portrait-play-icon {
+  position: relative;
+}
+.portrait-play-icon::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #fffdf7;
+  opacity: 0;
+  animation: intro-pulse 2.4s ease-out infinite;
+}
+@keyframes intro-pulse {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.portrait-play:hover .portrait-play-badge,
+.portrait-play:focus-visible .portrait-play-badge {
+  transform: translate(-1px, -2px);
+  box-shadow: 4px 5px 0 #292820;
+}

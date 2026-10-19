@@ -2,19 +2,24 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Captions, Maximize2, Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
-const clock = (seconds: number) => `0:${Math.floor(seconds || 0).toString().padStart(2, "0")}`;
+const clock = (seconds: number) => {
+  const s = Math.floor(seconds || 0);
+  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
+};
 
 type Props = {
   id: string;
   title: string;
   index: number;
-  link: string;
+  link?: string;
+  /** Small line under the play prompt, e.g. "Narrated walkthrough". */
+  kind?: string;
   active: boolean;
   request: number;
   onActivate: () => void;
 };
 
-export default function ProjectVideo({ id, title, index, link, active, request, onActivate }: Props) {
+export default function ProjectVideo({ id, title, index, link, kind = "Narrated walkthrough", active, request, onActivate }: Props) {
   const video = useRef<HTMLVideoElement>(null);
   const player = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -67,8 +72,8 @@ export default function ProjectVideo({ id, title, index, link, active, request, 
   return (
     <div className="project-player" ref={player} id={`video-${id}`} role="region" aria-label={`${title} video walkthrough`}>
       <div className="showcase-browser">
-        <span>{String(index + 1).padStart(2, "0")} / {title}</span>
-        <a href={link} target="_blank" rel="noreferrer" aria-label={`Open ${title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a>
+        <span>{index >= 0 ? `${String(index + 1).padStart(2, "0")} / ` : ""}{title}</span>
+        {link && <a href={link} target="_blank" rel="noreferrer" aria-label={`Open ${title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a>}
       </div>
       <div className="project-player-screen">
         <video
@@ -92,7 +97,7 @@ export default function ProjectVideo({ id, title, index, link, active, request, 
         {!playing && (
           <button className={`project-play-cover${started ? " is-paused" : ""}`} onClick={onActivate} aria-label={`${ended ? "Replay" : started ? "Resume" : "Play"} ${title} walkthrough`}>
             <span className="project-play-stamp">{ended ? <RotateCcw size={25} /> : <Play size={25} fill="currentColor" />}</span>
-            <span className="project-play-label">{ended ? "WATCH AGAIN" : started ? "CONTINUE WATCHING" : "SEE IT IN ACTION"}<span>Narrated walkthrough</span></span>
+            <span className="project-play-label">{ended ? "WATCH AGAIN" : started ? "CONTINUE WATCHING" : "SEE IT IN ACTION"}<span>{kind}</span></span>
           </button>
         )}
       </div>

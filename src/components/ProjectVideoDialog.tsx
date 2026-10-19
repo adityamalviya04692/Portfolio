@@ -4,7 +4,9 @@ import ProjectVideo from "./ProjectVideo";
 import { useMotionPreference } from "./MotionSystem";
 
 type Props = {
-  project: { id: string; title: string; link: string };
+  project: { id: string; title: string; link?: string };
+  eyebrow?: string;
+  kind?: string;
   index: number;
   request: number;
   returnFocusTo: HTMLElement | null;
@@ -12,7 +14,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ProjectVideoDialog({ project, index, request, returnFocusTo, onActivate, onClose }: Props) {
+export default function ProjectVideoDialog({ project, eyebrow = "PROJECT WALKTHROUGH", kind, index, request, returnFocusTo, onActivate, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -52,10 +54,10 @@ export default function ProjectVideoDialog({ project, index, request, returnFocu
       if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) close();
     }}>
       <header className="project-video-dialog-heading">
-        <div><span>PROJECT WALKTHROUGH</span><h2 id="project-video-title">{project.title}<span className="orange">.</span></h2></div>
+        <div><span>{eyebrow}</span><h2 id="project-video-title">{project.title}<span className="orange">.</span></h2></div>
         <button onClick={close} aria-label="Close video"><X size={21} /></button>
       </header>
-      <ProjectVideo id={project.id} title={project.title} index={index} link={project.link} active request={request} onActivate={onActivate} />
+      <ProjectVideo id={project.id} title={project.title} index={index} link={project.link} kind={kind} active request={request} onActivate={onActivate} />
     </dialog>
   );
 }
