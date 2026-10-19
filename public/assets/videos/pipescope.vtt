@@ -1,0 +1,26 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:01.160
+Meet PipeScope.
+
+2
+00:00:01.160 --> 00:00:02.920
+Open a Spark event log.
+
+3
+00:00:02.920 --> 00:00:05.720
+Find skew, spill, and slow stages.
+
+4
+00:00:05.720 --> 00:00:08.640
+Explore column lineage and downstream impact.
+
+5
+00:00:08.640 --> 00:00:09.900
+Compare runs.
+
+6
+00:00:09.900 --> 00:00:12.640
+Diagnose your pipeline, inside your browser.
+

@@ -14,9 +14,12 @@ import {
   Copy,
   X,
   FileText,
+  Play,
 } from "lucide-react";
 import data from "./data/portfolio.json";
 import ProjectArt from "./components/ProjectArt";
+import ProjectVideoDialog from "./components/ProjectVideoDialog";
+import ProjectMasonry from "./components/ProjectMasonry";
 import {
   Accordion,
   AvatarPortal,
@@ -35,6 +38,13 @@ const moriveda = data.projects.find((project) => project.id === "moriveda")!;
 const skillProjects = data.projects.filter((project) => project.id !== "moriveda");
 
 function Portfolio() {
+  const [activeVideo, setActiveVideo] = useState({ id: "", request: 0 });
+  const videoTrigger = useRef<HTMLElement | null>(null);
+  const playProject = (id: string, trigger?: HTMLElement) => {
+    if (trigger) videoTrigger.current = trigger;
+    setActiveVideo((previous) => ({ id, request: previous.request + 1 }));
+  };
+  const videoProject = skillProjects.find((project) => project.id === activeVideo.id);
   const [active, setActive] = useState("home"),
     [copied, setCopied] = useState(false),
     [slide, setSlide] = useState(0),
@@ -439,14 +449,17 @@ function Portfolio() {
               </div>
               <p>Tools I built to explore data quality, <br />pipeline design, Spark diagnostics and SQL learning.</p>
             </Reveal>
-            <div className="showcase-grid">
+            <ProjectMasonry>
               {skillProjects.map((project, index) => (
                 <Reveal key={project.id}>
                   <article className={`showcase-card showcase-${project.id}`} id={`project-${project.id}`}>
-                    <a className="showcase-visual" href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>
-                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}</span><span>OPEN DEMO <ArrowUpRight size={14} /></span></div>
-                      <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
-                    </a>
+                    <div className="showcase-visual">
+                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a></div>
+                      <button className="showcase-film-preview" onClick={(event) => playProject(project.id, event.currentTarget)} aria-label={`Play ${project.title} walkthrough`} aria-haspopup="dialog">
+                        <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
+                        <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "datalens" || project.id === "queryroom" ? "13" : "14"}s</span></span>
+                      </button>
+                    </div>
                     <div className="showcase-copy">
                       <div className="showcase-intro">
                       <span className="showcase-category">{project.category}</span>
@@ -461,7 +474,8 @@ function Portfolio() {
                         <p><strong>What I built.</strong> {project.approach}</p>
                       </Accordion>
                       <div className="showcase-links">
-                        {project.document ? (<a className="showcase-primary" href={asset(project.document || "")} target="_blank" rel="noreferrer"><FileText size={17} /> View case study <span>PDF</span></a>) : (<a className="showcase-primary" href={project.link} target="_blank" rel="noreferrer">Try Queryroom <ArrowUpRight size={17} /></a>)}
+                        <button className="showcase-watch" aria-haspopup="dialog" onClick={(event) => playProject(project.id, event.currentTarget)}><Play size={15} fill="currentColor" /> Watch walkthrough</button>
+                        {project.document ? (<a className="showcase-case-study" href={asset(project.document || "")} target="_blank" rel="noreferrer"><FileText size={17} /> View case study <span>PDF</span></a>) : (<a className="showcase-case-study" href={project.link} target="_blank" rel="noreferrer">Try Queryroom <ArrowUpRight size={17} /></a>)}
                         <a href={project.github} target="_blank" rel="noreferrer"><Github size={16} /> Code <ArrowUpRight size={14} /></a>
                         {project.presentation && (<a href={asset(project.presentation || "")} download><Download size={16} /> Slides <span>PPTX</span></a>)}
                       </div>
@@ -470,7 +484,7 @@ function Portfolio() {
                   </article>
                 </Reveal>
               ))}
-            </div>
+            </ProjectMasonry>
           </div>
         </section>
         <section id="research" className="research-section" aria-labelledby="research-heading">
@@ -686,6 +700,7 @@ function Portfolio() {
           </div>
         </section>
       </main>
+      {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onActivate={() => playProject(videoProject.id)} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request }))} />}
       <footer>
         <a className="monogram" href="#home" aria-label="Back to top">
           a<span>m.</span>

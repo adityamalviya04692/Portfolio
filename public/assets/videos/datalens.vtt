@@ -1,0 +1,26 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:01.560
+Meet DataLens.
+
+2
+00:00:01.560 --> 00:00:03.120
+Open a local dataset.
+
+3
+00:00:03.120 --> 00:00:06.060
+Check quality, missing values, and duplicates.
+
+4
+00:00:06.060 --> 00:00:08.060
+Explore charts and outliers.
+
+5
+00:00:08.060 --> 00:00:10.400
+Generate readable cleaning SQL.
+
+6
+00:00:10.400 --> 00:00:12.560
+Your data stays in your browser.
+
