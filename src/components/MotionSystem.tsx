@@ -21,6 +21,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { Pause, Play } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 const MotionContext = createContext({ reduced: false });
 export const useMotionPreference = () => useContext(MotionContext);
@@ -86,6 +87,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
           style={{ scaleX: reduced ? scrollYProgress : progress }}
         />
         <div className="motion-controls">
+          <ThemeToggle reduced={reduced} />
           <button
             onClick={() => {
               setPaused(!paused);

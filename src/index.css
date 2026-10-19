@@ -3080,3 +3080,650 @@ html[data-motion="off"] .scan-beam {
   .showcase-film-preview:hover .showcase-film-play, .showcase-film-preview:active .showcase-film-play { transform: translateX(-50%); }
 }
 html[data-motion="off"] .showcase-film-preview .showcase-film-play { transform: translateX(-50%); }
+/* Living hero desk: cut-outs of the same illustration plus light SVG overlays (LivingDesk.tsx). */
+.living-desk {
+  position: relative;
+  mix-blend-mode: multiply;
+  isolation: isolate;
+}
+.hero-scene .living-desk > img {
+  display: block;
+  mix-blend-mode: normal;
+}
+.ld-plate,
+.ld-part,
+.ld-hits {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.ld-part {
+  will-change: transform;
+}
+.living-desk:not(.ld-ready) .ld-plate,
+.living-desk:not(.ld-ready) .ld-part {
+  visibility: hidden;
+}
+.ld-hits polygon {
+  fill: transparent;
+  pointer-events: all;
+  cursor: pointer;
+}
+.ld-flash {
+  fill: #fff;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+.ld-steam-puff {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.ld-cut {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  will-change: transform;
+}
+.ld-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.ld-breeze {
+  animation: ld-breeze 7s ease-in-out infinite;
+}
+@keyframes ld-breeze {
+  0%, 100% { rotate: 0deg; }
+  14% { rotate: calc(var(--amp) * 1.1deg); }
+  30% { rotate: calc(var(--amp) * -0.45deg); }
+  46% { rotate: calc(var(--amp) * 0.7deg); }
+  62% { rotate: calc(var(--amp) * -0.2deg); }
+  78% { rotate: calc(var(--amp) * 0.3deg); }
+}
+.ld-torso {
+  animation: ld-breathe 4.6s ease-in-out infinite;
+}
+@keyframes ld-breathe {
+  0%, 100% { scale: 1 1; }
+  45% { scale: 1 1.006; }
+}
+/* The head rides the chest's rise (same 4.6s cycle) and drifts on its own slower tilt. */
+.ld-head {
+  animation: ld-head-breathe 4.6s ease-in-out infinite, ld-head-tilt 9s ease-in-out infinite;
+}
+@keyframes ld-head-breathe {
+  0%, 100% { translate: 0 0; }
+  45% { translate: 0 -0.141%; }
+}
+@keyframes ld-head-tilt {
+  0%, 100% { rotate: 0deg; }
+  30% { rotate: 0.6deg; }
+  55% { rotate: 0.1deg; }
+  75% { rotate: -0.4deg; }
+}
+/* Fingers tap while the code line is being typed (same 6s cycle as .ld-type-cover). */
+.ld-hand {
+  animation: ld-type-hand 6s linear infinite;
+}
+@keyframes ld-type-hand {
+  0%, 8%, 14%, 21%, 29%, 37%, 45%, 53%, 60%, 100% { translate: 0 0; }
+  11% { translate: 0 0.14%; }
+  18% { translate: 0 0.12%; }
+  26% { translate: 0 0.15%; }
+  34% { translate: 0 0.1%; }
+  42% { translate: 0 0.14%; }
+  50% { translate: 0 0.12%; }
+  57% { translate: 0 0.13%; }
+}
+/* Idle life when nobody is hovering: a foot tapping along, toys that can't sit still. */
+.ld-tap {
+  animation: ld-tap 6.5s ease-in-out infinite 1.5s;
+}
+@keyframes ld-tap {
+  0%, 58%, 66%, 74%, 100% { rotate: 0deg; }
+  62%, 70% { rotate: -4deg; }
+}
+.ld-bob {
+  animation: ld-bob 9s ease-in-out infinite 3s;
+}
+@keyframes ld-bob {
+  0%, 84%, 90%, 95%, 100% { translate: 0 0; rotate: 0deg; }
+  87% { translate: 0 -0.45%; rotate: 3deg; }
+  92.5% { translate: 0 -0.15%; rotate: -1deg; }
+}
+.ld-wiggle {
+  animation: ld-wiggle 11s ease-in-out infinite 5s;
+}
+@keyframes ld-wiggle {
+  0%, 88%, 100% { rotate: 0deg; }
+  90.5% { rotate: -3.5deg; }
+  93% { rotate: 2.5deg; }
+  95.5% { rotate: -1deg; }
+}
+.ld-type-cover {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: ld-type 6s infinite;
+}
+@keyframes ld-type {
+  0%, 8% { transform: scaleX(1); animation-timing-function: steps(18, end); }
+  60% { transform: scaleX(0); }
+  92% { transform: scaleX(0); animation-timing-function: step-end; }
+  93%, 100% { transform: scaleX(1); }
+}
+.ld-cursor {
+  animation: ld-cursor-move 6s infinite, ld-blink 1.05s step-end infinite;
+}
+@keyframes ld-cursor-move {
+  0%, 8% { transform: translateX(0); animation-timing-function: steps(18, end); }
+  60% { transform: translateX(110px); }
+  92% { transform: translateX(110px); animation-timing-function: step-end; }
+  93%, 100% { transform: translateX(0); }
+}
+@keyframes ld-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.ld-lamp {
+  mix-blend-mode: screen;
+  animation: ld-lamp 5s ease-in-out infinite;
+}
+@keyframes ld-lamp {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.55; }
+  52% { opacity: 0.45; }
+  54% { opacity: 0.55; }
+}
+.ld-pulse {
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: ld-pulse 2.6s ease-in-out infinite;
+}
+.ld-pulse-b {
+  animation-delay: 0.65s;
+}
+.ld-pulse-c {
+  animation-delay: 1.9s;
+}
+@keyframes ld-pulse {
+  0%, 100% { opacity: 0; }
+  30% { opacity: 0.6; }
+}
+.ld-led {
+  animation: ld-led 2.4s ease-in-out infinite;
+}
+@keyframes ld-led {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.ld-steam {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: ld-steam 4.2s ease-in-out infinite;
+}
+@keyframes ld-steam {
+  0% { opacity: 0; transform: translate(0, 4px) scale(0.6, 0.5); }
+  20% { opacity: 0.95; }
+  65% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(6px, -58px) scale(1.35, 1.2); }
+}
+
+/* ======================================================================
+   Day / night theme. html[data-theme] is set in index.html before paint and
+   flipped by ThemeToggle. Light is the original design; everything below
+   only re-colours it for night, section by section, top to bottom.
+   ====================================================================== */
+
+/* -- Toggle: a sun whose rays retract as a crescent cuts in -- */
+.theme-toggle {
+  position: relative;
+  overflow: hidden;
+  color: #e98b40;
+  transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease;
+}
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
+  overflow: visible;
+}
+.theme-toggle .theme-rays,
+.theme-toggle .theme-core,
+.theme-toggle .theme-cut,
+.theme-toggle .theme-star {
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+  transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.5s ease;
+}
+.theme-toggle .theme-star {
+  opacity: 0;
+  transform: scale(0);
+}
+.theme-toggle:hover .theme-rays {
+  transform: rotate(25deg);
+}
+.theme-toggle[data-mode="dark"] {
+  color: #f4dfa8;
+}
+.theme-toggle[data-mode="dark"] .theme-rays {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.4);
+}
+.theme-toggle[data-mode="dark"] .theme-core {
+  transform: scale(1.5);
+}
+.theme-toggle[data-mode="dark"] .theme-cut {
+  transform: translate(-8.5px, 4.5px);
+}
+.theme-toggle[data-mode="dark"] .theme-star {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.35s;
+}
+.theme-toggle[data-mode="dark"] .theme-star-b {
+  transition-delay: 0.5s;
+}
+.theme-toggle[data-mode="dark"]:hover .theme-core {
+  transform: scale(1.5) rotate(-15deg);
+}
+
+/* -- The switch itself: night spreads from the button (ThemeToggle.tsx) -- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-fading *,
+html.theme-fading *::before,
+html.theme-fading *::after {
+  transition: background-color 0.8s ease, color 0.8s ease, border-color 0.8s ease, box-shadow 0.8s ease,
+    fill 0.8s ease !important;
+}
+
+/* -- Night palette -- */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #ece6d8;
+  --blue: #3f63c4;
+  --night: #0e1120;
+  --night-2: #131729;
+  --night-card: #171c2f;
+  --night-well: #1e2439;
+  --night-line: #2a3150;
+  --night-muted: #aaa496;
+  --night-faint: #8e897d;
+  background: var(--night);
+  color: var(--ink);
+}
+html[data-theme="dark"] body {
+  background: var(--night);
+}
+
+/* -- Header, controls, loader -- */
+html[data-theme="dark"] nav {
+  background: #161b2fe6;
+  border-color: #ffffff14;
+}
+html[data-theme="dark"] .site-header nav a:hover {
+  color: #f0a463;
+}
+html[data-theme="dark"] .monogram {
+  background: var(--night-well);
+  color: var(--ink);
+}
+html[data-theme="dark"] .motion-controls button {
+  border-color: #ffffff1c;
+  background: #1a2035e0;
+  color: #e6e0d2;
+}
+html[data-theme="dark"] .motion-controls button[aria-pressed="true"]:not(.theme-toggle) {
+  background: #ed8838;
+  color: #fff;
+}
+html[data-theme="dark"] .page-loader {
+  background: var(--night);
+  color: var(--ink);
+}
+html[data-theme="dark"] .loader-line {
+  background: var(--night-line);
+}
+html[data-theme="dark"] .skip-link {
+  background: var(--night-card);
+  color: var(--ink);
+}
+
+/* -- Hero -- */
+html[data-theme="dark"] .hero-scroll {
+  background: #070c20;
+}
+/* Night sky behind the hero: two star fields, a soft aurora and a moon over the room. */
+html[data-theme="dark"] .hero-frame {
+  background:
+    radial-gradient(circle at 90% 13%, #fff6dc 0 26px, #fff1cc66 28px, #ffe7b322 52px, transparent 110px),
+    radial-gradient(circle, #ffffffd9 0.8px, transparent 1.4px) 0 0 / 150px 150px,
+    radial-gradient(circle, #cfe0ff99 0.7px, transparent 1.3px) 40px 70px / 230px 230px,
+    radial-gradient(circle, #ffe9c466 1px, transparent 1.6px) 110px 20px / 310px 310px,
+    radial-gradient(ellipse 45% 38% at 78% 30%, #5b3fa84d, transparent 70%),
+    radial-gradient(ellipse 40% 35% at 62% 78%, #0f7a8a40, transparent 70%),
+    radial-gradient(ellipse 35% 40% at 12% 85%, #2b3f9a33, transparent 70%),
+    linear-gradient(180deg, #0b0e1f 0%, #101531 55%, #141a3a 100%);
+  animation: night-sky 90s linear infinite;
+}
+@keyframes night-sky {
+  0% {
+    background-position: 0 0, 0 0, 40px 70px, 110px 20px, 0 0, 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 0, -150px 0, -190px 70px, -200px 20px, 0 0, 0 0, 0 0, 0 0;
+  }
+}
+html[data-theme="dark"] .name-letter,
+html[data-theme="dark"] h1 > span:first-of-type {
+  background-image: linear-gradient(110deg, #ed8838, #e3a46f, #8dbbe0, #ed8838);
+}
+html[data-theme="dark"] .hero-copy > p,
+html[data-theme="dark"] .hero-copy p {
+  color: #c9c3b5;
+}
+html[data-theme="dark"] .hero-copy > p,
+html[data-theme="dark"] .hero-copy .text-link,
+html[data-theme="dark"] .hero-copy .eyebrow {
+  text-shadow: 0 2px 16px #0b0e1fe6, 0 0 3px #0b0e1fb3;
+}
+html[data-theme="dark"] .role-sticker {
+  background: #2c4290;
+}
+html[data-theme="dark"] .scene-note {
+  background: #191e33dd;
+  border-color: var(--night-line);
+  color: var(--ink);
+  box-shadow: 0 8px 18px #0006;
+}
+html[data-theme="dark"] .hero-bottom > a {
+  border-color: #3a4263;
+}
+
+/* The workspace at night: a blue dusk over the room, lit by the lamp and screens. */
+.ld-night,
+.ld-night-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.ld-night {
+  /* Blue twilight rather than black: the whole room stays readable, the lamp and
+     screens punch through warmer and brighter. */
+  mix-blend-mode: multiply;
+  background:
+    radial-gradient(ellipse 4.5% 4% at 29.6% 29.6%, #fff 0 40%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 51.2% 31.2%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 65.3% 36.4%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 23% 34% at 33% 46%, #fff3dc 0%, #e8d6bd 40%, transparent 100%),
+    radial-gradient(ellipse 32% 32% at 57% 44%, #dbe3fb 0%, #b6c3ec 45%, transparent 100%),
+    radial-gradient(ellipse 22% 30% at 18% 18%, #c0caf2 0%, transparent 100%),
+    radial-gradient(ellipse 64% 66% at 52% 54%, #8f9ad3 0%, #737fc0 45%, #3a4584 78%, #141a3c 100%);
+}
+.ld-night-light {
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(ellipse 5% 4.5% at 29.6% 30%, #fff1c8f0 0%, transparent 70%),
+    radial-gradient(ellipse 19% 28% at 31% 44%, #ffb86a66 0%, transparent 72%),
+    radial-gradient(ellipse 24% 18% at 57% 42%, #5aa2ff47 0%, transparent 72%),
+    radial-gradient(ellipse 14% 9% at 60% 50%, #40d6ff26 0%, transparent 75%),
+    radial-gradient(ellipse 7% 8% at 51.2% 31.2%, #8fb4ff33 0%, transparent 80%),
+    radial-gradient(ellipse 7% 8% at 65.3% 36.4%, #8fb4ff33 0%, transparent 80%);
+}
+html[data-theme="dark"] .ld-night,
+html[data-theme="dark"] .ld-night-light {
+  opacity: 1;
+}
+html[data-theme="dark"] .living-desk {
+  mix-blend-mode: normal;
+  /* Soft rectangular fade on every border so the room melts into the night sky. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent),
+    linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent),
+    linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  mask-composite: intersect;
+}
+.ld-nightonly {
+  opacity: 0;
+  transition: opacity 1.6s ease 0.3s;
+}
+html[data-theme="dark"] .ld-nightonly {
+  opacity: 1;
+}
+.ld-moonlight {
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+.ld-bulb {
+  animation: ld-twinkle 3.2s ease-in-out infinite;
+}
+@keyframes ld-twinkle {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.55; }
+  60% { opacity: 0.95; }
+}
+.ld-mote {
+  opacity: 0;
+  transform-box: fill-box;
+  animation: ld-mote 5.5s ease-in-out infinite;
+}
+@keyframes ld-mote {
+  0% { opacity: 0; transform: translate(0, 0); }
+  30% { opacity: 0.9; }
+  70% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(9px, -34px); }
+}
+html[data-theme="dark"] .ld-lamp {
+  animation-name: ld-lamp-night;
+}
+@keyframes ld-lamp-night {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+  52% { opacity: 0.9; }
+  54% { opacity: 1; }
+}
+html[data-theme="dark"] .ld-steam-puff {
+  opacity: 0.6;
+}
+
+/* -- Blue sections (about, experience, contact) go a shade deeper -- */
+html[data-theme="dark"] .blue-section,
+html[data-theme="dark"] .about.blue-section,
+html[data-theme="dark"] .experience.blue-section,
+html[data-theme="dark"] .contact.blue-section {
+  background-color: #0b1739;
+}
+html[data-theme="dark"] .on-blue nav {
+  background: #0f1d47b0;
+}
+html[data-theme="dark"] .portrait-card {
+  background: #1c2238;
+  box-shadow: 12px 16px 0 #0006;
+}
+html[data-theme="dark"] .label-sticker.light {
+  background: #25304f;
+  color: #e9e2cf;
+}
+html[data-theme="dark"] .label-sticker {
+  background: #2a3a6c;
+}
+html[data-theme="dark"] .employer-logo,
+html[data-theme="dark"] .account-logo,
+html[data-theme="dark"] .account-visual-logo {
+  filter: brightness(0.92);
+}
+
+/* -- Projects -- */
+html[data-theme="dark"] .section-heading p {
+  color: var(--night-muted);
+}
+html[data-theme="dark"] .showcase-card {
+  border-color: var(--night-line);
+  background: var(--night-card);
+}
+html[data-theme="dark"] .showcase-visual,
+html[data-theme="dark"] .showcase-film-preview,
+html[data-theme="dark"] .project-player {
+  background: var(--night-well);
+}
+html[data-theme="dark"] .showcase-category {
+  color: var(--night-faint);
+}
+html[data-theme="dark"] .showcase-copy p,
+html[data-theme="dark"] .research-copy > p {
+  color: #bdb7a9;
+}
+html[data-theme="dark"] .showcase-copy .tags span,
+html[data-theme="dark"] .research-copy .tags span {
+  background: var(--night-well);
+  border-color: var(--night-line);
+  color: #d4cebf;
+}
+html[data-theme="dark"] .showcase-details.motion-accordion {
+  border-color: #262c46;
+}
+html[data-theme="dark"] .showcase-links .showcase-primary,
+html[data-theme="dark"] .showcase-links .showcase-watch {
+  background: #2b4597;
+  border-color: #2b4597;
+  color: #fff;
+}
+html[data-theme="dark"] .showcase-links .showcase-watch:hover {
+  background: #ed8838;
+  border-color: #ed8838;
+  color: #fff;
+}
+html[data-theme="dark"] .showcase-film-preview::after {
+  background: linear-gradient(transparent 25%, #0009);
+}
+html[data-theme="dark"] .project-meta {
+  color: var(--night-muted);
+}
+html[data-theme="dark"] .project-card .tags span {
+  border-color: var(--night-line);
+  color: var(--night-muted);
+}
+html[data-theme="dark"] .project-player-screen {
+  background: #1a1f33;
+}
+html[data-theme="dark"] .project-play-label {
+  border-color: var(--night-line);
+  background: var(--night-card);
+  box-shadow: 0 3px 12px #0007;
+}
+html[data-theme="dark"] .project-play-label > span,
+html[data-theme="dark"] .project-video-dialog-heading > div > span {
+  color: var(--night-muted);
+}
+html[data-theme="dark"] .project-player-controls {
+  background: var(--night-well);
+}
+html[data-theme="dark"] .project-player-controls button:hover,
+html[data-theme="dark"] .project-player-controls button[aria-pressed="true"] {
+  background: var(--night-line);
+}
+html[data-theme="dark"] .project-player-seek::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, var(--orange) var(--progress), #3a4263 var(--progress));
+}
+html[data-theme="dark"] .project-player-seek::-moz-range-track {
+  background: #3a4263;
+}
+html[data-theme="dark"] .project-player-seek::-webkit-slider-thumb {
+  border-color: var(--night-card);
+}
+html[data-theme="dark"] .project-player-seek::-moz-range-thumb {
+  border-color: var(--night-card);
+}
+html[data-theme="dark"] .project-player:fullscreen {
+  background: var(--night);
+}
+html[data-theme="dark"] .project-video-dialog {
+  border-color: var(--night-line);
+  background: var(--night-card);
+  box-shadow: 0 28px 100px #000a;
+}
+html[data-theme="dark"] .project-video-dialog-heading > button {
+  border-color: var(--night-line);
+  background: var(--night-well);
+}
+
+/* -- Research -- */
+html[data-theme="dark"] .research-section {
+  background: var(--night-2);
+  border-color: #232a44;
+}
+html[data-theme="dark"] .research-figure img {
+  border-color: var(--night-line);
+  filter: brightness(0.92);
+}
+html[data-theme="dark"] .research-figure > p {
+  color: var(--night-muted);
+}
+html[data-theme="dark"] .research-kicker {
+  color: #8eaaf0;
+}
+
+/* -- Freelance -- */
+html[data-theme="dark"] .moriveda-preview {
+  box-shadow: 0 17px 40px #0008;
+}
+html[data-theme="dark"] .live-browser-bar {
+  background: var(--night-well);
+  color: #9a9486;
+}
+html[data-theme="dark"] .freelance-copy p {
+  color: #bdb7a9;
+}
+html[data-theme="dark"] .freelance-copy .tags span {
+  color: #d0c8b4;
+  border-color: #343c5a;
+}
+html[data-theme="dark"] .freelance-metrics {
+  border-top-color: var(--night-line);
+}
+html[data-theme="dark"] .freelance-metrics strong {
+  color: #e8b77d;
+}
+html[data-theme="dark"] .freelance-metrics span {
+  color: var(--night-muted);
+}
+html[data-theme="dark"] .case-study-button {
+  background: #2b4597;
+}
+html[data-theme="dark"] .case-panel {
+  background: var(--night-card);
+}
+html[data-theme="dark"] .case-body p,
+html[data-theme="dark"] .case-body li {
+  color: #bdb7a9;
+}
+html[data-theme="dark"] .case-close {
+  background: var(--night-well);
+  box-shadow: 0 3px 15px #0008;
+}
+
+/* -- Contact & footer -- */
+html[data-theme="dark"] footer {
+  color: var(--night-faint);
+}
+html[data-theme="dark"] .showcase-film-play {
+  color: #20170c;
+}
+/* The theme toggle uses aria-pressed for state, not the pause button's orange "on" look. */
+.motion-controls .theme-toggle[aria-pressed="true"] {
+  background: #1a2035e0;
+  color: #f4dfa8;
+}

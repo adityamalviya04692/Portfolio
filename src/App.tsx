@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import data from "./data/portfolio.json";
 import ProjectArt from "./components/ProjectArt";
+import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
 import ProjectMasonry from "./components/ProjectMasonry";
 import {
@@ -188,13 +189,12 @@ function Portfolio() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <Tilt className="desk-parallax">
-                <img
+              <div className="desk-parallax">
+                <LivingDesk
                   src={asset("assets/workspace-aditya.png")}
                   alt="Personalized avatar of Aditya Malviya at his data engineering workspace"
-                  loading="eager"
                 />
-              </Tilt>
+              </div>
               <div className="scene-note">
                 <span className="status-dot" /> PIPELINES RUNNING. IDEAS
                 FLOWING.
