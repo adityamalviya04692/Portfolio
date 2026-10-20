@@ -241,6 +241,41 @@
       "highlight": true
     },
     {
+      "id": "orchestra",
+      "image": "assets/projects/orchestra.webp",
+      "imageAlt": "Orchestra scheduler: a lakehouse DAG graph with a Spark join waiting to retry, DAG list and event feed",
+      "github": "https://github.com/adityamalviya04692/Project-Orchestra",
+      "document": "documents/orchestra-case-study.pdf",
+      "presentation": "documents/orchestra-case-study.pptx",
+      "problem": "Orchestration is invisible: catch-up and logical dates confuse teams, flaky tasks hide behind retries, and backfills double-load data unless every run is idempotent.",
+      "approach": "I built an Airflow-style scheduler on a simulated clock — cron, catch-up, retries with backoff, pools, trigger rules, SLAs and idempotent backfills — plus a run doctor and Airflow export.",
+      "title": "Orchestra",
+      "subtitle": "A pipeline orchestrator you can watch run",
+      "category": "Data Engineering · Orchestration",
+      "description": "A deterministic scheduler loop with live graph, grid and Gantt views. DAGs are YAML, validated for cycles and bad cron, and export to Apache Airflow 2. The run doctor separates root cause from blast radius and transient from deterministic failures.",
+      "stack": [
+        "TypeScript",
+        "React",
+        "Airflow 2",
+        "Cron",
+        "YAML",
+        "Vitest"
+      ],
+      "metrics": [
+        {
+          "value": "6-step",
+          "label": "Scheduler heartbeat"
+        },
+        {
+          "value": "15 tests",
+          "label": "Retries · backfill · trigger rules"
+        }
+      ],
+      "year": "Oct 2026 — Present",
+      "link": "https://adityamalviya04692.github.io/Project-Orchestra/",
+      "highlight": true
+    },
+    {
       "id": "flowforge",
       "image": "assets/projects/flowforge.webp",
       "imageAlt": "FlowForge green terminal-style workspace with a visual transformation graph and step inspector",

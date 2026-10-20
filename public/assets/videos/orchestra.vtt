@@ -1,0 +1,53 @@
+WEBVTT
+
+1
+00:00:00.467 --> 00:00:08.933
+This is Orchestra: a pipeline scheduler you can actually watch run, built to show how orchestration really works.
+
+2
+00:00:09.667 --> 00:00:17.067
+It runs entirely in the browser, on a simulated clock you can speed up, pause, or fast-forward.
+
+3
+00:00:17.800 --> 00:00:28.867
+Open it, and four missed days of the lakehouse pipeline catch up straight away, two runs at a time, just like Airflow's catch-up and max active runs.
+
+4
+00:00:29.600 --> 00:00:40.000
+Here, the engine history join hits a skewed key and fails. Instead of giving up, it waits, and retries with exponential backoff.
+
+5
+00:00:40.733 --> 00:00:50.800
+Every attempt keeps its own log. The executor ran out of memory on one hot engine ID, and the second try succeeded.
+
+6
+00:00:51.533 --> 00:01:00.067
+The Gantt view shows what that cost: the failed try, and the wait before the retry, sit right on the critical path.
+
+7
+00:01:00.800 --> 00:01:12.200
+The grid shows every run at once. One day failed at the quality gate, and everything downstream was blocked, but the team was still notified.
+
+8
+00:01:12.933 --> 00:01:24.867
+The doctor explains why. Bad data is a deterministic failure, so retrying won't help, while the flaky join needs a skew fix, not more retries.
+
+9
+00:01:25.600 --> 00:01:33.933
+Backfills are idempotent. Re-run last week, and days that already succeeded are simply skipped.
+
+10
+00:01:34.667 --> 00:01:40.900
+The backfilled days run alongside the scheduled ones, one run per logical date.
+
+11
+00:01:41.633 --> 00:01:50.900
+Pipelines are defined as YAML, and validated like a real scheduler would. A cycle is caught before it ever runs.
+
+12
+00:01:51.633 --> 00:02:00.367
+And every DAG exports to a ready Apache Airflow file, with the same retries, SLAs, pools and trigger rules.
+
+13
+00:02:01.100 --> 00:02:07.967
+That's Orchestra, built by Aditya Malviya. Try it live, at the link below.

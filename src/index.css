@@ -2113,6 +2113,7 @@ footer > a:not(.monogram) {
 .showcase-visual { display: flex; flex-direction: column; background: #eee8dc; }
 .showcase-browser { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px; font: 11px "Space Mono", monospace; }
 .showcase-browser > span:last-child { display: inline-flex; align-items: center; gap: 6px; }
+.showcase-orchestra .showcase-browser { background: #14123a; color: #fbbf24; }
 .showcase-corpus .showcase-browser { background: #07261e; color: #7ae9c9; }
 .showcase-datalens .showcase-browser { background: #efe904; color: #111; }
 .showcase-flowforge .showcase-browser { background: #0b160d; color: #a4efaa; }
