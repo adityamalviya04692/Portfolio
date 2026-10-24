@@ -205,6 +205,42 @@
   ],
   "projects": [
     {
+      "id": "reporeel",
+      "image": "assets/projects/reporeel.webp",
+      "imageAlt": "RepoReel: a search for 'remove ads from my smart TV' answered by an Instagram reel playing in a phone, with the GitHub repo it was hiding",
+      "github": "https://github.com/adityamalviya04692/Project-RepoReel",
+      "document": "documents/reporeel-case-study.pdf",
+      "presentation": "documents/reporeel-case-study.pptx",
+      "problem": "Repo reels hide the link behind 'comment REPO and I'll DM you', most captions never name the repo, and Instagram has no way to search for the tool you saw last week.",
+      "approach": "I built a free nightly pipeline that finds English reels about repos, crawls the feeds of creators who post them, matches each reel to its GitHub repo (caption, cover OCR, GitHub search), and a reel-first search on top.",
+      "title": "RepoReel",
+      "subtitle": "Find the reel. Then the repo.",
+      "category": "Data Engineering · Search",
+      "description": "Ask in plain words and get the exact Instagram reel that answers it, then the repo it was teasing. A DuckDB + fastembed pipeline classifies, matches and publishes sharded static data every night under a free-tier budget guard; the browser ranks reels with the same MiniLM model and reads screenshots with in-browser OCR.",
+      "stack": [
+        "Python",
+        "DuckDB",
+        "fastembed",
+        "React",
+        "Transformers.js",
+        "Tesseract.js",
+        "GitHub Actions"
+      ],
+      "metrics": [
+        {
+          "value": "411",
+          "label": "English repo reels indexed"
+        },
+        {
+          "value": "$0",
+          "label": "Infrastructure, budget-guarded"
+        }
+      ],
+      "year": "Oct 2026 — Present",
+      "link": "https://adityamalviya04692.github.io/Project-RepoReel/",
+      "highlight": true
+    },
+    {
       "id": "corpus",
       "image": "assets/projects/corpus.webp",
       "imageAlt": "Corpus landing page: 'Ask your documents. Query your data.' beside a chat preview with citations and a SQL bar chart",

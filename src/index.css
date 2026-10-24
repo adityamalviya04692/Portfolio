@@ -2114,6 +2114,7 @@ footer > a:not(.monogram) {
 .showcase-browser { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 20px; font: 11px "Space Mono", monospace; }
 .showcase-browser > span:last-child { display: inline-flex; align-items: center; gap: 6px; }
 .showcase-orchestra .showcase-browser { background: #14123a; color: #fbbf24; }
+.showcase-reporeel .showcase-browser { background: #000; color: #ffdc80; }
 .showcase-corpus .showcase-browser { background: #07261e; color: #7ae9c9; }
 .showcase-datalens .showcase-browser { background: #efe904; color: #111; }
 .showcase-flowforge .showcase-browser { background: #0b160d; color: #a4efaa; }
@@ -3043,8 +3044,18 @@ html[data-motion="off"] .scan-beam {
 
 /* Each column flows independently as project details expand. */
 .showcase-grid { grid-auto-rows: 1px; grid-auto-flow: dense; row-gap: 0; align-items: start; }
-.showcase-grid > :nth-child(odd) { grid-column: 1; }
-.showcase-grid > :nth-child(even) { grid-column: 2; }
+.showcase-grid > .col-a { grid-column: 1; }
+.showcase-grid > .col-b { grid-column: 2; }
+.showcase-grid > .wide { grid-column: 1 / -1; }
+/* Full-width cards lay out side by side: the film on the left, the story on the right. */
+@media (min-width: 1001px) {
+  .showcase-card.showcase-wide { flex-direction: row; }
+  .showcase-wide .showcase-visual { flex: 0 0 56%; justify-content: center; }
+  .showcase-wide .showcase-copy { flex: 1; min-width: 0; padding: 30px 32px; }
+  .showcase-wide .showcase-copy h3 { font-size: 40px; }
+  .showcase-wide .showcase-intro > p:last-child { -webkit-line-clamp: 5; }
+}
+.showcase-latest { margin-left: 10px; padding: 2px 8px; border-radius: 999px; background: var(--orange, #ed8838); color: #111; font-style: normal; font-size: 9px; letter-spacing: 1px; }
 .showcase-grid > * { align-self: start; min-width: 0; }
 .showcase-card { height: auto; }
 @media (max-width: 800px) {
