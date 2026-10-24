@@ -1,30 +1,21 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:01.400
-Meet FlowForge.
+00:00:00.400 --> 00:00:06.600
+This is FlowForge, a visual E T L workstation that runs in your browser.
 
 2
-00:00:01.400 --> 00:00:02.700
-Connect your data.
+00:00:07.200 --> 00:00:19.400
+It boots like a nineteen-eighties terminal, then draws a real pipeline: three thousand two hundred orders, deduplicated, filtered, and rolled up into ninety-two days of revenue.
 
 3
-00:00:02.700 --> 00:00:04.680
-Build a visual pipeline.
+00:00:20.000 --> 00:00:28.500
+In the workstation, every step runs on DuckDB in your browser, and shows its rows and schema as you build.
 
 4
-00:00:04.680 --> 00:00:07.040
-Filter, join, and aggregate.
+00:00:29.100 --> 00:00:38.967
+Select a step to see exactly what it produces, then export the whole pipeline as SQL, Pie Spark, or a d b t project.
 
 5
-00:00:07.040 --> 00:00:08.520
-Preview the results.
-
-6
-00:00:08.520 --> 00:00:11.660
-Export SQL, PySpark, or dbt.
-
-7
-00:00:11.660 --> 00:00:14.160
-Turn transformations into readable code.
-
+00:00:39.567 --> 00:00:46.300
+That's FlowForge, built by Aditya Malviya. Try it live, at the link below.

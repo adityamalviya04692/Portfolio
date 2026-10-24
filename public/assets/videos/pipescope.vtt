@@ -1,26 +1,21 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:01.160
-Meet PipeScope.
+00:00:00.400 --> 00:00:07.467
+This is PipeScope. See why your Spark pipeline is slow, and what it feeds.
 
 2
-00:00:01.160 --> 00:00:02.920
-Open a Spark event log.
+00:00:08.067 --> 00:00:24.267
+In the demo run, one task in stage thirteen reads four point two gigabytes and runs for thirteen minutes, while the median task takes three seconds. After tuning, the whole run drops from twenty minutes to four and a half.
 
 3
-00:00:02.920 --> 00:00:05.720
-Find skew, spill, and slow stages.
+00:00:24.867 --> 00:00:34.567
+Spark Doctor reads the event log in your browser, and turns skew, spill and idle executors into findings with fixes.
 
 4
-00:00:05.720 --> 00:00:08.640
-Explore column lineage and downstream impact.
+00:00:35.167 --> 00:00:44.800
+Lineage Explorer resolves your SQL and d b t models column by column, so you can trace any field from source to dashboard.
 
 5
-00:00:08.640 --> 00:00:09.900
-Compare runs.
-
-6
-00:00:09.900 --> 00:00:12.640
-Diagnose your pipeline, inside your browser.
-
+00:00:45.400 --> 00:00:52.267
+That's PipeScope, built by Aditya Malviya. Try it live, at the link below.

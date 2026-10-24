@@ -1,26 +1,21 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:01.560
-Meet DataLens.
+00:00:00.400 --> 00:00:06.700
+This is DataLens. Drop a dataset, and get answers in seconds.
 
 2
-00:00:01.560 --> 00:00:03.120
-Open a local dataset.
+00:00:07.300 --> 00:00:21.367
+The moment a file lands, every column is profiled in your browser. In the sample orders file, it finds forty duplicate IDs, missing ratings, and a column that mixes numbers and text.
 
 3
-00:00:03.120 --> 00:00:06.060
-Check quality, missing values, and duplicates.
+00:00:21.967 --> 00:00:32.100
+The overview scores data quality across completeness, validity, uniqueness and consistency, and writes the key insights in plain English.
 
 4
-00:00:06.060 --> 00:00:08.060
-Explore charts and outliers.
+00:00:32.700 --> 00:00:40.167
+Charts are chosen from the column types, and a SQL console and one-click cleaning are a tab away.
 
 5
-00:00:08.060 --> 00:00:10.400
-Generate readable cleaning SQL.
-
-6
-00:00:10.400 --> 00:00:12.560
-Your data stays in your browser.
-
+00:00:40.767 --> 00:00:47.700
+That's DataLens, built by Aditya Malviya. Try it live, at the link below.

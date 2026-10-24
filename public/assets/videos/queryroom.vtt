@@ -1,30 +1,21 @@
 WEBVTT
 
 1
-00:00:00.000 --> 00:00:01.360
-Meet Queryroom.
+00:00:00.400 --> 00:00:05.567
+This is Queryroom, a SQL practice studio in your browser.
 
 2
-00:00:01.360 --> 00:00:03.720
-Choose a SQL practice question.
+00:00:06.167 --> 00:00:16.900
+Write a query, run it against a real database, and read the result. Even the null row has a story: employees with no department.
 
 3
-00:00:03.720 --> 00:00:05.240
-Explore the schema.
+00:00:17.500 --> 00:00:24.767
+Three hundred and thirty-two interview questions come with the tables they use, right beside your editor.
 
 4
-00:00:05.240 --> 00:00:07.000
-Write and run your query.
+00:00:25.367 --> 00:00:33.500
+Stuck? Follow a step-by-step approach, or study a reference solution with every keyword explained.
 
 5
-00:00:07.000 --> 00:00:08.280
-Check your answer.
-
-6
-00:00:08.280 --> 00:00:10.360
-Use hints and explanations.
-
-7
-00:00:10.360 --> 00:00:12.960
-Build confidence with hands-on practice.
-
+00:00:34.100 --> 00:00:40.733
+That's Queryroom, built by Aditya Malviya. Try it live, at the link below.
