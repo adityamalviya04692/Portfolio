@@ -3921,7 +3921,8 @@ html[data-theme="dark"] .showcase-film-play {
 .carousel-card .showcase-copy { padding: 26px 28px 24px; }
 .carousel-card .showcase-copy h3 { margin-top: 12px; font-size: 32px; line-height: 1.1; }
 .carousel-card .showcase-subtitle { display: -webkit-box; height: 3em; margin: 8px 0 0; overflow: hidden; line-height: 1.5; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.carousel-card .showcase-copy .tags { height: 29px; margin: 18px 0 0; overflow: hidden; flex-wrap: wrap; }
+/* 4px of headroom so chips can lift on hover without being clipped; still one row. */
+.carousel-card .showcase-copy .tags { height: 33px; margin: 14px 0 0; padding-top: 4px; overflow: hidden; flex-wrap: wrap; }
 .carousel-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 .carousel-actions > * { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 46px; padding: 0 20px; border: 1px solid var(--ink); border-radius: 30px; font-size: 14px; font-weight: 700; white-space: nowrap; transition: background .18s ease, color .18s ease, transform .18s var(--ease-out), box-shadow .18s ease; }
 .carousel-explore { background: var(--orange); color: #292820; box-shadow: 3px 3px 0 var(--ink); }
