@@ -73,7 +73,7 @@ export default function ProjectVideo({ id, title, index, link, kind = "Narrated 
     <div className="project-player" ref={player} id={`video-${id}`} role="region" aria-label={`${title} video walkthrough`}>
       <div className="showcase-browser">
         <span>{index >= 0 ? `${String(index + 1).padStart(2, "0")} / ` : ""}{title}</span>
-        {link && <a href={link} target="_blank" rel="noreferrer" aria-label={`Open ${title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a>}
+        {link && <a href={link} target="_blank" rel="noreferrer" aria-label={`Open ${title} ${id === "behaviorlab" ? "source and setup" : "live demo"}`}>{id === "behaviorlab" ? "SOURCE & SETUP" : "OPEN APP"} <ArrowUpRight size={14} /></a>}
       </div>
       <div className="project-player-screen">
         <video
