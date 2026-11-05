@@ -3042,8 +3042,8 @@ html[data-motion="off"] .scan-beam {
   .project-video-dialog-heading { padding: 14px 17px; }
 }
 
-/* Each column flows independently as project details expand. */
-.showcase-grid { grid-auto-rows: 1px; grid-auto-flow: dense; row-gap: 0; align-items: start; }
+/* Project pairs share a row and preserve their source order. */
+.showcase-grid { grid-auto-rows: auto; grid-auto-flow: row; row-gap: 32px; align-items: start; }
 .showcase-grid > .col-a { grid-column: 1; }
 .showcase-grid > .col-b { grid-column: 2; }
 .showcase-grid > .wide { grid-column: 1 / -1; }

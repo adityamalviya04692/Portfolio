@@ -37,10 +37,13 @@ const profile = data.profile,
   email = `mailto:${profile.social.email}`;
 const moriveda = data.projects.find((project) => project.id === "moriveda")!;
 const skillProjects = data.projects.filter((project) => project.id !== "moriveda");
-// Newest project is featured full width; the rest pair up in two columns, and an odd one out goes full
-// width too, so the grid never ends with an empty half-row however many projects there are.
-const showcaseSlot = (index: number) =>
-  index === 0 || (skillProjects.length % 2 === 0 && index === skillProjects.length - 1) ? "wide" : index % 2 ? "col-a" : "col-b";
+// An odd count features only the newest project, then pairs the remaining cards.
+const showcaseSlot = (index: number) => {
+  const hasFeaturedProject = skillProjects.length % 2 === 1;
+  if (hasFeaturedProject && index === 0) return "wide";
+  const pairedIndex = index - (hasFeaturedProject ? 1 : 0);
+  return pairedIndex % 2 === 0 ? "col-a" : "col-b";
+};
 
 function Portfolio() {
   const [activeVideo, setActiveVideo] = useState({ id: "", request: 0 });
@@ -483,7 +486,7 @@ function Portfolio() {
                 <Reveal key={project.id} className={showcaseSlot(index)}>
                   <article className={`showcase-card showcase-${project.id}${showcaseSlot(index) === "wide" ? " showcase-wide" : ""}`} id={`project-${project.id}`}>
                     <div className="showcase-visual">
-                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}{index === 0 && <em className="showcase-latest">LATEST</em>}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} ${project.id === "behaviorlab" ? "source and setup" : "live demo"}`}>{project.id === "behaviorlab" ? "SOURCE & SETUP" : "OPEN APP"} <ArrowUpRight size={14} /></a></div>
+                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}{index === 0 && <em className="showcase-latest">LATEST</em>}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a></div>
                       <button className="showcase-film-preview" onClick={(event) => playProject(project.id, event.currentTarget)} aria-label={`Play ${project.title} walkthrough`} aria-haspopup="dialog">
                         <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
                         <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "behaviorlab" ? "2:27" : project.id === "reporeel" ? "1:27" : project.id === "corpus" ? "2:07" : project.id === "orchestra" ? "2:09" : project.id === "flowforge" ? "0:47" : project.id === "datalens" ? "0:48" : project.id === "pipescope" ? "0:53" : project.id === "queryroom" ? "0:41" : "14s"}</span></span>
