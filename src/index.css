@@ -3895,3 +3895,110 @@ html[data-theme="dark"] .showcase-film-play {
   transform: translate(-1px, -2px);
   box-shadow: 4px 5px 0 #292820;
 }
+
+/* ======================================================================
+   Project carousel: swipeable cards that open the project explorer dialog.
+   ====================================================================== */
+.project-carousel-bar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: -6px 0 20px; }
+.project-carousel-count { margin-right: 6px; font: 11px "Space Mono", monospace; letter-spacing: 1px; }
+.project-carousel-bar button { display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid var(--ink); border-radius: 50%; background: transparent; color: var(--ink); transition: background .18s ease, color .18s ease, opacity .18s ease; }
+.project-carousel-bar button:hover { background: var(--ink); color: var(--cream); }
+.project-carousel-bar button:disabled { opacity: .28; pointer-events: none; }
+.project-carousel-track { display: flex; align-items: flex-start; gap: 28px; padding: 4px 2px 26px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.project-carousel-track::-webkit-scrollbar { display: none; }
+.project-carousel-track:focus-visible { outline: 2px solid var(--blue); outline-offset: 6px; border-radius: 22px; }
+.carousel-card { flex: 0 0 min(78%, 640px); height: auto; scroll-snap-align: start; }
+.carousel-thumb { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; overflow: hidden; cursor: pointer; }
+.carousel-thumb img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; transition: transform .45s var(--ease-out); }
+.carousel-thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(#0000 55%, #0000004d); opacity: 0; transition: opacity .25s ease; }
+.carousel-thumb-chip { position: absolute; right: 16px; bottom: 16px; z-index: 1; display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border: 1px solid var(--ink); border-radius: 30px; background: #fffdf7; color: #292820; font-size: 13px; font-weight: 700; box-shadow: 3px 3px 0 var(--ink); opacity: 0; transform: translateY(6px); transition: opacity .22s ease, transform .22s var(--ease-out); }
+.carousel-thumb:hover img, .carousel-thumb:focus-visible img { transform: scale(1.03); }
+.carousel-thumb:hover::after, .carousel-thumb:focus-visible::after, .carousel-thumb:hover .carousel-thumb-chip, .carousel-thumb:focus-visible .carousel-thumb-chip { opacity: 1; transform: none; }
+.carousel-thumb:focus-visible { outline: 3px solid var(--blue); outline-offset: -3px; }
+@media (hover: none) { .carousel-thumb::after, .carousel-thumb-chip { opacity: 1; transform: none; } }
+/* Fixed rhythm so titles, tags, buttons and "Read more" line up across cards. */
+.carousel-card .showcase-copy { padding: 26px 28px 24px; }
+.carousel-card .showcase-copy h3 { margin-top: 12px; font-size: 32px; line-height: 1.1; }
+.carousel-card .showcase-subtitle { display: -webkit-box; height: 3em; margin: 8px 0 0; overflow: hidden; line-height: 1.5; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.carousel-card .showcase-copy .tags { height: 29px; margin: 18px 0 0; overflow: hidden; flex-wrap: wrap; }
+.carousel-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.carousel-actions > * { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 46px; padding: 0 20px; border: 1px solid var(--ink); border-radius: 30px; font-size: 14px; font-weight: 700; white-space: nowrap; transition: background .18s ease, color .18s ease, transform .18s var(--ease-out), box-shadow .18s ease; }
+.carousel-explore { background: var(--orange); color: #292820; box-shadow: 3px 3px 0 var(--ink); }
+.carousel-explore:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.carousel-actions a { color: var(--ink); background: transparent; }
+.carousel-actions a:hover { background: var(--ink); color: var(--cream); }
+.carousel-card .showcase-details { margin-top: 20px; }
+.carousel-card .showcase-details .accordion-panel p + p { margin-top: 12px; }
+.project-carousel-dots { display: flex; justify-content: center; gap: 7px; }
+.project-carousel-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 8px; background: #29282033; transition: width .25s var(--ease-out), background .25s ease; }
+.project-carousel-dots button.is-active { width: 26px; background: var(--orange); }
+@media (max-width: 760px) {
+  .carousel-card { flex-basis: 88%; }
+  .project-carousel-track { gap: 16px; }
+  .project-carousel-bar button { width: 40px; height: 40px; }
+  .carousel-card .showcase-copy { padding: 22px 20px 20px; }
+  .carousel-card .showcase-copy h3 { font-size: 27px; }
+  .carousel-actions > * { flex: 1; padding: 0 14px; }
+}
+
+/* -- Project explorer: the walkthrough dialog with details under the video -- */
+.project-video-dialog.project-explorer { width: min(1040px, calc(100vw - 48px)); }
+.project-explorer .project-player-screen { max-height: min(56dvh, 560px); }
+.project-explorer-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 34px; padding: 28px 28px 32px; border-top: 1px solid #e6e0d5; }
+.project-explorer-summary { display: flex; flex-direction: column; gap: 18px; }
+.project-explorer-subtitle { font-size: 18px; line-height: 1.45; }
+.project-explorer-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.project-explorer-metrics div { padding: 12px 14px; border: 1px solid #e3ddcf; border-radius: 12px; background: #f6f2e8; }
+.project-explorer-metrics strong { display: block; font-size: 24px; letter-spacing: -.5px; color: var(--blue); }
+.project-explorer-metrics span { font-size: 12px; line-height: 1.4; color: #635e54; }
+.project-explorer .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.project-explorer .tags span { padding: 6px 9px; border: 1px solid #e3ddcf; border-radius: 6px; background: #f1ede3; font-size: 11px; }
+.project-explorer .showcase-links { margin-top: 0; }
+.project-explorer-text { display: flex; flex-direction: column; gap: 18px; }
+.project-explorer-text h3 { margin-bottom: 6px; font: 10px "Space Mono", monospace; letter-spacing: 1px; text-transform: uppercase; color: #c96a1f; }
+.project-explorer-text p { font-size: 15px; line-height: 1.7; color: #59564e; }
+@media (max-width: 760px) {
+  .project-video-dialog.project-explorer { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; }
+  .project-explorer-body { grid-template-columns: 1fr; gap: 24px; padding: 22px 18px 28px; }
+}
+
+/* -- Dialog motion: grows out of the card that opened it, content settles a beat later -- */
+.project-video-dialog { opacity: 0; transform: translateY(18px) scale(.94); transition: opacity 240ms ease, transform 260ms cubic-bezier(.4, 0, 1, 1); }
+.project-video-dialog[data-visible="true"] { opacity: 1; transform: none; transition: opacity 380ms cubic-bezier(.22, 1, .36, 1), transform 520ms cubic-bezier(.22, 1, .36, 1); }
+.project-video-dialog::backdrop { opacity: 0; backdrop-filter: blur(0); transition: opacity 280ms ease, backdrop-filter 280ms ease; }
+.project-video-dialog[data-visible="true"]::backdrop { opacity: 1; backdrop-filter: blur(7px); transition: opacity 450ms ease, backdrop-filter 450ms ease; }
+.project-video-dialog .project-player, .project-explorer-summary > *, .project-explorer-text > * { opacity: 0; transform: translateY(10px); transition: opacity 180ms ease, transform 180ms ease; }
+.project-video-dialog[data-visible="true"] .project-player, .project-video-dialog[data-visible="true"] .project-explorer-summary > *, .project-video-dialog[data-visible="true"] .project-explorer-text > * { opacity: 1; transform: none; transition: opacity 450ms cubic-bezier(.22, 1, .36, 1), transform 550ms cubic-bezier(.22, 1, .36, 1); }
+.project-video-dialog[data-visible="true"] .project-player { transition-delay: 90ms; }
+.project-video-dialog[data-visible="true"] .project-explorer-summary > :nth-child(1) { transition-delay: 150ms; }
+.project-video-dialog[data-visible="true"] .project-explorer-summary > :nth-child(2) { transition-delay: 190ms; }
+.project-video-dialog[data-visible="true"] .project-explorer-summary > :nth-child(3) { transition-delay: 230ms; }
+.project-video-dialog[data-visible="true"] .project-explorer-summary > :nth-child(4) { transition-delay: 270ms; }
+.project-video-dialog[data-visible="true"] .project-explorer-text > :nth-child(1) { transition-delay: 210ms; }
+.project-video-dialog[data-visible="true"] .project-explorer-text > :nth-child(2) { transition-delay: 250ms; }
+.project-video-dialog[data-visible="true"] .project-explorer-text > :nth-child(3) { transition-delay: 290ms; }
+@media (max-width: 760px) {
+  .project-video-dialog.project-explorer { transform: translateY(48px); }
+  .project-video-dialog.project-explorer[data-visible="true"] { transform: none; }
+}
+.project-video-dialog[data-reduced="true"], .project-video-dialog[data-reduced="true"] .project-player, .project-video-dialog[data-reduced="true"] .project-explorer-summary > *, .project-video-dialog[data-reduced="true"] .project-explorer-text > * { transform: none !important; transition: opacity 150ms ease !important; transition-delay: 0ms !important; }
+@media (prefers-reduced-motion: reduce) {
+  .project-carousel-track { scroll-behavior: auto; }
+  .carousel-thumb img, .carousel-thumb-chip, .carousel-actions > *, .project-carousel-dots button { transition: none; }
+}
+
+/* -- Night colours for the carousel and explorer -- */
+html[data-theme="dark"] .project-carousel-bar button:hover,
+html[data-theme="dark"] .carousel-actions a:hover { background: var(--ink); color: var(--night); }
+html[data-theme="dark"] .project-carousel-dots button { background: var(--night-line); }
+html[data-theme="dark"] .project-carousel-dots button.is-active { background: var(--orange); }
+html[data-theme="dark"] .carousel-explore { border-color: var(--orange); box-shadow: none; }
+html[data-theme="dark"] .carousel-actions a { border-color: var(--night-line); }
+html[data-theme="dark"] .carousel-thumb-chip { border-color: var(--night-line); background: var(--night-card); color: var(--ink); box-shadow: 0 6px 18px #0008; }
+html[data-theme="dark"] .project-explorer-body { border-color: var(--night-line); }
+html[data-theme="dark"] .project-explorer-metrics div,
+html[data-theme="dark"] .project-explorer .tags span { border-color: var(--night-line); background: var(--night-well); }
+html[data-theme="dark"] .project-explorer-metrics strong { color: #8fa9f0; }
+html[data-theme="dark"] .project-explorer-metrics span,
+html[data-theme="dark"] .project-explorer-text p { color: var(--night-muted); }
+html[data-theme="dark"] .project-explorer-text h3 { color: var(--orange); }

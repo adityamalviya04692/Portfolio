@@ -17,9 +17,13 @@ type Props = {
   active: boolean;
   request: number;
   onActivate: () => void;
+  /** False opens the player paused on its cover until the visitor presses play. */
+  autoPlay?: boolean;
 };
 
-export default function ProjectVideo({ id, title, index, link, kind = "Narrated walkthrough", active, request, onActivate }: Props) {
+export default function ProjectVideo({ id, title, index, link, kind = "Narrated walkthrough", active, request, onActivate, autoPlay = true }: Props) {
+  // Paused openings wait for a newer play request than the one that opened the dialog.
+  const openingRequest = useRef(autoPlay ? -1 : request);
   const video = useRef<HTMLVideoElement>(null);
   const player = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -35,6 +39,7 @@ export default function ProjectVideo({ id, title, index, link, kind = "Narrated 
     const media = video.current;
     if (!media) return;
     if (!active) { media.pause(); return; }
+    if (request === openingRequest.current) return;
     setStarted(true);
     setError("");
     if (media.ended) media.currentTime = 0;

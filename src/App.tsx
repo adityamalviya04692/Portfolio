@@ -20,7 +20,7 @@ import data from "./data/portfolio.json";
 import ProjectArt from "./components/ProjectArt";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
-import ProjectMasonry from "./components/ProjectMasonry";
+import ProjectCarousel from "./components/ProjectCarousel";
 import {
   Accordion,
   AvatarPortal,
@@ -37,20 +37,18 @@ const profile = data.profile,
   email = `mailto:${profile.social.email}`;
 const moriveda = data.projects.find((project) => project.id === "moriveda")!;
 const skillProjects = data.projects.filter((project) => project.id !== "moriveda");
-// An odd count features only the newest project, then pairs the remaining cards.
-const showcaseSlot = (index: number) => {
-  const hasFeaturedProject = skillProjects.length % 2 === 1;
-  if (hasFeaturedProject && index === 0) return "wide";
-  const pairedIndex = index - (hasFeaturedProject ? 1 : 0);
-  return pairedIndex % 2 === 0 ? "col-a" : "col-b";
-};
 
 function Portfolio() {
-  const [activeVideo, setActiveVideo] = useState({ id: "", request: 0 });
+  const [activeVideo, setActiveVideo] = useState({ id: "", request: 0, explore: false });
   const videoTrigger = useRef<HTMLElement | null>(null);
   const playProject = (id: string, trigger?: HTMLElement) => {
     if (trigger) videoTrigger.current = trigger;
-    setActiveVideo((previous) => ({ id, request: previous.request + 1 }));
+    setActiveVideo((previous) => ({ id, request: previous.request + 1, explore: previous.id === id && previous.explore }));
+  };
+  // Explore opens the project details with its walkthrough paused until the visitor presses play.
+  const exploreProject = (id: string, trigger: HTMLElement) => {
+    videoTrigger.current = trigger;
+    setActiveVideo((previous) => ({ id, request: previous.request + 1, explore: true }));
   };
   // The 70-second profile intro plays in the same dialog as the project walkthroughs.
   const intro = { id: "intro", title: "Meet Aditya", link: "" };
@@ -481,41 +479,7 @@ function Portfolio() {
               </div>
               <p>Tools I built to explore reel-first search, orchestration, <br />document AI, data quality, pipeline design, Spark diagnostics and SQL.</p>
             </Reveal>
-            <ProjectMasonry>
-              {skillProjects.map((project, index) => (
-                <Reveal key={project.id} className={showcaseSlot(index)}>
-                  <article className={`showcase-card showcase-${project.id}${showcaseSlot(index) === "wide" ? " showcase-wide" : ""}`} id={`project-${project.id}`}>
-                    <div className="showcase-visual">
-                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}{index === 0 && <em className="showcase-latest">LATEST</em>}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a></div>
-                      <button className="showcase-film-preview" onClick={(event) => playProject(project.id, event.currentTarget)} aria-label={`Play ${project.title} walkthrough`} aria-haspopup="dialog">
-                        <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
-                        <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "behaviorlab" ? "2:27" : project.id === "reporeel" ? "1:27" : project.id === "corpus" ? "2:07" : project.id === "orchestra" ? "2:09" : project.id === "flowforge" ? "0:47" : project.id === "datalens" ? "0:48" : project.id === "pipescope" ? "0:53" : project.id === "queryroom" ? "0:41" : "14s"}</span></span>
-                      </button>
-                    </div>
-                    <div className="showcase-copy">
-                      <div className="showcase-intro">
-                      <span className="showcase-category">{project.category}</span>
-                      <h3>{project.title}</h3>
-                      <p className="showcase-subtitle">{project.subtitle}</p>
-                      <p>{project.description}</p>
-                      </div>
-                      <div className="showcase-meta">
-                      <div className="tags">{project.stack.slice(0, 5).map((item) => <span key={item}>{item}</span>)}</div>
-                      <Accordion title="Problem & approach" className="showcase-details">
-                        <p><strong>The problem.</strong> {project.problem}</p>
-                        <p><strong>What I built.</strong> {project.approach}</p>
-                      </Accordion>
-                      <div className="showcase-links">
-                        {project.document ? (<a className="showcase-primary" href={asset(project.document || "")} target="_blank" rel="noreferrer"><FileText size={17} /> View case study <span>PDF</span></a>) : (<a className="showcase-primary" href={project.link} target="_blank" rel="noreferrer">Try Queryroom <ArrowUpRight size={17} /></a>)}
-                        <a href={project.github} target="_blank" rel="noreferrer"><Github size={16} /> Code <ArrowUpRight size={14} /></a>
-                        {project.presentation && (<a href={asset(project.presentation || "")} download><Download size={16} /> Slides <span>PPTX</span></a>)}
-                      </div>
-                      </div>
-                    </div>
-                  </article>
-                </Reveal>
-              ))}
-            </ProjectMasonry>
+            <ProjectCarousel projects={skillProjects} onExplore={exploreProject} />
           </div>
         </section>
         <section id="research" className="research-section" aria-labelledby="research-heading">
@@ -731,7 +695,7 @@ function Portfolio() {
           </div>
         </section>
       </main>
-      {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onActivate={() => playProject(videoProject.id)} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request }))} />}
+      {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} details={activeVideo.explore && videoProject.id !== "intro" ? skillProjects.find((project) => project.id === videoProject.id) : undefined} autoPlay={!activeVideo.explore} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onActivate={() => playProject(videoProject.id)} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request, explore: false }))} />}
       <footer>
         <a className="monogram" href="#home" aria-label="Back to top">
           a<span>m.</span>
