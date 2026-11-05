@@ -483,10 +483,10 @@ function Portfolio() {
                 <Reveal key={project.id} className={showcaseSlot(index)}>
                   <article className={`showcase-card showcase-${project.id}${showcaseSlot(index) === "wide" ? " showcase-wide" : ""}`} id={`project-${project.id}`}>
                     <div className="showcase-visual">
-                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}{index === 0 && <em className="showcase-latest">LATEST</em>}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a></div>
+                      <div className="showcase-browser"><span>{String(index + 1).padStart(2, "0")} / {project.title}{index === 0 && <em className="showcase-latest">LATEST</em>}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} ${project.id === "behaviorlab" ? "source and setup" : "live demo"}`}>{project.id === "behaviorlab" ? "SOURCE & SETUP" : "OPEN APP"} <ArrowUpRight size={14} /></a></div>
                       <button className="showcase-film-preview" onClick={(event) => playProject(project.id, event.currentTarget)} aria-label={`Play ${project.title} walkthrough`} aria-haspopup="dialog">
                         <img src={asset(project.image || "")} alt={project.imageAlt} width="1440" height="645" loading="lazy" />
-                        <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "reporeel" ? "1:27" : project.id === "corpus" ? "2:07" : project.id === "orchestra" ? "2:09" : project.id === "flowforge" ? "0:47" : project.id === "datalens" ? "0:48" : project.id === "pipescope" ? "0:53" : project.id === "queryroom" ? "0:41" : "14s"}</span></span>
+                        <span className="showcase-film-play"><Play size={19} fill="currentColor" /><span>Watch walkthrough</span><span>{project.id === "behaviorlab" ? "2:27" : project.id === "reporeel" ? "1:27" : project.id === "corpus" ? "2:07" : project.id === "orchestra" ? "2:09" : project.id === "flowforge" ? "0:47" : project.id === "datalens" ? "0:48" : project.id === "pipescope" ? "0:53" : project.id === "queryroom" ? "0:41" : "14s"}</span></span>
                       </button>
                     </div>
                     <div className="showcase-copy">
