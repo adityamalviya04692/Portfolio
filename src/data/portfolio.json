@@ -206,7 +206,7 @@
   "projects": [
     {
       "id": "behaviorlab",
-      "title": "Behavior Lab",
+      "title": "behaviorlab",
       "subtitle": "Corporate-event actions, inspectable client insights",
       "category": "Data Engineering · Event Pipelines",
       "description": "An interactive Northline Events demo that traces ticket orders, meetings, briefs and check-ins through Flask, a SQLite transactional outbox, Kafka routing and Bronze/Silver/Gold profiles. Explore raw records, explainable scores, attendance and demo sales.",
@@ -235,7 +235,7 @@
       "link": "https://behavior-lab-tum9.onrender.com",
       "github": "https://github.com/adityamalviya04692/Project-BehaviorLab",
       "image": "assets/projects/behaviorlab.webp",
-      "imageAlt": "Behavior Lab corporate-events application with animated phone journeys and an event inspector",
+      "imageAlt": "behaviorlab corporate-events application with animated phone journeys and an event inspector",
       "presentation": "documents/behaviorlab-case-study.pptx",
       "document": "documents/behaviorlab-case-study.pdf",
       "highlight": true

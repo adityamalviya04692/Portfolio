@@ -2119,6 +2119,7 @@ footer > a:not(.monogram) {
 .showcase-datalens .showcase-browser { background: #efe904; color: #111; }
 .showcase-flowforge .showcase-browser { background: #0b160d; color: #a4efaa; }
 .showcase-pipescope .showcase-browser { background: #251c2b; color: #faf7ef; }
+.showcase-behaviorlab .showcase-browser { background: #284f40; color: #c1e3a2; }
 .showcase-queryroom .showcase-browser { background: #18392f; color: #c9f16c; }
 .showcase-visual img { display: block; width: 100%; height: auto; aspect-ratio: 1440 / 645; object-fit: cover; object-position: top center; }
 .showcase-copy { display: flex; flex: 1; flex-direction: column; padding: 30px; }
