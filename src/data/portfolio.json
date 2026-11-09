@@ -7,7 +7,7 @@
     "specialization": "Data Engineering · Azure · PySpark",
     "location": "Mumbai, Maharashtra, India",
     "yearsOfExperience": "nearly 5 years",
-    "availability": "Open to Senior Data Engineer roles · Mumbai · Hybrid",
+    "availability": "Open to Senior Data Engineer roles · Anywhere in India · On-site, hybrid or remote",
     "bio": "Senior Data Engineer at Tata Consultancy Services with nearly 5 years across two client accounts, Rolls-Royce Digital and Avery Dennison (Smartrac). I design and own production lakehouse pipelines with PySpark, SQL/T-SQL, Python, Azure Databricks, Azure Data Factory, Delta Lake and Unity Catalog, processing 30–40 GB/day of streaming data (Event Hubs, Kafka, Structured Streaming) and 5-7 GB/day of batch data. I lead a 4-member offshore team as Scrum Master: stand-ups, boards, pull-request approvals and delivery to the client.",
     "bioSecondary": "I care about the unglamorous parts — the skewed join that quietly costs an hour a night, the cluster that is three sizes too big, the pipeline nobody can redeploy safely. Fixing those is most of the job.",
     "avatar": "assets/aditya-portrait.png",
