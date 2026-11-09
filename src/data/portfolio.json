@@ -8,7 +8,7 @@
     "location": "Mumbai, Maharashtra, India",
     "yearsOfExperience": "nearly 5 years",
     "availability": "Open to Senior Data Engineer roles · Mumbai · Hybrid",
-    "bio": "Senior Data Engineer at Tata Consultancy Services with nearly 5 years across two client accounts, Rolls-Royce Digital and Avery Dennison (Smartrac). I design and own production lakehouse pipelines with PySpark, SQL/T-SQL, Python, Azure Databricks, Azure Data Factory, Delta Lake and Unity Catalog, processing 30–40 GB/day of streaming data (Event Hubs, Kafka, Structured Streaming) and 5-7 GB/day of batch data. I lead a 6-member offshore team as Scrum Master: stand-ups, boards, pull-request approvals and delivery to the client.",
+    "bio": "Senior Data Engineer at Tata Consultancy Services with nearly 5 years across two client accounts, Rolls-Royce Digital and Avery Dennison (Smartrac). I design and own production lakehouse pipelines with PySpark, SQL/T-SQL, Python, Azure Databricks, Azure Data Factory, Delta Lake and Unity Catalog, processing 30–40 GB/day of streaming data (Event Hubs, Kafka, Structured Streaming) and 5-7 GB/day of batch data. I lead a 4-member offshore team as Scrum Master: stand-ups, boards, pull-request approvals and delivery to the client.",
     "bioSecondary": "I care about the unglamorous parts — the skewed join that quietly costs an hour a night, the cluster that is three sizes too big, the pipeline nobody can redeploy safely. Fixing those is most of the job.",
     "avatar": "assets/aditya-portrait.png",
     "resume": "Aditya_Malviya_Senior_Data_Engineer.pdf",
@@ -159,7 +159,7 @@
     },
     {
       "title": "Team Leadership & Delivery",
-      "summary": "Leading a 6-member offshore team as Scrum Master since 2025.",
+      "summary": "Leading a 4-member offshore team as Scrum Master since 2025.",
       "points": [
         "Run daily stand-ups and sprint planning; maintain Azure DevOps boards",
         "Mentor juniors and approve their PySpark and SQL pull requests",
@@ -186,7 +186,7 @@
             "Lowered Azure platform costs by ~40% through right-sized Databricks job clusters, shorter job runtimes, Delta Lake OPTIMIZE and Z-ORDER with table partitioning, and parameterized, reusable ADF pipelines.",
             "Built Python data quality checks (deduplication, null handling) into the Bronze and Silver layers, governed tables through Unity Catalog (RBAC, data lineage), and secured credentials with Azure Key Vault-backed secret scopes and service principals.",
             "Deliver ~4 user stories and 2 bug fixes per sprint on feature branches merged into develop and main; prepare Azure DevOps YAML files and run CI/CD deployments of each branch to Dev for integration testing ahead of DevOps-owned promotion to Stage (limited-user UAT) and Production.",
-            "Lead a 6-member offshore team as Scrum Master across 27 two-week sprints and 3 production releases: daily stand-ups with UK client stakeholders, sprint planning on Azure DevOps Boards, mentoring 4 junior engineers and reviewing pull requests.",
+            "Lead a 4-member offshore team as Scrum Master across 27 two-week sprints and 3 production releases: daily stand-ups with UK client stakeholders, sprint planning on Azure DevOps Boards, mentoring 4 junior engineers and reviewing pull requests.",
             "Use AI-assisted development (GitHub Copilot, Claude and ChatGPT in VS Code) to automate repetitive coding and test writing and raise code quality across the team."
           ]
         },
