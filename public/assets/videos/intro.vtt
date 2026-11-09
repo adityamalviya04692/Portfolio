@@ -1,49 +1,49 @@
 WEBVTT
 
 1
-00:00:00.333 --> 00:00:06.533
-Hi, I'm Aditya Malviya, a Senior Data Engineer based in Mumbai.
+00:00:00.333 --> 00:00:04.100
+Hi! I'm Aditya Malviya, a Senior Data Engineer based in Mumbai.
 
 2
-00:00:06.833 --> 00:00:11.400
+00:00:06.900 --> 00:00:09.767
 I build data pipelines that hold up in production.
 
 3
-00:00:11.833 --> 00:00:20.200
+00:00:11.900 --> 00:00:18.300
 Medallion lakehouses on Azure Databricks, processing 27 GB of streaming data, every day.
 
 4
-00:00:20.400 --> 00:00:27.667
+00:00:20.400 --> 00:00:25.633
 I cut a critical Spark job's runtime by 73%, and Azure costs by 40%.
 
 5
-00:00:28.000 --> 00:00:33.933
+00:00:28.067 --> 00:00:31.833
 My toolkit: PySpark, Databricks, Data Factory, and Delta Lake.
 
 6
-00:00:34.167 --> 00:00:37.767
+00:00:34.233 --> 00:00:36.333
 FlowForge: a visual ETL builder.
 
 7
-00:00:38.667 --> 00:00:42.967
+00:00:38.733 --> 00:00:41.400
 PipeScope: Spark diagnostics and lineage.
 
 8
-00:00:43.167 --> 00:00:46.967
+00:00:43.233 --> 00:00:45.500
 DataLens: in-browser data profiling.
 
 9
-00:00:47.667 --> 00:00:51.267
+00:00:47.733 --> 00:00:49.833
 Queryroom: hands-on SQL practice.
 
 10
-00:00:52.167 --> 00:00:57.167
+00:00:52.233 --> 00:00:55.767
 And Moriveda: a storefront I launched in 21 days.
 
 11
-00:00:57.400 --> 00:01:02.800
+00:00:57.400 --> 00:01:01.200
 I also research when Spark's adaptive execution beats salting.
 
 12
-00:01:03.233 --> 00:01:09.833
-I'm open to senior data engineer roles. Let's build something reliable.
+00:01:03.233 --> 00:01:08.733
+I'm open to senior data engineer roles, anywhere in India. Let's build something reliable.
