@@ -8,7 +8,7 @@
     "location": "Mumbai, Maharashtra, India",
     "yearsOfExperience": "nearly 5 years",
     "availability": "Open to Senior Data Engineer roles · Mumbai · Hybrid",
-    "bio": "Senior Data Engineer at Tata Consultancy Services with nearly 5 years across two client accounts, Rolls-Royce Digital and Avery Dennison (Smartrac). I design and own production lakehouse pipelines with PySpark, SQL/T-SQL, Python, Azure Databricks, Azure Data Factory, Delta Lake and Unity Catalog, processing ~27 GB/day of streaming data (Event Hubs, Kafka, Structured Streaming) and 5-7 GB/day of batch data. I lead a 6-member offshore team as Scrum Master: stand-ups, boards, pull-request approvals and delivery to the client.",
+    "bio": "Senior Data Engineer at Tata Consultancy Services with nearly 5 years across two client accounts, Rolls-Royce Digital and Avery Dennison (Smartrac). I design and own production lakehouse pipelines with PySpark, SQL/T-SQL, Python, Azure Databricks, Azure Data Factory, Delta Lake and Unity Catalog, processing 30–40 GB/day of streaming data (Event Hubs, Kafka, Structured Streaming) and 5-7 GB/day of batch data. I lead a 6-member offshore team as Scrum Master: stand-ups, boards, pull-request approvals and delivery to the client.",
     "bioSecondary": "I care about the unglamorous parts — the skewed join that quietly costs an hour a night, the cluster that is three sizes too big, the pipeline nobody can redeploy safely. Fixing those is most of the job.",
     "avatar": "assets/aditya-portrait.png",
     "resume": "Aditya_Malviya_Senior_Data_Engineer.pdf",
@@ -36,7 +36,7 @@
       "label": "Azure cloud cost reduced"
     },
     {
-      "value": "27 GB/day",
+      "value": "30–40 GB/day",
       "label": "Streaming data processed"
     }
   ],
@@ -69,7 +69,7 @@
           "Azure Event Hubs",
           "Delta Lake",
           "Unity Catalog",
-          "Databricks Workflows",
+          "Databricks Jobs & Pipelines",
           "Auto Loader",
           "Azure Key Vault",
           "Azure DevOps",
@@ -135,7 +135,7 @@
       "summary": "End-to-end ETL/ELT on Azure — ingestion through to modelled, query-ready tables.",
       "points": [
         "Medallion-architecture lakehouses (Bronze / Silver / Gold) on Delta Lake",
-        "Streaming ingestion with Event Hubs, Kafka and Structured Streaming (~27 GB/day); batch loads with Delta MERGE and SCD Type 2 (5-7 GB/day)",
+        "Streaming ingestion with Event Hubs, Kafka and Structured Streaming (30–40 GB/day); batch loads with Delta MERGE and SCD Type 2 (5-7 GB/day)",
         "Layer-wise data quality checks and Unity Catalog governance, access control and lineage"
       ]
     },
@@ -153,7 +153,7 @@
       "summary": "I collaborate with DevOps colleagues on repeatable data pipeline releases.",
       "points": [
         "Worked with the DevOps team during ADF and Databricks pipeline builds and releases",
-        "Working understanding of Azure DevOps, YAML, Git and environment promotion",
+        "Prepare Azure DevOps YAML files and run CI/CD deployments of feature branches to Dev for integration testing",
         "Containerised services with Docker for environment parity"
       ]
     },
@@ -170,7 +170,7 @@
   "experience": [
     {
       "company": "Tata Consultancy Services",
-      "role": "Senior Data Engineer (Mar 2026–present); Data Engineer (Dec 2021–Feb 2026)",
+      "role": "Senior Data Engineer (Mar 2026–present); Data Engineer (Dec 2021–Mar 2026)",
       "account": "Rolls-Royce Digital account (Feb 2022–present)",
       "period": "Dec 2021 — Present",
       "location": "Mumbai, India",
@@ -178,25 +178,24 @@
       "projects": [
         {
           "name": "Engine History Analysis",
-          "period": "2024 — Present",
+          "period": "Current project",
           "highlights": [
-            "Design and own production ADF and Azure Databricks ETL/ELT pipelines in PySpark and Spark SQL on a Medallion Architecture (Bronze, Silver, Gold) over Delta Lake and ADLS Gen2, processing ~27 GB/day of streaming and 5-7 GB/day of batch engine data into star-schema models for Power BI reporting.",
-            "Built real-time ingestion with Azure Event Hubs, Apache Kafka and Spark Structured Streaming into Delta Lake, alongside incremental batch loads using Delta MERGE, SCD Type 2 and Auto Loader, orchestrated with Databricks Workflows.",
-            "Cut a critical Spark job's runtime by ~73% (52 to 14 minutes) by fixing join skew with key salting and Adaptive Query Execution, eliminating recurring executor out-of-memory failures.",
-            "Reduced Azure costs by ~40% through cluster right-sizing, Delta OPTIMIZE, Z-ORDER and partitioning, and parameterized ADF pipelines.",
-            "Implemented data quality checks at every medallion layer and Unity Catalog governance (RBAC, fine-grained permissions, lineage); secrets via Azure Key Vault-backed scopes and service principals.",
-            "Since 2025, lead a 6-member offshore team as Scrum Master: daily stand-ups, sprint planning, Azure DevOps boards, mentoring juniors and approving their pull requests, and owning delivery commitments to the client.",
-            "Use AI-assisted development (GitHub Copilot, Claude and ChatGPT in VS Code) to automate repetitive coding and test writing and raise code quality across the team.",
-            "Collaborate with the DevOps team on Azure DevOps CI/CD releases for ADF and Databricks code; working knowledge of YAML pipelines and Git branching."
+            "Architected and owned ETL pipelines in Databricks Jobs & Pipelines (PySpark, Spark SQL) that process files through a Bronze/Silver/Gold Medallion Lakehouse on Delta Lake and ADLS Gen2, plus 7 production Azure Data Factory (ADF) pipelines for ingestion and ETL/ELT flows, modeling 50–60 Star Schema tables for Power BI.",
+            "Engineered streaming ingestion of 30–40 GB/day with Azure Event Hubs, Apache Kafka and Spark Structured Streaming, plus 5–7 GB/day of incremental batch loads using Auto Loader and SCD Type 2 Delta MERGE upserts, orchestrated through Databricks Jobs with daily Gold-layer refreshes.",
+            "Reduced a critical PySpark job's runtime by 73% (52 min to 14 min) and eliminated recurring executor out-of-memory failures by first applying selective key salting to a skewed join, then enabling and configuring Adaptive Query Execution (AQE) skew-join handling.",
+            "Lowered Azure platform costs by ~40% through right-sized Databricks job clusters, shorter job runtimes, Delta Lake OPTIMIZE and Z-ORDER with table partitioning, and parameterized, reusable ADF pipelines.",
+            "Built Python data quality checks (deduplication, null handling) into the Bronze and Silver layers, governed tables through Unity Catalog (RBAC, data lineage), and secured credentials with Azure Key Vault-backed secret scopes and service principals.",
+            "Deliver ~4 user stories and 2 bug fixes per sprint on feature branches merged into develop and main; prepare Azure DevOps YAML files and run CI/CD deployments of each branch to Dev for integration testing ahead of DevOps-owned promotion to Stage (limited-user UAT) and Production.",
+            "Lead a 6-member offshore team as Scrum Master across 27 two-week sprints and 3 production releases: daily stand-ups with UK client stakeholders, sprint planning on Azure DevOps Boards, mentoring 4 junior engineers and reviewing pull requests.",
+            "Use AI-assisted development (GitHub Copilot, Claude and ChatGPT in VS Code) to automate repetitive coding and test writing and raise code quality across the team."
           ]
         },
         {
           "name": "Assumptions Management",
-          "period": "Feb 2022 — 2024",
+          "period": "Earlier project",
           "highlights": [
-            "Built production FastAPI (Python) data services with RBAC and Azure API Management over MS SQL Server and Azure Blob Storage, containerized with Docker.",
-            "Improved performance by ~30% via Redis caching and SQL/T-SQL and database-logic optimization.",
-            "Resolved SonarQube findings and wrote Pytest unit tests within Agile/Scrum sprints on Azure DevOps Boards.",
+            "Developed containerized (Docker) FastAPI data services with RBAC and Azure API Management over Microsoft SQL Server and Azure Blob Storage; cut the web app's end-to-end processing time (including pipeline runs) from 5–7 min to 3–4 min via Redis caching and T-SQL query optimization.",
+            "Maintained 95–100% Pytest coverage on every branch and cleared all SonarQube quality-gate findings (reliability, security, maintainability, coverage, cognitive complexity) before merges to develop and main.",
             "Early on, shadowed client technical walkthroughs and leadership reviews to learn the Rolls-Royce domain."
           ]
         }

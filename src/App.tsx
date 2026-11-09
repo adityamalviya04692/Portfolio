@@ -361,7 +361,7 @@ function Portfolio() {
                   <span className="employer-label">EMPLOYER</span>
                   <h3>Tata Consultancy Services</h3>
                   <p>
-                    Senior Data Engineer & Scrum Master (Mar 2026–present) · Data Engineer (Dec 2021–Feb 2026)
+                    Senior Data Engineer & Scrum Master (Mar 2026–present) · Data Engineer (Dec 2021–Mar 2026)
                   </p>
                 </div>
                 <span>
@@ -401,9 +401,9 @@ function Portfolio() {
                         </>
                       ) : (
                         <>
-                          <strong>~30% faster</strong>
+                          <strong>5–7 → 3–4 min</strong>
                           <span>
-                            Backend performance through caching & optimization
+                            End-to-end processing time via Redis caching & T-SQL tuning
                           </span>
                         </>
                       )}
@@ -443,8 +443,8 @@ function Portfolio() {
                     <span>Data pipelines, backend services and semantic search</span>
                   </div>
                   <ul className="experience-highlights">
-                    <li>Ingested, cleansed and prepared Smartrac RFID R&amp;D datasets used to train machine learning models.</li>
-                    <li>Built backend and AI components with Vertex AI (Google pre-trained models), Cloud Functions and a vector database.</li>
+                    <li>Ingested, cleansed and prepared a 10–15 GB batch RFID R&amp;D dataset on Databricks for ML model training.</li>
+                    <li>Built a production RAG document Q&amp;A tool on Vertex AI, Cloud Functions, Vertex AI Vector Search and ChromaDB that lets researchers upload and query up to 4 documents at once.</li>
                   </ul>
                 </article>
               </Reveal>
@@ -459,7 +459,7 @@ function Portfolio() {
                     <span>JUL — NOV 2021</span>
                   </div>
                   <h3>Python development for GradeUp</h3>
-                  <p>Contributed Python development for GradeUp following its acquisition by BYJU’S.</p>
+                  <p>Developed Python and Django backend features for GradeUp’s exam-preparation web platform.</p>
                   <ProjectArt type="byjus" />
                   <div className="assignment-impact">
                     <strong>Python development</strong>
