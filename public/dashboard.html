@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Portfolio Analytics</title>
+<style>
+  :root {
+    --bg: #15171c; --panel: #1d2026; --panel2: #232730; --line: #2b2f38;
+    --fg: #eceef2; --muted: #9aa0aa; --blue: #2f6bff; --orange: #ff7a1a;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 15px/1.5 -apple-system, "Segoe UI", Roboto, system-ui, sans-serif; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 18px 48px; }
+  header { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
+    justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+  h1 { margin: 0; font-size: 22px; letter-spacing: .2px; }
+  h1 span { color: var(--orange); }
+  .sub { color: var(--muted); font-size: 12.5px; }
+  .actions { display: flex; gap: 8px; }
+  button, .btn { background: var(--panel2); color: var(--fg); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 12px; font: inherit; font-size: 13px; cursor: pointer; text-decoration: none; }
+  button:hover, .btn:hover { border-color: var(--blue); }
+  button:focus-visible, .btn:focus-visible, input:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }
+  @media (max-width: 620px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .kpi .n { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .kpi .l { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; margin-top: 6px; }
+  .kpi.blue .n { color: var(--blue); } .kpi.orange .n { color: var(--orange); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 14px 0; }
+  .card h2 { margin: 0 0 14px; font-size: 13px; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); }
+  .chart { display: flex; align-items: flex-end; gap: 6px; }
+  .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+  .barwrap { width: 100%; height: 110px; display: flex; align-items: flex-end; justify-content: center; }
+  .bar { width: 70%; background: var(--blue); border-radius: 4px 4px 0 0; min-height: 2px; }
+  .bar.today { background: var(--orange); }
+  .bn { font-size: 11px; font-variant-numeric: tabular-nums; }
+  .bl { font-size: 10px; color: var(--muted); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  .rrow { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .rk { width: 34%; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rtrack { flex: 1; background: var(--panel2); border-radius: 6px; height: 10px; overflow: hidden; }
+  .rfill { height: 100%; border-radius: 6px; }
+  .rv { width: 38px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; }
+  .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  td, th { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+  .pill { background: rgba(47,107,255,.16); color: #9dbbff; border-radius: 20px; padding: 2px 9px; font-size: 12px; }
+  .links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (max-width: 620px) { .links { grid-template-columns: 1fr; } }
+  .lnk { display: block; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 13px 14px; color: var(--fg); text-decoration: none; }
+  .lnk:hover { border-color: var(--blue); } .lnk b { display: block; } .lnk small { color: var(--muted); }
+  .taglink { display: flex; align-items: center; gap: 10px; background: var(--panel2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
+  .tl { min-width: 0; flex: 1; }
+  .tl code { display: block; color: var(--muted); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .copy { background: var(--orange); color: #1a1205; border: 0; font-weight: 600; flex: none; }
+  .copy.done { background: var(--blue); color: #fff; }
+  .empty { color: var(--muted); font-size: 13px; padding: 6px 0; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 22px; text-align: center; }
+  .gate { max-width: 360px; margin: 18vh auto 0; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 24px; }
+  .gate h1 { font-size: 20px; margin-bottom: 6px; }
+  .gate p { color: var(--muted); margin: 0 0 16px; font-size: 13.5px; }
+  .gate input { width: 100%; background: var(--bg); color: var(--fg); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; font: inherit; margin-bottom: 12px; }
+  .gate button { width: 100%; background: var(--orange); color: #1a1205; border: 0; font-weight: 700; padding: 10px; }
+  .err { color: #ff8f8f; font-size: 13px; min-height: 20px; margin: 0 0 8px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <h1>Portfolio <span style="color:var(--orange)">Analytics</span></h1>
+  <p>Enter your dashboard key. It is saved only in this browser.</p>
+  <form id="gateForm">
+    <label for="keyInput" class="sub">Dashboard key</label>
+    <input id="keyInput" type="password" autocomplete="current-password" required>
+    <div class="err" id="gateErr" role="alert"></div>
+    <button type="submit">Open dashboard</button>
+  </form>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header>
+    <div>
+      <h1>Portfolio <span>Analytics</span></h1>
+      <div class="sub" id="updated">Loading…</div>
+    </div>
+    <div class="actions">
+      <button id="refresh" type="button">Refresh</button>
+      <button id="signout" type="button">Sign out</button>
+      <a class="btn" id="siteLink" target="_blank" rel="noopener">Live site ↗</a>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="kpi orange"><div class="n" id="kTotal">0</div><div class="l">Total visits</div></div>
+    <div class="kpi blue"><div class="n" id="k7">0</div><div class="l">Last 7 days</div></div>
+    <div class="kpi"><div class="n" id="k30">0</div><div class="l">Last 30 days</div></div>
+    <div class="kpi"><div class="n" id="kToday">0</div><div class="l">Today</div></div>
+  </div>
+
+  <div class="card"><h2>Visits, last 14 days</h2><div class="chart" id="chart"></div></div>
+
+  <div class="cols">
+    <div class="card"><h2>Where visitors came from</h2><div id="sources"></div></div>
+    <div class="card"><h2>Devices</h2><div id="devices"></div></div>
+  </div>
+
+  <div class="card"><h2>Recent visits</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>When</th><th>Source</th><th>Device</th></tr></thead>
+      <tbody id="recent"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card"><h2>Quick links</h2><div class="links" id="quick"></div></div>
+  <div class="card"><h2>Tagged links to share</h2><div id="tags"></div></div>
+
+  <div class="foot">Visitor identity is never collected. The <code>?ref=</code> tag on a link is how you know who opened it.</div>
+</div>
+
+<script>
+(function () {
+  var API = "https://script.google.com/macros/s/AKfycbwRbW9TmUr1Sc2vdBq1Z1x-_sPZV6dzSAr01MlR-LFqS7F10xEm93qvsKFsrDfzl0hBvg/exec";
+  var SITE = "https://adityamalviya04692.github.io/Portfolio/";
+  var LINKS = [
+    ["Microsoft Clarity", "Recordings, heatmaps, full stats", "https://clarity.microsoft.com/projects/view/zb3t34gmiu/dashboard"],
+    ["Live portfolio", "adityamalviya04692.github.io", SITE],
+    ["GitHub repo", "Source code", "https://github.com/adityamalviya04692/Portfolio"],
+    ["Deploy status", "GitHub Actions builds", "https://github.com/adityamalviya04692/Portfolio/actions"]
+  ];
+  var TAGS = [["LinkedIn", "linkedin"], ["Naukri", "naukri"], ["Resume PDF", "resume"], ["Instahyre", "instahyre"]];
+  var TZ = "Asia/Kolkata";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var timer = null;
+
+  function store(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function dayKey(d) { return new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d); }
+  function lastDays(n) {
+    var out = [], now = Date.now();
+    for (var i = n - 1; i >= 0; i--) out.push(new Date(now - i * 86400000));
+    return out;
+  }
+  function sumDays(days, n) {
+    return lastDays(n).reduce(function (t, d) { return t + (days[dayKey(d)] || 0); }, 0);
+  }
+
+  function renderChart(days) {
+    var box = $("chart"); box.textContent = "";
+    var series = lastDays(14), max = 1;
+    var vals = series.map(function (d) { var v = days[dayKey(d)] || 0; if (v > max) max = v; return v; });
+    series.forEach(function (d, i) {
+      var col = el("div", "col"), wrap = el("div", "barwrap");
+      var bar = el("div", "bar" + (i === series.length - 1 ? " today" : ""));
+      bar.style.height = vals[i] ? Math.max(Math.round(vals[i] / max * 100), 4) + "%" : "0";
+      wrap.appendChild(bar);
+      col.appendChild(wrap);
+      col.appendChild(el("div", "bn", String(vals[i])));
+      col.appendChild(el("div", "bl", new Intl.DateTimeFormat("en-GB", { timeZone: TZ, day: "2-digit", month: "2-digit" }).format(d)));
+      box.appendChild(col);
+    });
+  }
+
+  function renderRows(id, obj, color) {
+    var box = $(id); box.textContent = "";
+    var arr = Object.keys(obj || {}).map(function (k) { return [k, obj[k]]; })
+      .sort(function (a, b) { return b[1] - a[1]; }).slice(0, 8);
+    if (!arr.length) { box.appendChild(el("div", "empty", "No data yet.")); return; }
+    var max = arr[0][1] || 1;
+    arr.forEach(function (r) {
+      var row = el("div", "rrow");
+      row.appendChild(el("div", "rk", r[0]));
+      var track = el("div", "rtrack"), fill = el("div", "rfill");
+      fill.style.width = Math.max(Math.round(r[1] / max * 100), 6) + "%";
+      fill.style.background = color;
+      track.appendChild(fill);
+      row.appendChild(track);
+      row.appendChild(el("div", "rv", String(r[1])));
+      box.appendChild(row);
+    });
+  }
+
+  function renderRecent(list) {
+    var body = $("recent"); body.textContent = "";
+    if (!list || !list.length) {
+      var tr0 = el("tr"), td0 = el("td", "empty", "No visits logged yet.");
+      td0.colSpan = 3; tr0.appendChild(td0); body.appendChild(tr0); return;
+    }
+    var fmt = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: true });
+    list.forEach(function (r) {
+      var tr = el("tr");
+      tr.appendChild(el("td", null, fmt.format(new Date(r.t))));
+      var td = el("td"); td.appendChild(el("span", "pill", r.s)); tr.appendChild(td);
+      tr.appendChild(el("td", null, r.d));
+      body.appendChild(tr);
+    });
+  }
+
+  function renderStatic() {
+    $("siteLink").href = SITE;
+    var q = $("quick"); q.textContent = "";
+    LINKS.forEach(function (l) {
+      var a = el("a", "lnk"); a.href = l[2]; a.target = "_blank"; a.rel = "noopener";
+      a.appendChild(el("b", null, l[0] + " ↗")); a.appendChild(el("small", null, l[1]));
+      q.appendChild(a);
+    });
+    var t = $("tags"); t.textContent = "";
+    TAGS.forEach(function (x) {
+      var url = SITE + "?ref=" + x[1];
+      var row = el("div", "taglink"), box = el("div", "tl");
+      box.appendChild(el("b", null, x[0])); box.appendChild(el("code", null, url));
+      var b = el("button", "copy", "Copy"); b.type = "button";
+      b.addEventListener("click", function () {
+        var done = function () { b.textContent = "Copied"; b.classList.add("done");
+          setTimeout(function () { b.textContent = "Copy"; b.classList.remove("done"); }, 1400); };
+        if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () {});
+      });
+      row.appendChild(box); row.appendChild(b); t.appendChild(row);
+    });
+  }
+
+  function render(s) {
+    var days = s.days || {};
+    $("kTotal").textContent = s.total || 0;
+    $("k7").textContent = sumDays(days, 7);
+    $("k30").textContent = sumDays(days, 30);
+    $("kToday").textContent = days[dayKey(new Date())] || 0;
+    renderChart(days);
+    renderRows("sources", s.sources, "var(--blue)");
+    renderRows("devices", s.devices, "var(--orange)");
+    renderRecent(s.recent);
+    $("updated").textContent = "Updated " + new Intl.DateTimeFormat("en-GB", { timeZone: TZ, dateStyle: "medium", timeStyle: "short" }).format(new Date()) + " IST";
+  }
+
+  function fetchStats(key) {
+    return fetch(API + "?format=json&key=" + encodeURIComponent(key), { redirect: "follow" })
+      .then(function (r) { return r.json(); });
+  }
+
+  function show(key) {
+    return fetchStats(key).then(function (data) {
+      if (data && data.error) throw new Error("bad key");
+      $("gate").hidden = true; $("app").hidden = false;
+      renderStatic(); render(data);
+      store("am-dash-key", key);
+      clearInterval(timer);
+      timer = setInterval(function () {
+        fetchStats(key).then(function (d) { if (d && !d.error) render(d); }).catch(function () {});
+      }, 60000);
+    });
+  }
+
+  $("gateForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    $("gateErr").textContent = "";
+    show($("keyInput").value.trim()).catch(function (err) {
+      $("gateErr").textContent = err.message === "bad key"
+        ? "That key is not right. Check the DASH_KEY in your script."
+        : "Could not reach the analytics service. Try again in a moment.";
+    });
+  });
+  $("refresh").addEventListener("click", function () {
+    var k = load("am-dash-key"); if (k) show(k).catch(function () {});
+  });
+  $("signout").addEventListener("click", function () {
+    store("am-dash-key", null); clearInterval(timer);
+    $("app").hidden = true; $("gate").hidden = false; $("keyInput").value = "";
+  });
+
+  var saved = load("am-dash-key");
+  if (saved) show(saved).catch(function () { store("am-dash-key", null); });
+})();
+</script>
+</body>
+</html>
