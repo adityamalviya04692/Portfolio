@@ -109,7 +109,7 @@
     <div class="kpi"><div class="n" id="kToday">0</div><div class="l">Today</div></div>
   </div>
 
-  <div class="card"><h2>Visits, last 14 days</h2><div class="chart" id="chart"></div></div>
+  <div class="card"><h2 id="chartTitle">Visits, last 14 days</h2><div class="chart" id="chart"></div></div>
 
   <div class="cols">
     <div class="card"><h2>Where visitors came from</h2><div id="sources"></div></div>
@@ -175,9 +175,11 @@
       wrap.appendChild(bar);
       col.appendChild(wrap);
       col.appendChild(el("div", "bn", String(vals[i])));
-      col.appendChild(el("div", "bl", new Intl.DateTimeFormat("en-GB", { timeZone: TZ, day: "2-digit", month: "2-digit" }).format(d)));
+      col.appendChild(el("div", "bl", new Intl.DateTimeFormat("en-GB", { timeZone: TZ, day: "numeric" }).format(d)));
       box.appendChild(col);
     });
+    var rng = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, day: "numeric", month: "short" });
+    $("chartTitle").textContent = "Visits, " + rng.format(series[0]) + " to " + rng.format(series[series.length - 1]);
   }
 
   function renderRows(id, obj, color) {
