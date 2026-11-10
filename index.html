@@ -45,6 +45,30 @@
         if (ref) clarity("set", "ref", ref);
       } catch (e) {}
     </script>
+    <script>
+      // Email alert per new visit, via the Apps Script web app in scripts/visit-alert.gs.
+      (function () {
+        var ALERT_URL = "https://script.google.com/macros/s/AKfycbwRbW9TmUr1Sc2vdBq1Z1x-_sPZV6dzSAr01MlR-LFqS7F10xEm93qvsKFsrDfzl0hBvg/exec";
+        try {
+          var q = new URLSearchParams(location.search);
+          // Open the site once with ?me=1 on your own devices to stop alerts for your visits.
+          if (q.get("me") === "1") localStorage.setItem("am-owner", "1");
+          if (!ALERT_URL || location.hostname !== "adityamalviya04692.github.io" || navigator.webdriver ||
+              /bot|crawl|spider|preview|headless|lighthouse/i.test(navigator.userAgent) ||
+              localStorage.getItem("am-owner") || sessionStorage.getItem("am-alerted")) return;
+          sessionStorage.setItem("am-alerted", "1");
+          navigator.sendBeacon(ALERT_URL, JSON.stringify({
+            ref: q.get("ref") || q.get("utm_source"),
+            referrer: document.referrer,
+            page: location.pathname + location.search,
+            lang: navigator.language,
+            tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            screen: screen.width + "x" + screen.height,
+            ua: navigator.userAgent
+          }));
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
