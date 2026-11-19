@@ -55,17 +55,28 @@
           if (q.get("me") === "1") localStorage.setItem("am-owner", "1");
           if (!ALERT_URL || location.hostname !== "adityamalviya04692.github.io" || navigator.webdriver ||
               /bot|crawl|spider|preview|headless|lighthouse/i.test(navigator.userAgent) ||
-              localStorage.getItem("am-owner") || sessionStorage.getItem("am-alerted")) return;
-          sessionStorage.setItem("am-alerted", "1");
-          navigator.sendBeacon(ALERT_URL, JSON.stringify({
-            ref: q.get("ref") || q.get("utm_source"),
-            referrer: document.referrer,
-            page: location.pathname + location.search,
-            lang: navigator.language,
-            tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            screen: screen.width + "x" + screen.height,
-            ua: navigator.userAgent
-          }));
+              localStorage.getItem("am-owner")) return;
+
+          var sendVisit = function () {
+            var now = Date.now();
+            var previous = Number(localStorage.getItem("am-last-visit"));
+            localStorage.setItem("am-last-visit", String(now));
+            if (previous && now - previous < 30 * 60 * 1000) return;
+
+            var queued = navigator.sendBeacon(ALERT_URL, JSON.stringify({
+              visitId: crypto.randomUUID(),
+              ref: q.get("ref") || q.get("utm_source"),
+              referrer: document.referrer,
+              page: location.pathname + location.search,
+              lang: navigator.language,
+              tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              screen: screen.width + "x" + screen.height,
+              ua: navigator.userAgent
+            }));
+            if (!queued) localStorage.removeItem("am-last-visit");
+          };
+          if (navigator.locks) navigator.locks.request("am-visit-alert", sendVisit).catch(function () {});
+          else sendVisit();
         } catch (e) {}
       })();
     </script>

@@ -49,9 +49,14 @@ function doPost(e) {
   var v;
   try { v = JSON.parse(e.postData.contents); } catch (err) { return _text("bad request"); }
 
+  if (!v || typeof v !== "object" || Array.isArray(v)) return _text("bad request");
+
   var lock = LockService.getScriptLock();
-  try { lock.waitLock(5000); } catch (err) {}
+  lock.waitLock(5000);
   try {
+    var visitId = typeof v.visitId === "string" && /^[0-9a-f-]{36}$/.test(v.visitId) ? v.visitId : "";
+    var cache = CacheService.getScriptCache();
+    if (visitId && cache.get("visit:" + visitId)) return _text("duplicate");
     var s = _load();
     var now = new Date();
     var day = Utilities.formatDate(now, TZ, "yyyy-MM-dd");
@@ -72,6 +77,7 @@ function doPost(e) {
 
     _trimDays(s);
     _save(s);
+    if (visitId) cache.put("visit:" + visitId, "1", 1800);
     if (EMAIL_ALERTS) _email(v, source, device, ua, now);
   } finally {
     try { lock.releaseLock(); } catch (e) {}
