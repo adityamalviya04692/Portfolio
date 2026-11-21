@@ -1139,7 +1139,8 @@ footer > a:not(.monogram) {
     transform: rotate(-4deg);
   }
   .portrait-card img {
-    height: 245px;
+    height: auto;
+    aspect-ratio: 1 / 1.08;
   }
   .photo-bottom {
     padding: 13px 0;
