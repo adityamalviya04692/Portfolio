@@ -1039,7 +1039,7 @@ footer > a:not(.monogram) {
 }
 @media (max-width: 700px) {
   html {
-    scroll-padding-top: 85px;
+    scroll-padding-top: 120px;
   }
   .site-header {
     padding: 15px 5%;
@@ -2630,12 +2630,20 @@ footer > a:not(.monogram) {
     margin-right: 0;
     transform: none;
     margin-top: 45px;
-    margin-left: auto;
-    max-width: calc(100% - 10px);
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
   .site-header nav a {
-    font-size: 9px;
-    padding: 9px 10px;
+    flex: 0 0 calc(100% / 3);
+    text-align: center;
+    white-space: nowrap;
+    font-size: 10px;
+    padding: 12px 5px;
+  }
+  .site-header nav a:focus-visible {
+    outline-offset: -3px;
   }
   .site-header .monogram {
     position: absolute;
@@ -2939,12 +2947,6 @@ html[data-motion="off"] .scan-beam {
 .site-header nav a.active:hover {
   color: #fff;
 }
-@media (max-width: 480px) {
-  html { scroll-padding-top: 155px; }
-  .site-header nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; max-width: 100%; gap: 2px; }
-  .site-header nav a { text-align: center; justify-content: center; padding: 10px 7px; font-size: 10px; }
-}
-
 /* Project films share the card's browser frame, paper and editorial controls. */
 .project-player { background: #eee8dc; min-width: 0; }
 .project-player .showcase-browser a { display: inline-flex; align-items: center; gap: 6px; min-height: 24px; white-space: nowrap; }

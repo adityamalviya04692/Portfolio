@@ -60,6 +60,7 @@ function Portfolio() {
     [copied, setCopied] = useState(false),
     [slide, setSlide] = useState(0),
     [caseOpen, setCaseOpen] = useState(false);
+  const navigation = useRef<HTMLElement>(null);
   const dialog = useRef<HTMLDialogElement>(null),
     { reduced } = useMotionPreference();
   useEffect(() => {
@@ -113,6 +114,19 @@ function Portfolio() {
     };
   }, []);
   useEffect(() => {
+    const nav = navigation.current;
+    if (!nav || nav.scrollWidth <= nav.clientWidth) return;
+    const link = nav.querySelector('[aria-current="location"]');
+    const navBox = nav.getBoundingClientRect();
+    const linkBox = link?.getBoundingClientRect();
+    nav.scrollTo({
+      left: linkBox
+        ? nav.scrollLeft + linkBox.left - navBox.left + (linkBox.width - nav.clientWidth) / 2
+        : 0,
+      behavior: reduced ? "instant" : "smooth",
+    });
+  }, [active, reduced]);
+  useEffect(() => {
     if (caseOpen) {
       dialog.current?.showModal();
       const previous = document.body.style.overflow;
@@ -142,7 +156,7 @@ function Portfolio() {
         <a className="monogram" href="#home" aria-label="Aditya Malviya home">
           a<span>m.</span>
         </a>
-        <nav aria-label="Main navigation">
+        <motion.nav ref={navigation} layoutScroll aria-label="Main navigation">
           {["about", "experience", "projects", "research", "freelance", "contact"].map((id) => (
             <a
               key={id}
@@ -160,7 +174,7 @@ function Portfolio() {
               <span>{id}</span>
             </a>
           ))}
-        </nav>
+        </motion.nav>
         <a className="contact-pill" href={email}>
           Get in touch <ArrowUpRight size={17} />
         </a>
