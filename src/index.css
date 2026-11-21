@@ -4113,3 +4113,14 @@ html[data-custom-pointer="idle"] .portfolio-cursor {
   right: auto;
   bottom: auto;
 }
+
+.portfolio-cursor[data-fit] {
+  left: var(--fit-x);
+  top: var(--fit-y);
+  width: var(--fit-width);
+  height: var(--fit-height);
+  border-radius: var(--fit-radius);
+  background-color: var(--cursor-tint);
+  border: 1px solid var(--cursor-outline);
+  --cursor-position-duration: 175ms;
+}

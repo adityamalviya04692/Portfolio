@@ -6,11 +6,12 @@ import { useMotionPreference } from "./MotionSystem";
 const controls = "a[href], button, input, [role='button']";
 const media = ".portrait-play, .carousel-thumb, .research-figure a, .project-play-cover, video, .ld-hits polygon";
 const freeControls = media + ", .motion-accordion button, .email-link, .preview-open, .hero-bottom a, .skip-link, input";
+const fittedShapes = ".skills-content > div, .skills-content .tags > span, .carousel-thumb-chip, .project-play-stamp, .portrait-play-icon";
 const primary = ".button, .contact-pill, .carousel-explore, .showcase-primary";
 const normal: IpadCursorStyle = {
   width: 14, height: 14, radius: "50%", background: "#eb883caa",
   border: "1.5px solid #57351e", backdropBlur: 0, backdropSaturate: "135%",
-  durationBase: 135, durationPosition: 0, durationBackdropFilter: 90, scale: 1,
+  durationBase: 230, durationPosition: 0, durationBackdropFilter: 90, scale: 1,
 };
 const surfaces = {
   normal,
@@ -38,8 +39,8 @@ export default function PortfolioCursor() {
         el.setAttribute("data-cursor-style", customCursorStyle({
           background: "#ed883823", border: "1.5px solid #d87427", radius: "999px",
         }));
-      } else if (el.matches(".social-links a, .motion-controls button, .project-carousel-bar button, .carousel-controls button, .monogram, .project-carousel-dots button")) {
-        el.setAttribute("data-cursor-style", customCursorStyle({ radius: "50%", durationBase: 100 }));
+      } else if (el.matches(".social-links a, .motion-controls button, .project-carousel-bar button, .carousel-controls button, .monogram, .project-carousel-dots button, .project-player-controls > button:first-child")) {
+        el.setAttribute("data-cursor-style", customCursorStyle({ radius: "50%", durationBase: 200 }));
       } else if (el.matches("[download], .showcase-links a")) {
         el.setAttribute("data-cursor-style", customCursorStyle({ background: "#9fc5ff2e", border: "1px solid #749ada" }));
       }
@@ -77,6 +78,18 @@ export default function PortfolioCursor() {
       positionLayer();
     });
 
+    const fitShape = (target: Element | null) => {
+      if (!cursor) return;
+      cursor.toggleAttribute("data-fit", target instanceof HTMLElement);
+      if (!(target instanceof HTMLElement)) return;
+      const box = target.getBoundingClientRect();
+      cursor.style.setProperty("--fit-x", `${box.left + box.width / 2}px`);
+      cursor.style.setProperty("--fit-y", `${box.top + box.height / 2}px`);
+      cursor.style.setProperty("--fit-width", `${target.offsetWidth + 4}px`);
+      cursor.style.setProperty("--fit-height", `${target.offsetHeight + 4}px`);
+      cursor.style.setProperty("--fit-radius", getComputedStyle(target).borderRadius);
+    };
+
     const move = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || !eligible.matches) {
         hide();
@@ -88,7 +101,7 @@ export default function PortfolioCursor() {
           className: "portfolio-cursor", adsorptionStrength: 2, blockPadding: 2,
           normalStyle: normal, textStyle: surfaces.text,
           blockStyle: { background: "var(--cursor-tint)", border: "1px solid var(--cursor-outline)",
-            radius: "auto", durationBase: 145, durationPosition: 110, backdropBlur: 0, backdropSaturate: "115%" },
+            radius: "auto", durationBase: 240, durationPosition: 175, backdropBlur: 0, backdropSaturate: "115%" },
           mouseDownStyle: { scale: 0.78, background: "#ed88386b" },
           enableLighting: true, enableMouseDownEffect: true,
         });
@@ -101,6 +114,7 @@ export default function PortfolioCursor() {
       if (document.documentElement.dataset.customPointer !== "on") document.documentElement.dataset.customPointer = "on";
       const el = event.target;
       if (!(el instanceof Element)) return;
+      fitShape(el.closest(fittedShapes));
       let next: keyof typeof surfaces = "normal";
       if (el.closest(media)) next = "media";
       else if (el.closest("input[type=range]")) next = "seek";
@@ -118,6 +132,7 @@ export default function PortfolioCursor() {
 
     const hide = () => {
       if (cursor) document.documentElement.dataset.customPointer = "idle";
+      fitShape(null);
     };
     const key = (e: KeyboardEvent) => { if (e.key === "Tab") hide(); };
     const stop = () => {
@@ -142,6 +157,7 @@ export default function PortfolioCursor() {
     document.addEventListener("keydown", key);
     document.addEventListener("fullscreenchange", positionLayer);
     window.addEventListener("blur", hide);
+    window.addEventListener("scroll", hide, true);
     eligible.addEventListener("change", stop);
     return () => {
       stop();
@@ -150,6 +166,7 @@ export default function PortfolioCursor() {
       document.removeEventListener("keydown", key);
       document.removeEventListener("fullscreenchange", positionLayer);
       window.removeEventListener("blur", hide);
+      window.removeEventListener("scroll", hide, true);
       eligible.removeEventListener("change", stop);
     };
   }, [reduced]);
