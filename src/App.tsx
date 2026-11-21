@@ -192,7 +192,7 @@ function Portfolio() {
               <Reveal>
                 <div className="eyebrow">
                   <span className="status-dot" />
-                  <Scramble text="HELLO WORLD, I'M" />
+                  <Scramble text="HELLO PARTITION_0, I'M" />
                 </div>
               </Reveal>
               <h1 aria-label={profile.name}>
