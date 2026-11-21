@@ -40,6 +40,7 @@ const skillProjects = data.projects.filter((project) => project.id !== "moriveda
 
 function Portfolio() {
   const [activeVideo, setActiveVideo] = useState({ id: "", request: 0, explore: false });
+  const portraitWave = useRef<HTMLVideoElement>(null);
   const videoTrigger = useRef<HTMLElement | null>(null);
   const playProject = (id: string, trigger?: HTMLElement) => {
     if (trigger) videoTrigger.current = trigger;
@@ -60,6 +61,23 @@ function Portfolio() {
     [caseOpen, setCaseOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null),
     { reduced } = useMotionPreference();
+  useEffect(() => {
+    const video = portraitWave.current;
+    if (!video || reduced || video.ended) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.4 && !activeVideo.id && !video.ended) {
+        void video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    }, { threshold: 0.4 });
+    observer.observe(video);
+    return () => {
+      observer.disconnect();
+      video.pause();
+    };
+  }, [reduced, activeVideo.id]);
   useEffect(() => {
     const target = document.getElementById(window.location.hash.slice(1));
     const frame = requestAnimationFrame(() =>
@@ -249,6 +267,18 @@ function Portfolio() {
                         alt="Aditya Malviya"
                         loading="lazy"
                       />
+                      {!reduced && (
+                        <video
+                          ref={portraitWave}
+                          className="portrait-wave"
+                          src={asset("assets/videos/profile-wave.mp4")}
+                          poster={asset(profile.avatar)}
+                          muted
+                          playsInline
+                          preload="none"
+                          aria-hidden="true"
+                        />
+                      )}
                       <span className="portrait-play-badge">
                         <span className="portrait-play-icon">
                           <Play size={16} fill="currentColor" />

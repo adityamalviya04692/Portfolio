@@ -3833,6 +3833,16 @@ html[data-theme="dark"] .showcase-film-play {
   cursor: pointer;
   color: inherit;
 }
+.portrait-wave {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  object-fit: cover;
+  object-position: right center;
+  pointer-events: none;
+}
 .portrait-play img {
   transition: filter 0.3s ease;
 }
