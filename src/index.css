@@ -92,7 +92,8 @@ svg {
   justify-content: center;
   padding-right: 5px;
 }
-.monogram span span {
+.monogram > span:not([data-ripple]),
+.monogram .monogram-accent {
   color: var(--orange);
 }
 nav {
@@ -362,7 +363,7 @@ h2 {
   letter-spacing: -3px;
   line-height: 1.03;
 }
-.about-copy h2 span {
+.about-copy h2 .heading-accent {
   color: #edb679;
 }
 .about-copy > p {
@@ -869,7 +870,7 @@ li {
   letter-spacing: -7px;
   margin: 18px 0 48px;
 }
-.contact h2 > span:first-child {
+.contact h2 .heading-accent {
   color: #a8bed3;
 }
 .contact-lower {
@@ -4066,21 +4067,21 @@ html[data-theme="dark"] .project-explorer-text h3 { color: var(--orange); }
   }
 }
 
-.heading-ripple-definitions {
-  position: absolute;
-  pointer-events: none;
+[data-ripple] {
+  display: inline-block;
+  position: relative;
 }
 
-[data-rippling] {
-  filter: var(--heading-ripple);
-}
-
-[data-ripple="nav"] {
+.ripple-ink {
   display: inline-block;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-rippling] {
-    filter: none;
-  }
+.ripple-slice {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+[data-ripple]:not([data-rippling]) > .ripple-slice {
+  visibility: hidden;
 }

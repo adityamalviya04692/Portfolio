@@ -17,7 +17,7 @@ import {
   Play,
 } from "lucide-react";
 import data from "./data/portfolio.json";
-import HeadingRipples from "./components/HeadingRipples";
+import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRipples";
 import ProjectArt from "./components/ProjectArt";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
@@ -158,7 +158,7 @@ function Portfolio() {
         className={`site-header ${["about", "experience", "contact"].includes(active) ? "on-blue" : ""}`}
       >
         <a className="monogram" href="#home" aria-label="Aditya Malviya home">
-          <span data-ripple="nav">a<span>m.</span></span>
+          <RippleWord>a<span className="monogram-accent">m.</span></RippleWord>
         </a>
         <motion.nav ref={navigation} layoutScroll aria-label="Main navigation">
           {["about", "experience", "projects", "research", "freelance", "contact"].map((id) => (
@@ -175,12 +175,12 @@ function Portfolio() {
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}
                 />
               )}
-              <span data-ripple="nav">{id}</span>
+              <RippleWord>{id}</RippleWord>
             </a>
           ))}
         </motion.nav>
         <a className="contact-pill" href={email}>
-          <span data-ripple="nav">Get in touch</span> <ArrowUpRight size={17} />
+          <span><RippleWords text="Get in touch" /></span> <ArrowUpRight size={17} />
         </a>
       </header>
       <main>
@@ -193,26 +193,14 @@ function Portfolio() {
                   <Scramble text="HELLO WORLD, I'M" />
                 </div>
               </Reveal>
-              <h1 data-ripple aria-label={profile.name}>
-                {["Aditya", "Malviya."].map((name, row) => (
+              <h1 aria-label={profile.name}>
+                {["Aditya", "Malviya."].map((name) => (
                   <span className="name-line" aria-hidden="true" key={name}>
-                    {name.split("").map((letter, i) => (
-                      <motion.span
-                        key={i}
-                        className="name-letter"
-                        initial={
-                          reduced ? false : { y: 130, rotate: 12, opacity: 0 }
-                        }
-                        animate={{ y: 0, rotate: 0, opacity: 1 }}
-                        transition={{
-                          delay: 0.1 + row * 0.14 + i * 0.04,
-                          duration: 0.85,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                      >
-                        {letter}
-                      </motion.span>
-                    ))}
+                    <RippleWord>
+                      {name.split("").map((letter, index) => (
+                        <span key={index} className="name-letter">{letter}</span>
+                      ))}
+                    </RippleWord>
                   </span>
                 ))}
               </h1>
@@ -274,8 +262,8 @@ function Portfolio() {
               <Reveal>
                 <Tilt>
                   <div className="portrait-card">
-                    <div className="portrait-caption" data-ripple>
-                      THE HUMAN BEHIND THE CODE ↘
+                    <div className="portrait-caption">
+                      <RippleWords text="THE HUMAN BEHIND THE CODE ↘" />
                     </div>
                     <button
                       className="portrait-play"
@@ -319,7 +307,7 @@ function Portfolio() {
                       </button>
                     )}
                     <div className="photo-bottom">
-                      <strong data-ripple>Aditya.</strong>
+                      <strong><RippleWord>Aditya.</RippleWord></strong>
                       <span>
                         Mumbai, India <MapPin size={14} />
                       </span>
@@ -331,10 +319,10 @@ function Portfolio() {
                 <span className="label-sticker light">
                   <Scramble text="A LITTLE ABOUT ME" />
                 </span>
-                <h2 data-ripple>
-                  Big on data.
+                <h2>
+                  <RippleWords text="Big on data." />
                   <br />
-                  Bigger on <span>impact.</span>
+                  <RippleWords text="Bigger on" />{" "}<RippleWord className="heading-accent">impact.</RippleWord>
                 </h2>
                 <p>{profile.bio}</p>
                 <p className="secondary-copy">{profile.bioSecondary}</p>
@@ -414,8 +402,8 @@ function Portfolio() {
               <span className="label-sticker light">
                 <Scramble text="PROFESSIONAL EXPERIENCE" />
               </span>
-              <h2 data-ripple>
-                Built in production<span className="orange">.</span>
+              <h2>
+                <RippleWords text="Built in production" suffix={<span className="orange">.</span>} />
               </h2>
               <div className="employer-heading">
                 <img className="employer-logo" src={asset("assets/tcs-logo.jpg")} alt="Tata Consultancy Services logo" />
@@ -537,7 +525,7 @@ function Portfolio() {
             <Reveal className="section-heading">
               <div>
                 <span className="label-sticker">PERSONAL PROJECTS</span>
-                <h2 data-ripple id="projects-heading">Built to explore<span className="orange">.</span></h2>
+                <h2 id="projects-heading"><RippleWords text="Built to explore" suffix={<span className="orange">.</span>} /></h2>
               </div>
               <p>Tools I built to explore reel-first search, orchestration, <br />document AI, data quality, pipeline design, Spark diagnostics and SQL.</p>
             </Reveal>
@@ -547,7 +535,7 @@ function Portfolio() {
         <section id="research" className="research-section" aria-labelledby="research-heading">
           <div className="section-wrap">
             <Reveal className="section-heading">
-              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 data-ripple id="research-heading">Built on evidence<span className="orange">.</span></h2></div>
+              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading"><RippleWords text="Built on evidence" suffix={<span className="orange">.</span>} /></h2></div>
               <p>Testing the assumptions behind <br />Spark performance tuning.</p>
             </Reveal>
             <Reveal>
@@ -582,8 +570,8 @@ function Portfolio() {
                 <span className="label-sticker">
                   <Scramble text="INDEPENDENT WORK" />
                 </span>
-                <h2 data-ripple>
-                  Built end to end<span className="orange">.</span>
+                <h2>
+                  <RippleWords text="Built end to end" suffix={<span className="orange">.</span>} />
                 </h2>
               </div>
               <p>
@@ -707,11 +695,10 @@ function Portfolio() {
               <span className="label-sticker light">
                 <Scramble text="HAVE SOMETHING IN MIND?" />
               </span>
-              <h2 data-ripple>
-                Let's work
+              <h2>
+                <RippleWords text="Let's work" />
                 <br />
-                <span>together</span>
-                <span className="orange">!</span>
+                <RippleWord className="heading-accent">together<span className="orange">!</span></RippleWord>
               </h2>
             </Reveal>
             <Reveal className="contact-lower">
