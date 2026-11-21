@@ -4085,3 +4085,31 @@ html[data-theme="dark"] .project-explorer-text h3 { color: var(--orange); }
 [data-ripple]:not([data-rippling]) > .ripple-slice {
   visibility: hidden;
 }
+
+:root {
+  --cursor-ink: #47382e;
+  --cursor-tint: #234a9120;
+  --cursor-outline: #486db09c;
+}
+
+html[data-theme="dark"] {
+  --cursor-ink: #ffcf9f;
+  --cursor-tint: #ffd09f20;
+  --cursor-outline: #ffbe82a8;
+}
+
+html[data-custom-pointer="on"] *,
+html[data-custom-pointer="on"] {
+  cursor: none !important;
+}
+
+html[data-custom-pointer="idle"] .portfolio-cursor {
+  visibility: hidden;
+}
+
+.portfolio-cursor[popover] {
+  margin: 0;
+  padding: 0;
+  right: auto;
+  bottom: auto;
+}

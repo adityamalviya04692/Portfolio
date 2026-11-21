@@ -17,6 +17,7 @@ import {
   Play,
 } from "lucide-react";
 import data from "./data/portfolio.json";
+import PortfolioCursor from "./components/PortfolioCursor";
 import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRipples";
 import ProjectArt from "./components/ProjectArt";
 import LivingDesk from "./components/LivingDesk";
@@ -153,6 +154,7 @@ function Portfolio() {
       <a className="skip-link" href="#about">
         Skip to content
       </a>
+      <PortfolioCursor />
       <HeadingRipples />
       <header
         className={`site-header ${["about", "experience", "contact"].includes(active) ? "on-blue" : ""}`}
