@@ -17,6 +17,7 @@ import {
   Play,
 } from "lucide-react";
 import data from "./data/portfolio.json";
+import HeadingRipples from "./components/HeadingRipples";
 import ProjectArt from "./components/ProjectArt";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
@@ -152,11 +153,12 @@ function Portfolio() {
       <a className="skip-link" href="#about">
         Skip to content
       </a>
+      <HeadingRipples />
       <header
         className={`site-header ${["about", "experience", "contact"].includes(active) ? "on-blue" : ""}`}
       >
         <a className="monogram" href="#home" aria-label="Aditya Malviya home">
-          a<span>m.</span>
+          <span data-ripple="nav">a<span>m.</span></span>
         </a>
         <motion.nav ref={navigation} layoutScroll aria-label="Main navigation">
           {["about", "experience", "projects", "research", "freelance", "contact"].map((id) => (
@@ -173,12 +175,12 @@ function Portfolio() {
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}
                 />
               )}
-              <span>{id}</span>
+              <span data-ripple="nav">{id}</span>
             </a>
           ))}
         </motion.nav>
         <a className="contact-pill" href={email}>
-          Get in touch <ArrowUpRight size={17} />
+          <span data-ripple="nav">Get in touch</span> <ArrowUpRight size={17} />
         </a>
       </header>
       <main>
@@ -191,7 +193,7 @@ function Portfolio() {
                   <Scramble text="HELLO WORLD, I'M" />
                 </div>
               </Reveal>
-              <h1 aria-label={profile.name}>
+              <h1 data-ripple aria-label={profile.name}>
                 {["Aditya", "Malviya."].map((name, row) => (
                   <span className="name-line" aria-hidden="true" key={name}>
                     {name.split("").map((letter, i) => (
@@ -272,7 +274,7 @@ function Portfolio() {
               <Reveal>
                 <Tilt>
                   <div className="portrait-card">
-                    <div className="portrait-caption">
+                    <div className="portrait-caption" data-ripple>
                       THE HUMAN BEHIND THE CODE ↘
                     </div>
                     <button
@@ -317,7 +319,7 @@ function Portfolio() {
                       </button>
                     )}
                     <div className="photo-bottom">
-                      <strong>Aditya.</strong>
+                      <strong data-ripple>Aditya.</strong>
                       <span>
                         Mumbai, India <MapPin size={14} />
                       </span>
@@ -329,7 +331,7 @@ function Portfolio() {
                 <span className="label-sticker light">
                   <Scramble text="A LITTLE ABOUT ME" />
                 </span>
-                <h2>
+                <h2 data-ripple>
                   Big on data.
                   <br />
                   Bigger on <span>impact.</span>
@@ -412,7 +414,7 @@ function Portfolio() {
               <span className="label-sticker light">
                 <Scramble text="PROFESSIONAL EXPERIENCE" />
               </span>
-              <h2>
+              <h2 data-ripple>
                 Built in production<span className="orange">.</span>
               </h2>
               <div className="employer-heading">
@@ -535,7 +537,7 @@ function Portfolio() {
             <Reveal className="section-heading">
               <div>
                 <span className="label-sticker">PERSONAL PROJECTS</span>
-                <h2 id="projects-heading">Built to explore<span className="orange">.</span></h2>
+                <h2 data-ripple id="projects-heading">Built to explore<span className="orange">.</span></h2>
               </div>
               <p>Tools I built to explore reel-first search, orchestration, <br />document AI, data quality, pipeline design, Spark diagnostics and SQL.</p>
             </Reveal>
@@ -545,7 +547,7 @@ function Portfolio() {
         <section id="research" className="research-section" aria-labelledby="research-heading">
           <div className="section-wrap">
             <Reveal className="section-heading">
-              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading">Built on evidence<span className="orange">.</span></h2></div>
+              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 data-ripple id="research-heading">Built on evidence<span className="orange">.</span></h2></div>
               <p>Testing the assumptions behind <br />Spark performance tuning.</p>
             </Reveal>
             <Reveal>
@@ -580,7 +582,7 @@ function Portfolio() {
                 <span className="label-sticker">
                   <Scramble text="INDEPENDENT WORK" />
                 </span>
-                <h2>
+                <h2 data-ripple>
                   Built end to end<span className="orange">.</span>
                 </h2>
               </div>
@@ -705,7 +707,7 @@ function Portfolio() {
               <span className="label-sticker light">
                 <Scramble text="HAVE SOMETHING IN MIND?" />
               </span>
-              <h2>
+              <h2 data-ripple>
                 Let's work
                 <br />
                 <span>together</span>

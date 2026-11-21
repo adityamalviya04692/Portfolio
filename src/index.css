@@ -92,7 +92,7 @@ svg {
   justify-content: center;
   padding-right: 5px;
 }
-.monogram span {
+.monogram span span {
   color: var(--orange);
 }
 nav {
@@ -4063,5 +4063,24 @@ html[data-theme="dark"] .project-explorer-text h3 { color: var(--orange); }
   }
   .project-player-seek {
     width: 0;
+  }
+}
+
+.heading-ripple-definitions {
+  position: absolute;
+  pointer-events: none;
+}
+
+[data-rippling] {
+  filter: var(--heading-ripple);
+}
+
+[data-ripple="nav"] {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rippling] {
+    filter: none;
   }
 }
