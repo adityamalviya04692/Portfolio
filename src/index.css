@@ -1134,7 +1134,7 @@ footer > a:not(.monogram) {
   }
   .portrait-card {
     max-width: 250px;
-    width: 75%;
+    width: 100%;
     margin: 0 auto;
     transform: rotate(-4deg);
   }
@@ -2655,7 +2655,7 @@ footer > a:not(.monogram) {
     min-height: 0;
   }
   .hero {
-    padding-top: 130px;
+    padding-top: 156px;
     min-height: 880px;
   }
   .hero-copy p {
@@ -3841,7 +3841,7 @@ html[data-theme="dark"] .showcase-film-play {
   height: 100%;
   border-radius: 2px;
   object-fit: cover;
-  object-position: right center;
+  object-position: 80% center;
   pointer-events: none;
 }
 .portrait-play img {
@@ -4015,3 +4015,51 @@ html[data-theme="dark"] .project-explorer-metrics strong { color: #8fa9f0; }
 html[data-theme="dark"] .project-explorer-metrics span,
 html[data-theme="dark"] .project-explorer-text p { color: var(--night-muted); }
 html[data-theme="dark"] .project-explorer-text h3 { color: var(--orange); }
+
+
+.portrait-wave-retry {
+  min-height: 44px;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .about-top > :first-child {
+    width: 100%;
+  }
+  .portrait-play-badge {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    justify-content: center;
+    gap: 5px;
+    padding: 4px;
+    font-size: 10px;
+  }
+  .project-video-dialog-heading > button {
+    flex: 0 0 44px;
+  }
+  .project-video-dialog-heading h2,
+  .project-explorer-metrics div {
+    overflow-wrap: anywhere;
+  }
+  .project-explorer-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .project-video-dialog {
+    width: calc(100vw - 24px);
+  }
+  .project-player-controls button {
+    flex-basis: 40px;
+    width: 40px;
+  }
+  .project-player-seek {
+    width: 0;
+  }
+}

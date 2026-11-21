@@ -32,11 +32,10 @@ type Props = {
   index: number;
   request: number;
   returnFocusTo: HTMLElement | null;
-  onActivate: () => void;
   onClose: () => void;
 };
 
-export default function ProjectVideoDialog({ project, details, autoPlay = true, eyebrow = "PROJECT WALKTHROUGH", kind, index, request, returnFocusTo, onActivate, onClose }: Props) {
+export default function ProjectVideoDialog({ project, details, autoPlay = true, eyebrow = "PROJECT WALKTHROUGH", kind, index, request, returnFocusTo, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -84,7 +83,7 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
         <div><span>{details ? `${details.category} · ${details.year}` : eyebrow}</span><h2 id="project-video-title">{project.title}<span className="orange">.</span></h2></div>
         <button onClick={close} aria-label={details ? `Close ${project.title} details` : "Close video"}><X size={21} /></button>
       </header>
-      <ProjectVideo id={project.id} title={project.title} index={index} link={project.link} kind={kind} active request={request} onActivate={onActivate} autoPlay={autoPlay} />
+      <ProjectVideo id={project.id} title={project.title} index={index} link={project.link} kind={kind} active request={request} autoPlay={autoPlay} />
       {details && (
         <div className="project-explorer-body">
           <div className="project-explorer-summary">

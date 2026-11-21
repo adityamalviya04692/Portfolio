@@ -40,6 +40,7 @@ const skillProjects = data.projects.filter((project) => project.id !== "moriveda
 
 function Portfolio() {
   const [activeVideo, setActiveVideo] = useState({ id: "", request: 0, explore: false });
+  const [waveBlocked, setWaveBlocked] = useState(false);
   const portraitWave = useRef<HTMLVideoElement>(null);
   const videoTrigger = useRef<HTMLElement | null>(null);
   const playProject = (id: string, trigger?: HTMLElement) => {
@@ -67,7 +68,9 @@ function Portfolio() {
 
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && entry.intersectionRatio >= 0.4 && !activeVideo.id && !video.ended) {
-        void video.play().catch(() => {});
+        void video.play().catch((reason: DOMException) => {
+          if (reason.name === "NotAllowedError") setWaveBlocked(true);
+        });
       } else {
         video.pause();
       }
@@ -286,6 +289,19 @@ function Portfolio() {
                         Watch my intro <small>1:10</small>
                       </span>
                     </button>
+                    {waveBlocked && !reduced && (
+                      <button
+                        className="portrait-wave-retry"
+                        onClick={() => {
+                          void portraitWave.current?.play().then(
+                            () => setWaveBlocked(false),
+                            () => {},
+                          );
+                        }}
+                      >
+                        Play welcome wave
+                      </button>
+                    )}
                     <div className="photo-bottom">
                       <strong>Aditya.</strong>
                       <span>
@@ -725,7 +741,7 @@ function Portfolio() {
           </div>
         </section>
       </main>
-      {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} details={activeVideo.explore && videoProject.id !== "intro" ? skillProjects.find((project) => project.id === videoProject.id) : undefined} autoPlay={!activeVideo.explore} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onActivate={() => playProject(videoProject.id)} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request, explore: false }))} />}
+      {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} details={activeVideo.explore && videoProject.id !== "intro" ? skillProjects.find((project) => project.id === videoProject.id) : undefined} autoPlay={!activeVideo.explore} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request, explore: false }))} />}
       <footer>
         <a className="monogram" href="#home" aria-label="Back to top">
           a<span>m.</span>

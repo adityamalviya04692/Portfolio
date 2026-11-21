@@ -16,12 +16,11 @@ type Props = {
   kind?: string;
   active: boolean;
   request: number;
-  onActivate: () => void;
   /** False opens the player paused on its cover until the visitor presses play. */
   autoPlay?: boolean;
 };
 
-export default function ProjectVideo({ id, title, index, link, kind = "Narrated walkthrough", active, request, onActivate, autoPlay = true }: Props) {
+export default function ProjectVideo({ id, title, index, link, kind = "Narrated walkthrough", active, request, autoPlay = true }: Props) {
   // Paused openings wait for a newer play request than the one that opened the dialog.
   const openingRequest = useRef(autoPlay ? -1 : request);
   const video = useRef<HTMLVideoElement>(null);
@@ -35,29 +34,31 @@ export default function ProjectVideo({ id, title, index, link, kind = "Narrated 
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const play = () => {
     const media = video.current;
     if (!media) return;
-    if (!active) { media.pause(); return; }
-    if (request === openingRequest.current) return;
-    setStarted(true);
     setError("");
     if (media.ended) media.currentTime = 0;
-    void media.play().catch(() => setError("Playback could not start. Try again or open the video below."));
+    void media.play().catch((reason: DOMException) => {
+      if (reason.name !== "AbortError" && reason.name !== "NotAllowedError") {
+        setError("Playback could not start. Try again or open the video below.");
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (!active) video.current?.pause();
+    else if (request !== openingRequest.current) play();
   }, [active, request]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) video.current?.pause();
-    });
-    if (player.current) observer.observe(player.current);
     const pauseWhenHidden = () => { if (document.hidden) video.current?.pause(); };
     document.addEventListener("visibilitychange", pauseWhenHidden);
-    return () => { observer.disconnect(); document.removeEventListener("visibilitychange", pauseWhenHidden); };
+    return () => document.removeEventListener("visibilitychange", pauseWhenHidden);
   }, []);
 
   const togglePlayback = () => {
-    if (video.current?.paused) onActivate();
+    if (video.current?.paused) play();
     else video.current?.pause();
   };
   const toggleCaptions = () => {
@@ -100,7 +101,7 @@ export default function ProjectVideo({ id, title, index, link, kind = "Narrated 
           <track kind="captions" src={asset(`assets/videos/${id}.vtt`)} srcLang="en" label="English" />
         </video>
         {!playing && (
-          <button className={`project-play-cover${started ? " is-paused" : ""}`} onClick={onActivate} aria-label={`${ended ? "Replay" : started ? "Resume" : "Play"} ${title} walkthrough`}>
+          <button className={`project-play-cover${started ? " is-paused" : ""}`} onClick={play} aria-label={`${ended ? "Replay" : started ? "Resume" : "Play"} ${title} walkthrough`}>
             <span className="project-play-stamp">{ended ? <RotateCcw size={25} /> : <Play size={25} fill="currentColor" />}</span>
             <span className="project-play-label">{ended ? "WATCH AGAIN" : started ? "CONTINUE WATCHING" : "SEE IT IN ACTION"}<span>{kind}</span></span>
           </button>
