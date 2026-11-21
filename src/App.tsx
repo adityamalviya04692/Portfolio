@@ -65,15 +65,17 @@ function Portfolio() {
     { reduced } = useMotionPreference();
   useEffect(() => {
     const video = portraitWave.current;
-    if (!video || reduced || video.ended) return;
+    if (!video || reduced) return;
 
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.4 && !activeVideo.id && !video.ended) {
+      const inView = entry.isIntersecting && entry.intersectionRatio >= 0.4;
+      if (!inView) {
+        video.pause();
+        if (video.currentTime > 0) video.currentTime = 0;
+      } else if (!activeVideo.id && !video.ended) {
         void video.play().catch((reason: DOMException) => {
           if (reason.name === "NotAllowedError") setWaveBlocked(true);
         });
-      } else {
-        video.pause();
       }
     }, { threshold: 0.4 });
     observer.observe(video);
@@ -294,6 +296,7 @@ function Portfolio() {
                           playsInline
                           preload="none"
                           aria-hidden="true"
+                          onPlaying={() => setWaveBlocked(false)}
                         />
                       )}
                       <span className="portrait-play-badge">
@@ -307,10 +310,7 @@ function Portfolio() {
                       <button
                         className="portrait-wave-retry"
                         onClick={() => {
-                          void portraitWave.current?.play().then(
-                            () => setWaveBlocked(false),
-                            () => {},
-                          );
+                          void portraitWave.current?.play().catch(() => {});
                         }}
                       >
                         Play welcome wave
