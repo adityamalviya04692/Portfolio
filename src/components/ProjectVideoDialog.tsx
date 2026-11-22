@@ -9,6 +9,7 @@ export type ProjectDetails = {
   id: string;
   title: string;
   subtitle: string;
+  cardSummary?: string;
   category: string;
   year: string;
   description: string;

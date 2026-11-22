@@ -207,6 +207,7 @@
       "id": "behaviorlab",
       "title": "behaviorlab",
       "subtitle": "Corporate-event actions, inspectable client insights",
+      "cardSummary": "Trace event activity from raw records to explainable client profiles.",
       "category": "Data Engineering · Event Pipelines",
       "description": "An interactive Northline Events demo that traces ticket orders, meetings, briefs and check-ins through Flask, a SQLite transactional outbox, Kafka routing and Bronze/Silver/Gold profiles. Explore raw records, explainable scores, attendance and demo sales.",
       "problem": "Client activity across browsing, purchases and event operations needs consistent event capture and traceable reporting.",
@@ -250,6 +251,7 @@
       "approach": "I built a free nightly pipeline that finds English reels about repos, crawls the feeds of creators who post them, matches each reel to its GitHub repo (caption, cover OCR, GitHub search), and a reel-first search on top.",
       "title": "RepoReel",
       "subtitle": "Find the reel. Then the repo.",
+      "cardSummary": "Search in plain English to find a coding reel and its GitHub repo.",
       "category": "Data Engineering · Search",
       "description": "Ask in plain words and get the exact Instagram reel that answers it, then the repo it was teasing. A DuckDB + fastembed pipeline classifies, matches and publishes sharded static data every night under a free-tier budget guard; the browser ranks reels with the same MiniLM model and reads screenshots with in-browser OCR.",
       "stack": [
@@ -286,6 +288,7 @@
       "approach": "I built a browser-native RAG and analytics workspace: hybrid retrieval with intent routing and sentence-level citations, plus DuckDB tables with profiling, natural-language SQL and dbt contract export.",
       "title": "Corpus",
       "subtitle": "Ask your documents, query your data — RAG + DuckDB in the browser",
+      "cardSummary": "Ask questions across documents or query structured data in your browser.",
       "category": "AI Engineering · Data Engineering",
       "description": "Cited answers across PDFs, Word and Markdown, side-by-side document comparison, and plain-English questions over CSV and Parquet that become guarded, self-correcting DuckDB SQL. Gemma 4 runs free on WebGPU; retrieval is scored live with hit@k and MRR.",
       "stack": [
@@ -322,6 +325,7 @@
       "approach": "I built an Airflow-style scheduler on a simulated clock — cron, catch-up, retries with backoff, pools, trigger rules, SLAs and idempotent backfills — plus a run doctor and Airflow export.",
       "title": "Orchestra",
       "subtitle": "A pipeline orchestrator you can watch run",
+      "cardSummary": "Schedule pipelines and see where failures start and what they affect.",
       "category": "Data Engineering · Orchestration",
       "description": "A deterministic scheduler loop with live graph, grid and Gantt views. DAGs are YAML, validated for cycles and bad cron, and export to Apache Airflow 2. The run doctor separates root cause from blast radius and transient from deterministic failures.",
       "stack": [
@@ -357,6 +361,7 @@
       "approach": "I built a graph-based workspace with step previews, topology validation, schema-aware joins and readable exports for SQL, PySpark and dbt.",
       "title": "FlowForge",
       "subtitle": "Visual ETL builder with production-code export",
+      "cardSummary": "Build ETL pipelines visually and export runnable SQL or PySpark code.",
       "category": "Data Engineering · Developer Tooling",
       "description": "Graph-based ETL designer with local DuckDB-WASM execution, schema-aware joins and data-quality checks. A pipeline graph generates DuckDB SQL, Spark SQL, PySpark and dbt project files that can be inspected before deployment.",
       "stack": [
@@ -393,6 +398,7 @@
       "approach": "I connected event-log diagnostics with column-level lineage and table build times in a browser workspace. Demo performance figures use synthetic logs.",
       "title": "PipeScope",
       "subtitle": "Spark diagnostics and column-level lineage",
+      "cardSummary": "Diagnose Spark bottlenecks and trace how columns flow through SQL.",
       "category": "Spark Performance · Data Lineage",
       "description": "Browser-based Spark event-log doctor and SQL/dbt lineage explorer. It combines evidence-backed tuning findings, stage and SQL timelines, column-level impact analysis and a critical-path overlay while keeping logs and SQL local.",
       "stack": [
@@ -429,6 +435,7 @@
       "approach": "I built a local DuckDB profiling engine with explainable quality scores, adaptive charts and cleaning steps that generate reproducible SQL.",
       "title": "DataLens",
       "subtitle": "Browser-native data profiling and quality workspace",
+      "cardSummary": "Profile local datasets and pinpoint quality issues without uploading files.",
       "category": "Data Quality · Analytics Engineering",
       "description": "Privacy-first workspace for profiling CSV, Parquet, JSON and Excel files entirely in the browser. DuckDB-WASM powers set-based profiling, explainable quality scoring, adaptive visualizations, a SQL console and reproducible cleaning exports without uploading source data.",
       "stack": [
@@ -465,6 +472,7 @@
       "approach": "I built an interactive learning studio with embedded SQLite execution, progressive hints, reference-answer checks, a database browser, and chapter-based book practice.",
       "title": "Queryroom",
       "subtitle": "Interactive SQL learning studio for students",
+      "cardSummary": "Run SQL against practice databases, with hints and answer checks.",
       "category": "EdTech · SQL Learning",
       "description": "An edtech portfolio project that turns SQL study into hands-on practice. Students can explore 332 interview-style questions, execute queries against 37 SQLite tables, reveal progressive hints, and verify answers. Book Practice includes exercises and example tables from Sams Teach Yourself SQL in 24 Hours, alongside a separate bank covering common industry SQL patterns. Progress is saved locally, with a standalone offline edition.",
       "stack": [
