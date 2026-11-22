@@ -22,9 +22,9 @@ export default function ProjectGallery({ projects, onExplore }: Props) {
 
   return (
     <div role="region" aria-label="Personal projects">
-      <div className="project-card-grid" ref={grid}>
+      <div className="project-card-grid" ref={grid} style={{ "--project-count": projects.length } as CSSProperties}>
         {projects.map((project, index) => (
-          <article key={project.id} style={{ "--fan-slot": index % 4 } as CSSProperties} className={`carousel-card showcase-${project.id}`} id={`project-${project.id}`} aria-label={`${index + 1} of ${projects.length}: ${project.title}`}>
+          <article key={project.id} style={{ "--fan-position": projects.length > 1 ? 2 * index / (projects.length - 1) - 1 : 0, "--fan-layer": Math.min(index, projects.length - 1 - index) } as CSSProperties} className={`carousel-card showcase-${project.id}`} id={`project-${project.id}`} aria-label={`${index + 1} of ${projects.length}: ${project.title}`}>
             <button
               type="button"
               className="carousel-thumb"

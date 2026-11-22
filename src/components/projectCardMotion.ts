@@ -7,7 +7,6 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
 
   const media = window.matchMedia(desktopPointer);
   const cards = Array.from(grid.querySelectorAll<HTMLElement>(".carousel-thumb"), (button) => ({
-    button,
     face: button.querySelector<HTMLElement>(".carousel-face")!,
     x: 0, y: 0, vx: 0, vy: 0, targetX: 0, targetY: 0,
   }));
@@ -36,7 +35,7 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
       ) > 0.04;
       if (settling) {
         card.face.style.translate = `${card.x.toFixed(2)}px ${card.y.toFixed(2)}px`;
-        card.face.style.rotate = `${(card.x * 0.13).toFixed(2)}deg`;
+        card.face.style.rotate = `${(card.x * 0.16).toFixed(2)}deg`;
         moving = true;
       } else {
         card.x = card.y = card.vx = card.vy = card.targetX = card.targetY = 0;
@@ -56,11 +55,11 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
     if (!previous) return;
 
     const elapsed = Math.max(8, Math.min(80, next.time - previous.time));
-    const impulseX = clamp((next.x - previous.x) / elapsed * 23, 33);
-    const impulseY = clamp((next.y - previous.y) / elapsed * 19, 23);
+    const impulseX = clamp((next.x - previous.x) / elapsed * 32, 65);
+    const impulseY = clamp((next.y - previous.y) / elapsed * 27, 52);
 
     for (const card of cards) {
-      const { x, y, width, height } = card.button.getBoundingClientRect();
+      const { x, y, width, height } = card.face.getBoundingClientRect();
       const dx = (next.x - x - width / 2) / (width * 1.2);
       const dy = (next.y - y - height / 2) / (height * 0.82);
       const proximity = Math.max(0, 1 - Math.hypot(dx, dy));
