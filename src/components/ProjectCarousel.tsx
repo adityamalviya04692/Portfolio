@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useMotionPreference } from "./MotionSystem";
+import { attachProjectCardMotion } from "./projectCardMotion";
 import type { ProjectDetails } from "./ProjectVideoDialog";
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
@@ -46,6 +47,10 @@ export default function ProjectCarousel({ projects, onExplore }: Props) {
     window.addEventListener("resize", sync);
     return () => window.removeEventListener("resize", sync);
   }, [sync]);
+
+  useEffect(() => {
+    if (!reduced && track.current) return attachProjectCardMotion(track.current);
+  }, [reduced, projects.length]);
 
   return (
     <div className="project-carousel" role="region" aria-roledescription="carousel" aria-label="Personal projects">

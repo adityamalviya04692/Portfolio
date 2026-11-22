@@ -4009,13 +4009,10 @@ html[data-theme="dark"] .showcase-film-play {
   }
   .carousel-face {
     pointer-events: none;
-    transform: translate(var(--fan-shift, 0px), var(--fan-drop)) rotate(var(--fan-angle));
+    transform: translateY(var(--fan-drop)) rotate(var(--fan-angle));
     transition: transform 240ms cubic-bezier(.22, 1, .36, 1);
   }
-  .carousel-card:has(+ .carousel-card .carousel-thumb:hover),
-  .carousel-card:has(+ .carousel-card .carousel-thumb:focus-visible) { --fan-shift: -5px; }
-  .carousel-card:has(.carousel-thumb:is(:hover, :focus-visible)) + .carousel-card { --fan-shift: 5px; }
-  .carousel-thumb:is(:hover, :focus-visible) .carousel-face {
+  .carousel-thumb:focus-visible .carousel-face {
     transform: translateY(-9px);
     transition-duration: 300ms;
   }
@@ -4023,7 +4020,7 @@ html[data-theme="dark"] .showcase-film-play {
 html[data-motion="off"] .carousel-thumb .carousel-face { transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .carousel-thumb .carousel-face,
-  .carousel-thumb:is(:hover, :focus-visible) .carousel-face { transform: none; transition: none; }
+  .carousel-thumb:focus-visible .carousel-face { transform: none; transition: none; }
 }
 
 /* -- Project explorer: the walkthrough dialog with details under the video -- */
