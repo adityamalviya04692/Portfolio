@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
-import { Accordion } from "./MotionSystem";
+import { Accordion, useMotionPreference } from "./MotionSystem";
 import type { ProjectDetails } from "./ProjectVideoDialog";
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
@@ -13,26 +13,23 @@ type Props = {
 
 /** Swipeable, snap-scrolling project cards; each opens the project explorer dialog. */
 export default function ProjectCarousel({ projects, onExplore }: Props) {
+  const { reduced } = useMotionPreference();
   const track = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
 
-  const step = () => {
+  const step = useCallback(() => {
     const cards = track.current?.children;
     return cards && cards.length > 1 ? (cards[1] as HTMLElement).offsetLeft - (cards[0] as HTMLElement).offsetLeft : 1;
-  };
+  }, []);
   const sync = useCallback(() => {
     const el = track.current;
-    if (!el) return;
+    if (!el || !projects.length) return;
     setCurrent(Math.min(projects.length - 1, Math.round(el.scrollLeft / step())));
-    setAtStart(el.scrollLeft < 4);
-    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
-  }, [projects.length]);
+  }, [projects.length, step]);
   const goTo = (index: number) => {
     const el = track.current;
     const target = Math.max(0, Math.min(projects.length - 1, index));
-    if (el) el.scrollTo({ left: target * step(), behavior: "smooth" });
+    if (el) el.scrollTo({ left: target * step(), behavior: reduced ? "instant" : "smooth" });
   };
   const onKey = (event: KeyboardEvent) => {
     if (event.key === "ArrowRight") { event.preventDefault(); goTo(current + 1); }
@@ -49,8 +46,31 @@ export default function ProjectCarousel({ projects, onExplore }: Props) {
     <div className="project-carousel" role="region" aria-roledescription="carousel" aria-label="Personal projects">
       <div className="project-carousel-bar">
         <span className="project-carousel-count" aria-live="polite">{pad(current + 1)} / {pad(projects.length)}</span>
-        <button onClick={() => goTo(current - 1)} disabled={atStart} aria-label="Previous project"><ArrowLeft size={18} /></button>
-        <button onClick={() => goTo(current + 1)} disabled={atEnd} aria-label="Next project"><ArrowRight size={18} /></button>
+        <button onClick={() => goTo(current - 1)} disabled={current === 0} aria-label="Previous project"><ArrowLeft size={18} /></button>
+        <button onClick={() => goTo(current + 1)} disabled={current >= projects.length - 1} aria-label="Next project"><ArrowRight size={18} /></button>
+      </div>
+      <div className="project-carousel-arc" role="group" aria-label="Jump to a project">
+        {projects.map((project, index) => {
+          const position = projects.length > 1 ? (2 * index) / (projects.length - 1) - 1 : 0;
+          const style = {
+            "--arc-drop": position ** 2,
+            "--arc-angle": `${position * 15}deg`,
+          } as CSSProperties;
+
+          return (
+            <button
+              key={project.id}
+              style={style}
+              onClick={() => goTo(index)}
+              aria-label={`Go to ${project.title}`}
+              aria-current={index === current ? "true" : undefined}
+            >
+              <span>
+                <img src={asset(`assets/projects/${project.id}-card.webp`)} alt="" width="1200" height="750" loading="lazy" />
+              </span>
+            </button>
+          );
+        })}
       </div>
       <div className="project-carousel-track" ref={track} onScroll={sync} onKeyDown={onKey} tabIndex={0} aria-label="Project cards. Use the arrow keys to move between projects.">
         {projects.map((project, index) => (
@@ -78,11 +98,6 @@ export default function ProjectCarousel({ projects, onExplore }: Props) {
               </Accordion>
             </div>
           </article>
-        ))}
-      </div>
-      <div className="project-carousel-dots">
-        {projects.map((project, index) => (
-          <button key={project.id} className={index === current ? "is-active" : ""} onClick={() => goTo(index)} aria-label={`Go to ${project.title}`} aria-current={index === current} />
         ))}
       </div>
     </div>
