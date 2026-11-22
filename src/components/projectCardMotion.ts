@@ -1,12 +1,12 @@
-const desktopPointer = "(min-width: 860px) and (hover: hover) and (pointer: fine)";
+const desktopPointer = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
 const clamp = (value: number, limit: number) => Math.max(-limit, Math.min(limit, value));
 
-export function attachProjectCardMotion(track: HTMLDivElement) {
-  const region = track.parentElement;
+export function attachProjectCardMotion(grid: HTMLDivElement) {
+  const region = grid.parentElement;
   if (!region) return;
 
   const media = window.matchMedia(desktopPointer);
-  const cards = Array.from(track.querySelectorAll<HTMLElement>(".carousel-thumb"), (button) => ({
+  const cards = Array.from(grid.querySelectorAll<HTMLElement>(".carousel-thumb"), (button) => ({
     button,
     face: button.querySelector<HTMLElement>(".carousel-face")!,
     x: 0, y: 0, vx: 0, vy: 0, targetX: 0, targetY: 0,

@@ -3917,29 +3917,15 @@ html[data-theme="dark"] .showcase-film-play {
 .showcase-section { --project-gutter: 32px; padding-inline: 0; }
 .showcase-section .section-wrap { max-width: 1440px; }
 .showcase-section .section-heading h2 { font-size: clamp(36px, 4.3vw, 61px); }
-.showcase-section .section-heading,
-.project-carousel-bar { margin-inline: var(--project-gutter); }
-.project-carousel-bar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-block: -6px 4px; }
-.project-carousel-count { margin-right: 6px; font: 11px "Space Mono", monospace; letter-spacing: 1px; }
-.project-carousel-bar button { display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid var(--ink); border-radius: 50%; background: transparent; color: var(--ink); transition: background .18s ease, color .18s ease, opacity .18s ease; }
-.project-carousel-bar button:hover { background: var(--ink); color: var(--cream); }
-.project-carousel-bar button:disabled { opacity: .28; pointer-events: none; }
-.project-carousel-track {
-  --project-columns: 4;
-  --card-gap: 32px;
-  --card-width: calc((100% - (var(--project-columns) - 1) * var(--card-gap)) / var(--project-columns));
-  display: flex;
-  gap: var(--card-gap);
-  padding: 20px var(--project-gutter) 42px;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--project-gutter);
-  scrollbar-width: none;
+.showcase-section .section-heading { margin-inline: var(--project-gutter); }
+.project-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 340px));
+  justify-content: center;
+  gap: 28px 24px;
+  padding: 16px var(--project-gutter) 30px;
 }
-.project-carousel-track::-webkit-scrollbar { display: none; }
-.project-carousel-track:focus-visible { outline: 2px solid var(--blue); outline-offset: 6px; border-radius: 22px; }
-.carousel-card { flex: 0 0 var(--card-width); min-width: 0; height: auto; scroll-snap-align: start; }
+.carousel-card { min-width: 0; }
 .carousel-thumb {
   display: block;
   width: 100%;
@@ -3954,6 +3940,7 @@ html[data-theme="dark"] .showcase-film-play {
 .carousel-face {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100%;
   aspect-ratio: 9 / 16;
   max-height: max(360px, 60svh);
 }
@@ -3987,40 +3974,34 @@ html[data-theme="dark"] .showcase-film-play {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-@media (max-width: 1199px) {
-  .project-carousel-track { --project-columns: 3; --card-gap: 26px; }
-}
-@media (max-width: 859px) {
-  .project-carousel-track { --project-columns: 2; --card-gap: 24px; }
-}
 @media (max-width: 639px) {
   .showcase-section { --project-gutter: 16px; }
-  .project-carousel-track { --card-width: 80%; --card-gap: 16px; }
-  .project-carousel-bar button { width: 40px; height: 40px; }
+  .project-card-grid {
+    grid-template-columns: minmax(0, 340px);
+    gap: 20px;
+  }
 }
-@media (min-width: 860px) and (hover: hover) and (pointer: fine) {
+@media (min-width: 1024px) {
+  .project-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 52px 14px;
+    padding-block: 20px 48px;
+    overflow-x: clip;
+  }
   .carousel-card {
-    --fan-middle: calc((var(--project-columns) - 1) / 2);
-    --fan-position: clamp(-1, calc((var(--fan-slot) - var(--fan-middle)) / var(--fan-middle)), 1);
+    --fan-position: calc((var(--fan-slot) - 1.5) / 1.5);
     --fan-drop: calc(var(--fan-position) * var(--fan-position) * 24px);
-    --fan-angle: calc(var(--fan-position) * 5deg);
+    --fan-angle: calc(var(--fan-position) * 7deg);
+    --fan-layer: max(0, 1 - var(--fan-slot), var(--fan-slot) - 2);
     position: relative;
-    padding-top: 10px;
+    z-index: calc(3 - var(--fan-layer));
   }
   .carousel-face {
-    pointer-events: none;
+    box-shadow: 0 2px 5px #29282020, 0 11px 21px -8px #29282044;
+    transform-origin: center 32%;
     transform: translateY(var(--fan-drop)) rotate(var(--fan-angle));
-    transition: transform 240ms cubic-bezier(.22, 1, .36, 1);
   }
-  .carousel-thumb:focus-visible .carousel-face {
-    transform: translateY(-9px);
-    transition-duration: 300ms;
-  }
-}
-html[data-motion="off"] .carousel-thumb .carousel-face { transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .carousel-thumb .carousel-face,
-  .carousel-thumb:focus-visible .carousel-face { transform: none; transition: none; }
+  .carousel-card:focus-within { z-index: 4; }
 }
 
 /* -- Project explorer: the walkthrough dialog with details under the video -- */
@@ -4064,12 +4045,7 @@ html[data-motion="off"] .carousel-thumb .carousel-face { transform: none; }
   .project-video-dialog.project-explorer[data-visible="true"] { transform: none; }
 }
 .project-video-dialog[data-reduced="true"], .project-video-dialog[data-reduced="true"] .project-player, .project-video-dialog[data-reduced="true"] .project-explorer-summary > *, .project-video-dialog[data-reduced="true"] .project-explorer-text > * { transform: none !important; transition: opacity 150ms ease !important; transition-delay: 0ms !important; }
-@media (prefers-reduced-motion: reduce) {
-  .project-carousel-track { scroll-behavior: auto; }
-}
-
-/* -- Night colours for the carousel and explorer -- */
-html[data-theme="dark"] .project-carousel-bar button:hover { background: var(--ink); color: var(--night); }
+/* -- Night colours for the project cards and explorer -- */
 html[data-theme="dark"] .carousel-artwork { background: var(--night-2); }
 html[data-theme="dark"] .carousel-thumb-chip { color: #b8c9ff; }
 html[data-theme="dark"] .project-explorer-body { border-color: var(--night-line); }

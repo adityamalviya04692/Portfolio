@@ -22,7 +22,7 @@ import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRip
 import ProjectArt from "./components/ProjectArt";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
-import ProjectCarousel from "./components/ProjectCarousel";
+import ProjectGallery from "./components/ProjectGallery";
 import {
   Accordion,
   AvatarPortal,
@@ -531,7 +531,7 @@ function Portfolio() {
               </div>
               <p>Tools I built to explore reel-first search, orchestration, <br />document AI, data quality, pipeline design, Spark diagnostics and SQL.</p>
             </Reveal>
-            <ProjectCarousel projects={skillProjects} onExplore={exploreProject} />
+            <ProjectGallery projects={skillProjects} onExplore={exploreProject} />
           </div>
         </section>
         <section id="research" className="research-section" aria-labelledby="research-heading">

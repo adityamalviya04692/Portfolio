@@ -39,7 +39,7 @@ export default function PortfolioCursor() {
         el.setAttribute("data-cursor-style", customCursorStyle({
           background: "#ed883823", border: "1.5px solid #d87427", radius: "999px",
         }));
-      } else if (el.matches(".social-links a, .motion-controls button, .project-carousel-bar button, .carousel-controls button, .monogram, .project-carousel-dots button, .project-player-controls > button:first-child")) {
+      } else if (el.matches(".social-links a, .motion-controls button, .carousel-controls button, .monogram, .project-player-controls > button:first-child")) {
         el.setAttribute("data-cursor-style", customCursorStyle({ radius: "50%", durationBase: 200 }));
       } else if (el.matches("[download], .showcase-links a")) {
         el.setAttribute("data-cursor-style", customCursorStyle({ background: "#9fc5ff2e", border: "1px solid #749ada" }));
