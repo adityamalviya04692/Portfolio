@@ -3955,6 +3955,20 @@ html[data-theme="dark"] .showcase-film-play {
 .carousel-face .showcase-browser, .carousel-caption .showcase-category { display: none; }
 .carousel-artwork { display: block; overflow: hidden; }
 .carousel-artwork img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+/* Accent and brand colors from the eight project sites. */
+.showcase-behaviorlab { --project-accent: #28766c; }
+.showcase-reporeel { --project-accent: #ff6b9a; --project-on-accent: #161218; }
+.showcase-corpus { --project-accent: #0a7a5d; }
+.showcase-orchestra { --project-accent: #f59e0b; --project-on-accent: #211807; }
+.showcase-flowforge { --project-accent: #6d4aff; }
+.showcase-pipescope { --project-accent: #a34f25; }
+.showcase-datalens { --project-accent: #efe904; --project-on-accent: #191900; }
+.showcase-queryroom { --project-accent: #315f50; }
+.project-card-grid .carousel-caption {
+  background: var(--project-accent, #102b79);
+  color: var(--project-on-accent, white);
+}
+.project-card-grid .carousel-caption :is(.showcase-subtitle, .carousel-thumb-chip) { color: inherit; }
 .carousel-caption { display: grid; gap: 6px; padding: 11px; }
 .carousel-caption strong { font-size: clamp(15px, 1.3vw, 19px); line-height: 1.12; letter-spacing: -.035em; }
 .carousel-caption .showcase-subtitle { margin: 0; font-size: 12px; line-height: 1.4; }
@@ -3964,7 +3978,7 @@ html[data-theme="dark"] .showcase-film-play {
 }
 @media (hover: hover) and (pointer: fine) {
   .carousel-thumb-chip:hover {
-    outline: 1px solid var(--cursor-outline, var(--orange));
+    outline: 1px solid currentColor;
     outline-offset: 2px;
     border-radius: 3px;
     background: var(--cursor-tint);
