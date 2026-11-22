@@ -3958,9 +3958,18 @@ html[data-theme="dark"] .showcase-film-play {
 .carousel-caption { display: grid; gap: 6px; padding: 11px; }
 .carousel-caption strong { font-size: clamp(15px, 1.3vw, 19px); line-height: 1.12; letter-spacing: -.035em; }
 .carousel-caption .showcase-subtitle { margin: 0; font-size: 12px; line-height: 1.4; }
-.carousel-thumb-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--blue); }
+.carousel-thumb-chip { justify-self: start; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--blue); }
 @media (hover: hover) {
   .carousel-card:hover { z-index: var(--project-count); }
+}
+@media (hover: hover) and (pointer: fine) {
+  .carousel-thumb-chip:hover {
+    outline: 1px solid var(--cursor-outline, var(--orange));
+    outline-offset: 2px;
+    border-radius: 3px;
+    background: var(--cursor-tint);
+  }
+  html[data-custom-pointer="on"]:has(.carousel-thumb-chip:hover) .portfolio-cursor { visibility: hidden; }
 }
 .carousel-card:focus-within { z-index: var(--project-count); }
 .carousel-thumb:focus-visible { outline: none; }
@@ -3972,7 +3981,7 @@ html[data-theme="dark"] .showcase-film-play {
 }
 @media (max-width: 639px) {
   .showcase-section { --project-gutter: 16px; }
-  .project-card-grid { --tilt: 12deg; --depth: 30px; padding: 18px 7% 56px; }
+  .project-card-grid { --tilt: 20deg; --depth: 42px; padding: 18px 8% 68px; }
   .carousel-face { height: clamp(122px, 34vw, 172px); border-radius: 7px; }
   .carousel-caption { padding: 6px 2px; justify-items: center; }
   .carousel-caption strong { writing-mode: vertical-rl; font-size: 11px; }
