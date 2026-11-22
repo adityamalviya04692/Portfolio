@@ -3924,10 +3924,8 @@ html[data-theme="dark"] .showcase-film-play {
 .project-carousel-track:focus-visible { outline: 2px solid var(--blue); outline-offset: 6px; border-radius: 22px; }
 .carousel-card { flex: 0 0 var(--card-width); min-width: 0; height: auto; scroll-snap-align: start; }
 .carousel-thumb {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  display: block;
   width: 100%;
-  aspect-ratio: 9 / 16;
   padding: 0;
   border: 0;
   background: none;
@@ -3935,7 +3933,13 @@ html[data-theme="dark"] .showcase-film-play {
   text-align: left;
   cursor: pointer;
 }
-.carousel-thumb:focus-visible { outline: 3px solid var(--orange); outline-offset: -3px; }
+.carousel-thumb:focus-visible { outline: none; }
+.carousel-face {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  aspect-ratio: 9 / 16;
+}
+.carousel-thumb:focus-visible .carousel-face { outline: 3px solid var(--orange); outline-offset: -3px; }
 .carousel-artwork {
   display: block;
   overflow: hidden;
@@ -3974,6 +3978,53 @@ html[data-theme="dark"] .showcase-film-play {
 @media (max-width: 760px) {
   .project-carousel-track { --card-gap: 16px; }
   .project-carousel-bar button { width: 40px; height: 40px; }
+}
+
+@media (min-width: 1000px) and (hover: hover) and (pointer: fine) {
+  .project-carousel-bar { display: none; }
+  .project-carousel-track {
+    gap: 0;
+    overflow: visible;
+    padding: 42px 6% clamp(65px, 8vw, 108px);
+  }
+  .project-carousel-track::after { content: none; }
+  .carousel-card { position: relative; flex: 1 1 0; }
+  .carousel-thumb { aspect-ratio: 1 / 2.1; }
+  .carousel-face {
+    position: relative;
+    width: calc(100% + 16px);
+    margin-inline: -8px;
+    isolation: isolate;
+    grid-template-rows: 1fr auto;
+    border: 2px solid #fffdf7;
+    border-radius: 13px;
+    box-shadow: 0 12px 24px #17152232;
+    transform: translate(var(--fan-shift, 0px), calc(var(--fan-drop) * clamp(37px, 5vw, 76px))) rotate(var(--fan-angle));
+    transform-origin: center 65%;
+    transition: transform .36s var(--ease-out), box-shadow .36s ease;
+  }
+  .carousel-face .showcase-browser,
+  .carousel-caption .showcase-category,
+  .carousel-caption .showcase-subtitle { display: none; }
+  .carousel-artwork { position: absolute; inset: 0; z-index: -1; }
+  .carousel-caption {
+    grid-row: 2;
+    gap: 4px;
+    padding: 32px 12px 13px;
+    background: linear-gradient(transparent, #0e1120ed 50%, #0e1120);
+    color: #fffdf7;
+  }
+  .carousel-caption strong { font-size: clamp(12px, 1.22vw, 18px); }
+  .carousel-thumb-chip { font-size: 10px; gap: 4px; color: #ffe3cd; }
+  .carousel-thumb-chip svg { width: 12px; }
+  .carousel-card:has(~ .carousel-card:hover),
+  .carousel-card:has(~ .carousel-card .carousel-thumb:focus-visible) { --fan-shift: -10px; }
+  .carousel-card:is(:hover, :has(.carousel-thumb:focus-visible)) ~ .carousel-card { --fan-shift: 10px; }
+  .carousel-card:is(:hover, :has(.carousel-thumb:focus-visible)) { z-index: 1; }
+  .carousel-thumb:is(:hover, :focus-visible) .carousel-face {
+    transform: translateY(calc(var(--fan-drop) * 22px - 23px)) rotate(0deg) scale(1.12);
+    box-shadow: 0 20px 38px #17152256;
+  }
 }
 
 /* -- Project explorer: the walkthrough dialog with details under the video -- */
@@ -4019,7 +4070,7 @@ html[data-theme="dark"] .showcase-film-play {
 .project-video-dialog[data-reduced="true"], .project-video-dialog[data-reduced="true"] .project-player, .project-video-dialog[data-reduced="true"] .project-explorer-summary > *, .project-video-dialog[data-reduced="true"] .project-explorer-text > * { transform: none !important; transition: opacity 150ms ease !important; transition-delay: 0ms !important; }
 @media (prefers-reduced-motion: reduce) {
   .project-carousel-track { scroll-behavior: auto; }
-  .carousel-artwork img { transition: none; }
+  .carousel-artwork img, .carousel-face { transition: none; }
 }
 
 /* -- Night colours for the carousel and explorer -- */

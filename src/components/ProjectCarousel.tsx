@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useMotionPreference } from "./MotionSystem";
 import type { ProjectDetails } from "./ProjectVideoDialog";
@@ -32,8 +32,18 @@ export default function ProjectCarousel({ projects, onExplore }: Props) {
     if (el) el.scrollTo({ left: target * step(), behavior: reduced ? "instant" : "smooth" });
   };
   const onKey = (event: KeyboardEvent) => {
-    if (event.key === "ArrowRight") { event.preventDefault(); goTo(current + 1); }
-    if (event.key === "ArrowLeft") { event.preventDefault(); goTo(current - 1); }
+    const direction = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+    if (!direction) return;
+    event.preventDefault();
+
+    const el = track.current;
+    if (el && getComputedStyle(el).overflowX === "visible") {
+      const cards = [...el.querySelectorAll<HTMLButtonElement>(".carousel-thumb")];
+      const focused = cards.indexOf(document.activeElement as HTMLButtonElement);
+      cards[Math.max(0, Math.min(cards.length - 1, focused + direction))]?.focus();
+      return;
+    }
+    goTo(current + direction);
   };
 
   useEffect(() => {
@@ -50,31 +60,41 @@ export default function ProjectCarousel({ projects, onExplore }: Props) {
         <button onClick={() => goTo(current + 1)} disabled={current >= projects.length - 1} aria-label="Next project"><ArrowRight size={18} /></button>
       </div>
       <div className="project-carousel-track" ref={track} onScroll={sync} onKeyDown={onKey} tabIndex={0} aria-label="Project cards. Use the arrow keys to move between projects.">
-        {projects.map((project, index) => (
-          <article key={project.id} className={`showcase-card carousel-card showcase-${project.id}`} id={`project-${project.id}`} aria-roledescription="slide" aria-label={`${index + 1} of ${projects.length}: ${project.title}`}>
-            <button
-              type="button"
-              className="carousel-thumb"
-              onClick={(event) => onExplore(project.id, event.currentTarget)}
-              aria-label={`Explore ${project.title}`}
-              aria-haspopup="dialog"
-            >
-              <span className="showcase-browser">
-                <span>{pad(index + 1)} / {project.title}</span>
-                {index === 0 && <em className="showcase-latest">LATEST</em>}
-              </span>
-              <span className="carousel-artwork">
-                <img src={asset(`assets/projects/${project.id}-card.webp`)} alt="" width="1200" height="750" loading={index < 3 ? "eager" : "lazy"} />
-              </span>
-              <span className="carousel-caption">
-                <span className="showcase-category">{project.category}</span>
-                <strong>{project.title}</strong>
-                <span className="showcase-subtitle">{project.subtitle}</span>
-                <span className="carousel-thumb-chip" aria-hidden="true">Explore project <ArrowRight size={16} /></span>
-              </span>
-            </button>
-          </article>
-        ))}
+        {projects.map((project, index) => {
+          const position = projects.length > 1 ? (2 * index) / (projects.length - 1) - 1 : 0;
+          const arc = {
+            "--fan-angle": `${position * 24}deg`,
+            "--fan-drop": position ** 2,
+          } as CSSProperties;
+
+          return (
+            <article key={project.id} style={arc} className={`carousel-card showcase-${project.id}`} id={`project-${project.id}`} aria-roledescription="slide" aria-label={`${index + 1} of ${projects.length}: ${project.title}`}>
+              <button
+                type="button"
+                className="carousel-thumb"
+                onClick={(event) => onExplore(project.id, event.currentTarget)}
+                aria-label={`Explore ${project.title}`}
+                aria-haspopup="dialog"
+              >
+                <span className="carousel-face showcase-card">
+                  <span className="showcase-browser">
+                    <span>{pad(index + 1)} / {project.title}</span>
+                    {index === 0 && <em className="showcase-latest">LATEST</em>}
+                  </span>
+                  <span className="carousel-artwork">
+                    <img src={asset(`assets/projects/${project.id}-card.webp`)} alt="" width="1200" height="750" loading={index < 3 ? "eager" : "lazy"} />
+                  </span>
+                  <span className="carousel-caption">
+                    <span className="showcase-category">{project.category}</span>
+                    <strong>{project.title}</strong>
+                    <span className="showcase-subtitle">{project.subtitle}</span>
+                    <span className="carousel-thumb-chip" aria-hidden="true">Explore project <ArrowRight size={16} /></span>
+                  </span>
+                </span>
+              </button>
+            </article>
+          );
+        })}
       </div>
     </div>
   );
