@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
-import { Accordion, useMotionPreference } from "./MotionSystem";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useMotionPreference } from "./MotionSystem";
 import type { ProjectDetails } from "./ProjectVideoDialog";
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
@@ -49,54 +49,30 @@ export default function ProjectCarousel({ projects, onExplore }: Props) {
         <button onClick={() => goTo(current - 1)} disabled={current === 0} aria-label="Previous project"><ArrowLeft size={18} /></button>
         <button onClick={() => goTo(current + 1)} disabled={current >= projects.length - 1} aria-label="Next project"><ArrowRight size={18} /></button>
       </div>
-      <div className="project-carousel-arc" role="group" aria-label="Jump to a project">
-        {projects.map((project, index) => {
-          const position = projects.length > 1 ? (2 * index) / (projects.length - 1) - 1 : 0;
-          const style = {
-            "--arc-drop": position ** 2,
-            "--arc-angle": `${position * 15}deg`,
-          } as CSSProperties;
-
-          return (
-            <button
-              key={project.id}
-              style={style}
-              onClick={() => goTo(index)}
-              aria-label={`Go to ${project.title}`}
-              aria-current={index === current ? "true" : undefined}
-            >
-              <span>
-                <img src={asset(`assets/projects/${project.id}-card.webp`)} alt="" width="1200" height="750" loading="lazy" />
-              </span>
-            </button>
-          );
-        })}
-      </div>
       <div className="project-carousel-track" ref={track} onScroll={sync} onKeyDown={onKey} tabIndex={0} aria-label="Project cards. Use the arrow keys to move between projects.">
         {projects.map((project, index) => (
           <article key={project.id} className={`showcase-card carousel-card showcase-${project.id}`} id={`project-${project.id}`} aria-roledescription="slide" aria-label={`${index + 1} of ${projects.length}: ${project.title}`}>
-            <div className="showcase-visual">
-              <div className="showcase-browser"><span>{pad(index + 1)} / {project.title}{index === 0 && <em className="showcase-latest">LATEST</em>}</span><a href={project.link} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live demo`}>OPEN APP <ArrowUpRight size={14} /></a></div>
-              <button className="carousel-thumb" onClick={(event) => onExplore(project.id, event.currentTarget)} aria-label={`Explore ${project.title}`} aria-haspopup="dialog">
-                <img src={asset(`assets/projects/${project.id}-card.webp`)} alt="" width="1200" height="750" loading={index < 2 ? "eager" : "lazy"} />
-                <span className="carousel-thumb-chip" aria-hidden="true">Explore project <ArrowRight size={14} /></span>
-              </button>
-            </div>
-            <div className="showcase-copy">
-              <span className="showcase-category">{project.category}</span>
-              <h3>{project.title}</h3>
-              <p className="showcase-subtitle">{project.subtitle}</p>
-              <div className="tags">{project.stack.slice(0, 4).map((item) => <span key={item}>{item}</span>)}</div>
-              <div className="carousel-actions">
-                <button className="carousel-explore" onClick={(event) => onExplore(project.id, event.currentTarget)} aria-haspopup="dialog">Explore project <ArrowRight size={16} /></button>
-                <a href={project.link} target="_blank" rel="noreferrer">Open app <ArrowUpRight size={15} /></a>
-              </div>
-              <Accordion title="Read more" className="showcase-details">
-                <p>{project.description}</p>
-                {project.problem && <p><strong>The problem.</strong> {project.problem}</p>}
-                {project.approach && <p><strong>What I built.</strong> {project.approach}</p>}
-              </Accordion>
-            </div>
+            <button
+              type="button"
+              className="carousel-thumb"
+              onClick={(event) => onExplore(project.id, event.currentTarget)}
+              aria-label={`Explore ${project.title}`}
+              aria-haspopup="dialog"
+            >
+              <span className="showcase-browser">
+                <span>{pad(index + 1)} / {project.title}</span>
+                {index === 0 && <em className="showcase-latest">LATEST</em>}
+              </span>
+              <span className="carousel-artwork">
+                <img src={asset(`assets/projects/${project.id}-card.webp`)} alt="" width="1200" height="750" loading={index < 3 ? "eager" : "lazy"} />
+              </span>
+              <span className="carousel-caption">
+                <span className="showcase-category">{project.category}</span>
+                <strong>{project.title}</strong>
+                <span className="showcase-subtitle">{project.subtitle}</span>
+                <span className="carousel-thumb-chip" aria-hidden="true">Explore project <ArrowRight size={16} /></span>
+              </span>
+            </button>
           </article>
         ))}
       </div>
