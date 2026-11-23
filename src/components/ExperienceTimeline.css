@@ -35,21 +35,24 @@
   top: 0;
   left: 50%;
   transform: translate(-50%, -50%);
-  perspective: 440px;
-}
-.experience-calendar-reveal, .experience-calendar-page {
-  display: block;
-  transform-origin: center top;
-}
-.experience-calendar-page {
   padding: 4px 10px;
   border: 1px solid #ffc089;
   border-radius: 20px;
   background: var(--rail-surface);
   color: #ffc089;
   white-space: nowrap;
-  font: 11px ui-monospace, monospace;
+  font: 11px/18px ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }
+.experience-date-measure { opacity: 0; }
+.experience-date-window {
+  position: absolute;
+  inset: 4px 10px;
+  overflow: hidden;
+  text-align: center;
+}
+.experience-date-reel,
+.experience-date-reel > span { display: block; height: 18px; }
 .experience-entry {
   position: relative;
   display: grid;
@@ -101,22 +104,6 @@
 }
 .experience-motion .is-shown .experience-entry-copy { opacity: 1; transform: none; }
 .experience-motion .is-shown .experience-entry-visual { clip-path: inset(0); }
-
-@media (prefers-reduced-motion: no-preference) {
-  .experience-motion .experience-entry[data-rail-reached] .experience-calendar-reveal {
-    animation: experience-calendar-turn 560ms cubic-bezier(.2, .7, .28, 1) both;
-  }
-  @media (hover: hover) {
-    .experience-motion .experience-timeline-label:hover .experience-calendar-page {
-      animation: experience-calendar-turn 460ms cubic-bezier(.2, .7, .28, 1) both;
-    }
-  }
-}
-@keyframes experience-calendar-turn {
-  0% { transform: perspective(440px) rotateX(-78deg); opacity: .4; }
-  70% { transform: perspective(440px) rotateX(7deg); opacity: 1; }
-  100% { transform: perspective(440px) rotateX(0); opacity: 1; }
-}
 
 @media (max-width: 720px) {
   .experience-timeline { padding-left: 21px; }

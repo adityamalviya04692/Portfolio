@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { animate, motion, useMotionValue } from "framer-motion";
 import entries from "../data/experience.json";
 import { RippleWord } from "./HeadingRipples";
 import { Accordion, Scramble, useMotionPreference } from "./MotionSystem";
@@ -6,9 +7,63 @@ import "./ExperienceTimeline.css";
 
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 
+function TimelineDate({ label, leadIn, reached, reduced }: {
+  label: string;
+  leadIn: readonly [string, string];
+  reached: boolean;
+  reduced: boolean;
+}) {
+  const rowHeight = 18;
+  const offset = useMotionValue(-2 * rowHeight);
+  const playback = useRef<{ stop: () => void } | null>(null);
+  const replay = useCallback(() => {
+    playback.current?.stop();
+    offset.set(0);
+    playback.current = animate(offset, -2 * rowHeight, {
+      type: "spring",
+      stiffness: 45,
+      damping: 14,
+      mass: 1.25,
+      delay: 0.2,
+      restDelta: 0.03,
+      restSpeed: 0.08,
+    });
+  }, [offset]);
+
+  useEffect(() => {
+    if (reached && !reduced) replay();
+    else offset.set(-2 * rowHeight);
+    return () => playback.current?.stop();
+  }, [offset, reached, reduced, replay]);
+
+  return (
+    <span
+      className="experience-timeline-label"
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse" && reached && !reduced) replay();
+      }}
+    >
+      <span className="experience-date-measure">{label}</span>
+      <span className="experience-date-window" aria-hidden="true">
+        <motion.span className="experience-date-reel" style={{ y: offset }}>
+          {[...leadIn, label].map((line) => <span key={line}>{line}</span>)}
+        </motion.span>
+      </span>
+    </span>
+  );
+}
+
+const dateLeadIns = [
+  ["Calendar", "Today"],
+  ["Present", "Rolls-Royce Digital"],
+  ["Present", "2022"],
+  ["January 2022", "2021"],
+] as const;
+
 export default function ExperienceTimeline() {
   const timeline = useRef<HTMLDivElement>(null);
   const { reduced } = useMotionPreference();
+  const [reachedCount, setReachedCount] = useState(0);
   const today = new Intl.DateTimeFormat("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" }).format(new Date());
 
   useEffect(() => {
@@ -32,9 +87,13 @@ export default function ExperienceTimeline() {
       const { top, height } = rail.getBoundingClientRect();
       const distance = Math.max(0, Math.min(height, window.innerHeight * 0.78 - top));
       rail.style.setProperty("--rail-progress", String(Math.max(0, (distance - 14) / Math.max(1, height - 14))));
+      let count = 0;
       for (const row of rows) {
-        row.toggleAttribute("data-rail-reached", distance >= row.offsetTop);
+        const reached = distance >= row.offsetTop;
+        row.toggleAttribute("data-rail-reached", reached);
+        if (reached) count += 1;
       }
+      setReachedCount(count);
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(drawRail);
@@ -77,11 +136,12 @@ export default function ExperienceTimeline() {
               key={entry.title}
               onFocus={(event) => event.currentTarget.classList.add("is-shown")}
             >
-              <span className="experience-timeline-label">
-                <span className="experience-calendar-reveal">
-                  <span className="experience-calendar-page">{index === 0 ? `${today} · Present` : entry.period}</span>
-                </span>
-              </span>
+              <TimelineDate
+                label={index === 0 ? `${today} · Present` : entry.period}
+                leadIn={dateLeadIns[index]}
+                reached={index < reachedCount}
+                reduced={reduced}
+              />
               <div className="experience-entry-copy">
                 <div className="experience-project-heading">
                   <img className={`experience-project-logo logo-${entry.logoAlt.toLowerCase().replace(/ /g, "-")}`} src={asset(entry.logo)} alt={entry.logoAlt} />
