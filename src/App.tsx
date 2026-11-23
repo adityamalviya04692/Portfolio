@@ -299,24 +299,44 @@ function Portfolio() {
             <Reveal>
               <article className="research-feature">
                 <div className="research-board" aria-label="Illustrated research evidence board">
-                  <div className="research-note research-note-skew">
+                  <motion.div className="research-note research-note-skew" initial={{ rotate: -7 }} whileHover={{ x: -38, y: -32, rotate: -11 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
                     <span>FIELD NOTE / 01</span>
                     <strong>ONE HOT KEY.<br />TOO MUCH WORK.</strong>
                     <div className="research-skew-bars" aria-hidden="true"><i /><i /><i /><i /></div>
                     <p>Skewed partitions can dominate a join.</p>
-                  </div>
-                  <div className="research-note research-note-aqe">
+                  </motion.div>
+                  <motion.div className="research-note research-note-aqe" initial={{ rotate: 6 }} whileHover={{ x: 30, y: -28, rotate: 10 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
                     <span>FIELD NOTE / 02</span>
                     <strong>CAN AQE SPLIT IT?</strong>
                     <div className="research-split-diagram" aria-hidden="true"><b />→<b /><b /><b /></div>
                     <p>Advisory partition size mattered in the measured probes.</p>
-                  </div>
-                  <div className="research-note research-note-salt">
+                  </motion.div>
+                  <motion.div className="research-note research-note-salt" initial={{ rotate: 5 }} whileHover={{ x: -28, y: 35, rotate: 8 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
                     <span>FIELD NOTE / 03</span>
                     <strong>SPREAD THE KEY</strong>
                     <div className="research-salt-diagram" aria-hidden="true">HOT KEY <em>→</em> #0 · #1 · #2 · #3</div>
                     <p>Balance reduced skew against replicated rows.</p>
-                  </div>
+                  </motion.div>
+                  <motion.div className="research-note research-note-trigger" initial={{ rotate: 4 }} whileHover={{ x: 34, y: -22, rotate: 7 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                    <span>CONFIGURATION / TRIGGER</span><strong>101:1 SKEW<br />RULE DID NOT FIRE</strong>
+                    <div className="research-pencil-line" aria-hidden="true">hot partition &lt; advisory size → no split</div>
+                    <p>The final adaptive plan showed partition coalescing. Lowering the advisory size engaged the skew rule.</p>
+                  </motion.div>
+                  <motion.div className="research-note research-note-replication" initial={{ rotate: 7 }} whileHover={{ x: 36, y: 30, rotate: 10 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                    <span>SHUFFLE RECORDS / REPLICATION</span><strong>11 vs 20,000</strong>
+                    <div className="research-mini-table"><span>Selective salting</span><b>11 / salt</b><span>Uniform salting</span><b>20,000</b></div>
+                    <p>The measured row-count ratio was 1,818. Runtime cost remained unresolved.</p>
+                  </motion.div>
+                  <motion.div className="research-note research-note-method" initial={{ rotate: -5 }} whileHover={{ x: -30, y: 32, rotate: -9 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                    <span>BENCHMARK / SKEWBENCH</span><strong>CONTROL THE NOISE</strong>
+                    <div className="research-pencil-line" aria-hidden="true">baseline ≈ selective salt k=1</div>
+                    <p>Fixed-seed cell order and warmup address the cold-JVM effect. Small speedups are judged against the control floor.</p>
+                  </motion.div>
+                  <motion.div className="research-note research-note-model" initial={{ rotate: -4 }} whileHover={{ x: -25, y: -26, rotate: -5 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                    <span>COST MODEL / THEORY</span><strong>T(k) = aH/k + bP(k−1) + c</strong>
+                    <div className="research-pencil-line" aria-hidden="true">less skew ↔ more replication</div>
+                    <p>The predicted optimum is theoretical. This single-node study did not validate its runtime estimate.</p>
+                  </motion.div>
                   <div className="research-figure research-paper">
                     <span className="research-kicker">SKEWBENCH / {data.research.year}</span>
                     <h3>THE SKEW QUESTION</h3>
