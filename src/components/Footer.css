@@ -1,0 +1,32 @@
+.footer-ring {
+  position: relative;
+  height: clamp(105px, 17vw, 200px);
+  overflow: hidden;
+  perspective: 1000px;
+  pointer-events: none;
+  color-scheme: dark;
+}
+
+.footer-ring-plane {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: clamp(420px, 78vw, 1000px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) rotateX(64deg) rotateZ(-12deg);
+}
+
+.footer-ring-wheel {
+  display: block;
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .footer-ring-wheel {
+    animation: footer-ring-spin 26s linear infinite;
+  }
+}
+
+@keyframes footer-ring-spin {
+  to { transform: rotate(360deg); }
+}
