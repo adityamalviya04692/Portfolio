@@ -621,24 +621,12 @@ function Portfolio() {
               {profile.availability} <span>·</span> Mumbai, India
             </div>
           </div>
+          <a href="#home" className="back-top">
+            BACK TO TOP ↑
+          </a>
         </section>
       </main>
       {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} details={activeVideo.explore && videoProject.id !== "intro" ? skillProjects.find((project) => project.id === videoProject.id) : undefined} autoPlay={!activeVideo.explore} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request, explore: false }))} />}
-      <footer>
-        <a className="monogram" href="#home" aria-label="Back to top">
-          a<span>m.</span>
-        </a>
-        <span>© {new Date().getFullYear()} Aditya Malviya</span>
-        <a href={asset(profile.resume)} target="_blank" rel="noreferrer">
-          Resume <ArrowUpRight size={14} />
-        </a>
-        <a href={`tel:${profile.social.phone.replace(/\s/g, "")}`}>
-          Let's talk <ArrowUpRight size={14} />
-        </a>
-        <a href="#home" className="back-top">
-          BACK TO TOP ↑
-        </a>
-      </footer>
       <dialog
         ref={dialog}
         className="case-dialog"
