@@ -20,7 +20,6 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { Pause, Play } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import ParticleEngineer from "./ParticleEngineer";
 
@@ -90,6 +89,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
         <div className="motion-controls">
           <ThemeToggle reduced={reduced} />
           <button
+            className="pause-toggle"
             onClick={() => {
               setPaused(!paused);
               localStorage.setItem(
@@ -100,7 +100,12 @@ export function MotionSystem({ children }: { children: ReactNode }) {
             aria-label={paused ? "Enable animations" : "Pause animations"}
             aria-pressed={paused}
           >
-            {paused ? <Play size={15} /> : <Pause size={15} />}
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <g className="pause-bars" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                <path d="M9 6v12m6-12v12" />
+              </g>
+              <path className="pause-play" fill="currentColor" d="M9 5.5 19 12 9 18.5Z" />
+            </svg>
           </button>
         </div>
         {ready && children}

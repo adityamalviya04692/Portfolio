@@ -3307,7 +3307,8 @@ html[data-motion="off"] .showcase-film-preview .showcase-film-play { transform: 
   color: #e98b40;
   transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease;
 }
-.theme-toggle svg {
+.theme-toggle svg,
+.pause-toggle svg {
   width: 17px;
   height: 17px;
   overflow: visible;
@@ -3350,6 +3351,26 @@ html[data-motion="off"] .showcase-film-preview .showcase-film-play { transform: 
 }
 .theme-toggle[data-mode="dark"]:hover .theme-core {
   transform: scale(1.5) rotate(-15deg);
+}
+
+.pause-toggle .pause-bars,
+.pause-toggle .pause-play {
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+}
+.pause-toggle .pause-play { opacity: 0; transform: rotate(-65deg) scale(.35); }
+.pause-toggle[aria-pressed="true"] .pause-bars { opacity: 0; transform: rotate(65deg) scale(.35); }
+.pause-toggle[aria-pressed="true"] .pause-play { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  /* The control confirms the pause while the rest of the page stops moving. */
+  html .motion-controls .pause-toggle {
+    transition: background-color .6s ease, color .6s ease, border-color .6s ease !important;
+  }
+  html .motion-controls .pause-toggle :is(.pause-bars, .pause-play) {
+    transition: transform .7s cubic-bezier(.65, 0, .35, 1), opacity .5s ease !important;
+  }
+  .pause-toggle:not([aria-pressed="true"]):hover .pause-bars { transform: rotate(18deg); }
+  .pause-toggle[aria-pressed="true"]:hover .pause-play { transform: scale(1.12); }
 }
 
 /* -- The switch itself: night spreads from the button (ThemeToggle.tsx) -- */
