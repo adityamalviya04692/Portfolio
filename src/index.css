@@ -4420,19 +4420,6 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
   .research-paper, .research-note { transition: none; }
 }
 
-/* Responsive project hover follows the pointer without a waiting period. */
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .project-card-grid:not([data-deck-compact]) .carousel-face {
-    transition: translate 420ms linear(0, .08, .28, .52, .72, .88, .98, 1.03, 1.02, 1), box-shadow 420ms ease;
-  }
-  .project-card-grid:not([data-deck-compact]) .carousel-card:hover,
-  .project-card-grid:not([data-deck-compact]) .carousel-card:focus-within { z-index: 20; }
-  .project-card-grid:not([data-deck-compact]) .carousel-card:hover .carousel-face,
-  .project-card-grid:not([data-deck-compact]) .carousel-card:focus-within .carousel-face {
-    translate: 0 -16px;
-    box-shadow: 0 18px 35px #29282055;
-  }
-}
 /* A selected evidence note opens above the paper while the paper makes room. */
 .research-note { cursor: pointer; rotate: 0deg; transition: transform 620ms linear(0, .035, .13, .3, .5, .69, .84, .95, 1.025, 1.04, 1.025, 1), rotate 620ms ease, width 620ms ease, box-shadow 620ms ease, z-index 0s 620ms; }
 .research-note:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
