@@ -11,6 +11,7 @@
   --cream: #f4f0e6;
   --orange: #ed8838;
   --blue: #102b79;
+  --section-blue: var(--blue);
   --ink: #292820;
 }
 * {
@@ -285,18 +286,13 @@ h1 > span:first-of-type {
   margin: auto;
 }
 .blue-section {
-  background: var(--blue);
+  background: var(--section-blue);
   color: var(--cream);
 }
 .about {
   padding: 110px 7% 80px;
   border-radius: 48px 48px 0 0;
   position: relative;
-  background-image: radial-gradient(
-    ellipse at 15% 30%,
-    #31559f88,
-    transparent 60%
-  );
 }
 .about-top {
   display: grid;
@@ -1292,7 +1288,7 @@ footer > a:not(.monogram) {
 }
 /* Motion and source-aligned portfolio */
 .hero-scroll {
-  background: #102b79;
+  background: var(--section-blue);
   position: relative;
   height: 125svh;
   min-height: 900px;
@@ -3399,6 +3395,7 @@ html[data-theme="dark"] {
   color-scheme: dark;
   --ink: #ece6d8;
   --blue: #3f63c4;
+  --section-blue: #0b1739;
   --night: #0e1120;
   --night-2: #131729;
   --night-card: #171c2f;
@@ -3447,9 +3444,6 @@ html[data-theme="dark"] .skip-link {
 }
 
 /* -- Hero -- */
-html[data-theme="dark"] .hero-scroll {
-  background: #070c20;
-}
 /* Night sky behind the hero: two star fields, a soft aurora and a moon over the room. */
 html[data-theme="dark"] .hero-frame {
   background:
@@ -3586,13 +3580,6 @@ html[data-theme="dark"] .ld-steam-puff {
   opacity: 0.6;
 }
 
-/* -- Blue sections (about, experience, contact) go a shade deeper -- */
-html[data-theme="dark"] .blue-section,
-html[data-theme="dark"] .about.blue-section,
-html[data-theme="dark"] .experience.blue-section,
-html[data-theme="dark"] .contact.blue-section {
-  background-color: #0b1739;
-}
 html[data-theme="dark"] .on-blue nav {
   background: #0f1d47b0;
 }
