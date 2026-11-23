@@ -28,7 +28,6 @@ import SkillsPanel from "./components/SkillsPanel";
 import ProjectGallery from "./components/ProjectGallery";
 import {
   Accordion,
-  AvatarPortal,
   Counter,
   HeroFrame,
   MotionSystem,
@@ -69,7 +68,8 @@ function Portfolio() {
   const dialog = useRef<HTMLDialogElement>(null),
     { reduced } = useMotionPreference();
   useEffect(() => {
-    const target = document.getElementById(window.location.hash.slice(1));
+    const fragment = window.location.hash.slice(1);
+    const target = document.getElementById(fragment === "profile" ? "about" : fragment);
     const frame = requestAnimationFrame(() =>
       target?.scrollIntoView({ behavior: "instant", block: "start" }),
     );
@@ -84,7 +84,7 @@ function Portfolio() {
         if (section.getBoundingClientRect().top <= window.innerHeight * 0.35)
           current = section.id;
       }
-      setActive(current === "profile" ? "about" : current);
+      setActive(current);
     };
     const schedule = () => {
       if (!scheduled) scheduled = requestAnimationFrame(update);
@@ -239,8 +239,7 @@ function Portfolio() {
             </div>
           </section>
         </HeroFrame>
-        <AvatarPortal />
-        <section id="profile" className="about blue-section">
+        <section id="about" className="about blue-section">
           <AboutEditorial onIntro={(trigger) => playProject("intro", trigger)} />
           <div className="section-wrap">
             <div className="stats">
