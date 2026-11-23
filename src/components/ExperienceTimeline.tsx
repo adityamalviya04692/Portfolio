@@ -77,7 +77,11 @@ export default function ExperienceTimeline() {
               key={entry.title}
               onFocus={(event) => event.currentTarget.classList.add("is-shown")}
             >
-              <span className="experience-timeline-label">{index === 0 ? `${today} · Present` : entry.period}</span>
+              <span className="experience-timeline-label">
+                <span className="experience-calendar-reveal">
+                  <span className="experience-calendar-page">{index === 0 ? `${today} · Present` : entry.period}</span>
+                </span>
+              </span>
               <div className="experience-entry-copy">
                 <div className="experience-project-heading">
                   <img className={`experience-project-logo logo-${entry.logoAlt.toLowerCase().replace(/ /g, "-")}`} src={asset(entry.logo)} alt={entry.logoAlt} />
