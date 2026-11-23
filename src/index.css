@@ -3915,7 +3915,8 @@ html[data-theme="dark"] .showcase-film-play {
    Project carousel: swipeable cards that open the project explorer dialog.
    ====================================================================== */
 .showcase-section { --project-gutter: 32px; padding-inline: 0; }
-.showcase-section .section-wrap { max-width: 1440px; }
+.showcase-section .section-wrap { max-width: none; }
+.showcase-section [role="region"] { overflow-x: clip; }
 .showcase-section .section-heading h2 { font-size: clamp(36px, 4.3vw, 61px); }
 .showcase-section .section-heading { margin-inline: var(--project-gutter); }
 .project-card-grid {
@@ -3923,7 +3924,7 @@ html[data-theme="dark"] .showcase-film-play {
   --depth: clamp(48px, 6vw, 86px);
   display: grid;
   grid-template-columns: repeat(var(--project-count), minmax(0, 1fr));
-  padding: 28px 6% calc(var(--depth) + 48px);
+  padding: 30px 2% calc(var(--depth) + 58px);
   overflow-x: clip;
   isolation: isolate;
 }
@@ -3945,8 +3946,8 @@ html[data-theme="dark"] .showcase-film-play {
 .carousel-face {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  width: 108%;
-  margin-left: -4%;
+  width: 112%;
+  margin-left: -6%;
   aspect-ratio: 9 / 16;
   transform-origin: center 56%;
   transform: translateY(calc(var(--fan-position) * var(--fan-position) * var(--depth))) rotate(calc(var(--fan-position) * var(--tilt)));
@@ -3995,7 +3996,7 @@ html[data-theme="dark"] .showcase-film-play {
 }
 @media (max-width: 639px) {
   .showcase-section { --project-gutter: 16px; }
-  .project-card-grid { --tilt: 20deg; --depth: 42px; padding: 18px 8% 68px; }
+  .project-card-grid { --tilt: 20deg; --depth: 42px; padding: 18px 2% 68px; }
   .carousel-face { height: clamp(122px, 34vw, 172px); border-radius: 7px; }
   .carousel-caption { padding: 6px 2px; justify-items: center; }
   .carousel-caption strong { writing-mode: vertical-rl; font-size: 11px; }
