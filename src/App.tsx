@@ -501,7 +501,7 @@ function Portfolio() {
             <div className="footer-ring-plane">
               <svg className="footer-ring-wheel" viewBox="0 0 640 640">
                 <defs>
-                  <image id="footer-ring-logo" href={asset("am-monogram-v1.svg")} x="-53" y="27" width="106" height="106" />
+                  <image id="footer-ring-logo" href={asset("am-monogram-v1.svg")} x="-59" y="21" width="118" height="118" />
                 </defs>
                 {LOGO_ANGLES.map((angle) => (
                   <use key={angle} href="#footer-ring-logo" transform={`rotate(${angle} 320 320) translate(320)`} />
