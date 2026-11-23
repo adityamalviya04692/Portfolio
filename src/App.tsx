@@ -298,10 +298,31 @@ function Portfolio() {
             </Reveal>
             <Reveal>
               <article className="research-feature">
-                <div className="research-figure">
-                  <span className="research-kicker">SKEWBENCH / {data.research.year}</span>
-                  <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1536" height="1024" loading="lazy" /></a>
-                  <p>A conceptual illustration of adaptive splitting and selective salting. Read the paper for measured results and limitations.</p>
+                <div className="research-board" aria-label="Illustrated research evidence board">
+                  <div className="research-note research-note-skew">
+                    <span>FIELD NOTE / 01</span>
+                    <strong>ONE HOT KEY.<br />TOO MUCH WORK.</strong>
+                    <div className="research-skew-bars" aria-hidden="true"><i /><i /><i /><i /></div>
+                    <p>Skewed partitions can dominate a join.</p>
+                  </div>
+                  <div className="research-note research-note-aqe">
+                    <span>FIELD NOTE / 02</span>
+                    <strong>CAN AQE SPLIT IT?</strong>
+                    <div className="research-split-diagram" aria-hidden="true"><b />→<b /><b /><b /></div>
+                    <p>Advisory partition size mattered in the measured probes.</p>
+                  </div>
+                  <div className="research-note research-note-salt">
+                    <span>FIELD NOTE / 03</span>
+                    <strong>SPREAD THE KEY</strong>
+                    <div className="research-salt-diagram" aria-hidden="true">HOT KEY <em>→</em> #0 · #1 · #2 · #3</div>
+                    <p>Balance reduced skew against replicated rows.</p>
+                  </div>
+                  <div className="research-figure research-paper">
+                    <span className="research-kicker">SKEWBENCH / {data.research.year}</span>
+                    <h3>THE SKEW QUESTION</h3>
+                    <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1536" height="1024" loading="lazy" /></a>
+                    <p>A conceptual illustration of adaptive splitting and selective salting. Read the paper for measured results and limitations.</p>
+                  </div>
                 </div>
                 <div className="research-copy">
                   <span className="showcase-category">RESEARCH PAPER / {data.research.pages}</span>
