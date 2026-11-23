@@ -5,7 +5,7 @@ import { useMotionPreference } from "./MotionSystem";
 
 const controls = "a[href], button, input, [role='button']";
 const media = ".portrait-play, .carousel-thumb, .research-figure a, .project-play-cover, video, .ld-hits polygon";
-const freeControls = media + ", .motion-accordion button, .email-link, .preview-open, .hero-bottom a, .skip-link, .pause-toggle, input";
+const freeControls = media + ", .motion-accordion button, .email-link, .preview-open, .hero-bottom a, .skip-link, .pause-toggle, .research-note, input";
 const fittedShapes = ".skills-content .tags > span, .project-play-stamp, .portrait-play-icon";
 const primary = ".button, .contact-pill, .showcase-primary";
 const normal: IpadCursorStyle = {

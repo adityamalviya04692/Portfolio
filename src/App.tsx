@@ -61,6 +61,11 @@ function Portfolio() {
   const videoProject =
     activeVideo.id === "intro" ? intro : skillProjects.find((project) => project.id === activeVideo.id);
   const [activeResearchNote, setActiveResearchNote] = useState<string | null>(null);
+  useEffect(() => {
+    if (!activeResearchNote) return;
+    const timer = window.setTimeout(() => setActiveResearchNote(null), 4500);
+    return () => window.clearTimeout(timer);
+  }, [activeResearchNote]);
   const [active, setActive] = useState("home"),
     [copied, setCopied] = useState(false),
     [slide, setSlide] = useState(0),
