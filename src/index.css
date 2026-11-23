@@ -4240,6 +4240,9 @@ html[data-theme="dark"] .accordion-sheet { --sheet-blue: #0b1739; }
   box-shadow: none;
 }
 .project-video-dialog[data-card-flip="true"]::backdrop { opacity: 1; }
+.project-video-dialog[data-card-return="true"]::backdrop { animation: project-card-backdrop-out 430ms var(--ease-out) forwards; }
+@keyframes project-card-backdrop-out { to { opacity: 0; } }
+
 .project-video-dialog[data-card-flip="true"] > :not(.project-flip-ghost, .portfolio-cursor) { opacity: 0; }
 .project-video-dialog .project-flip-ghost {
   position: fixed;

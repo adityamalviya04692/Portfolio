@@ -36,18 +36,78 @@ type Props = {
   onClose: () => void;
 };
 
+const flipEase = "cubic-bezier(.23,1,.32,1)";
+const panelFlip = [
+  { transform: "perspective(1400px) rotateY(-89deg)" },
+  { transform: "perspective(1400px) rotateY(0deg)" },
+];
+
+function makeCardFlight(card: HTMLElement, from: DOMRect, to: DOMRect) {
+  const ghost = card.cloneNode(true) as HTMLElement;
+  ghost.className += " project-flip-ghost";
+  ghost.setAttribute("aria-hidden", "true");
+  const style = getComputedStyle(card).transform;
+  const matrix = new DOMMatrix(style === "none" ? undefined : style);
+  const angle = Math.atan2(matrix.b, matrix.a);
+  const width = card.offsetWidth;
+  const height = card.offsetHeight;
+  // Recover the rotated corner from the bounding box so the moving copy aligns with the deck.
+  const left = from.left - Math.min(0, width * Math.cos(angle)) - Math.min(0, -height * Math.sin(angle));
+  const top = from.top - Math.min(0, width * Math.sin(angle)) - Math.min(0, height * Math.cos(angle));
+  Object.assign(ghost.style, {
+    left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px`,
+  });
+  const x = to.left - left;
+  const y = to.top - top;
+  const frames = [
+    { transform: `perspective(1400px) rotateZ(${angle}rad)`, offset: 0 },
+    { transform: `perspective(1400px) translate(${x * 0.38}px, ${y * 0.38 - 18}px) rotateY(20deg) scale(1.06)`, offset: 0.34 },
+    { transform: `translate(${x}px, ${y}px) perspective(1400px) scale(${to.width / width}, ${to.height / height}) rotateY(89deg)`, offset: 1 },
+  ];
+  return { ghost, frames };
+}
+
 export default function ProjectVideoDialog({ project, details, autoPlay = true, eyebrow = "PROJECT WALKTHROUGH", kind, index, request, returnFocusTo, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [visible, setVisible] = useState(false);
   const [closing, setClosing] = useState(false);
   const { reduced } = useMotionPreference();
   const closeTimer = useRef<number>();
-  const entranceAnimation = useRef<Animation>();
+  const flipAnimation = useRef<Animation>();
+  const flipGhost = useRef<HTMLElement>();
   const close = () => {
     if (closing) return;
-    entranceAnimation.current?.cancel();
-    dialog.current?.querySelector("video")?.pause();
+    const element = dialog.current;
+    flipAnimation.current?.cancel();
+    flipGhost.current?.remove();
+    element?.querySelector("video")?.pause();
     setClosing(true);
+
+    const card = details && !reduced && visible
+      ? returnFocusTo?.querySelector<HTMLElement>(".carousel-face")
+      : undefined;
+    const destination = card?.getBoundingClientRect();
+    if (element && card && destination?.width && destination.height) {
+      const { ghost, frames } = makeCardFlight(card, destination, element.getBoundingClientRect());
+      flipAnimation.current = element.animate([...panelFlip].reverse(), {
+        duration: 280, easing: "cubic-bezier(.64,0,.77,0)", fill: "forwards",
+      });
+      flipAnimation.current.onfinish = () => {
+        element.dataset.cardFlip = "true";
+        element.dataset.cardReturn = "true";
+        flipAnimation.current?.cancel();
+        // Keep the same easing and keyframes, played backward, so the card retraces its path.
+        flipGhost.current = ghost;
+        element.append(ghost);
+        flipAnimation.current = ghost.animate(frames, {
+          duration: 430, easing: "cubic-bezier(.25,.72,.3,1)", direction: "reverse", fill: "forwards",
+        });
+        flipAnimation.current.onfinish = onClose;
+      };
+      return;
+    }
+
+    if (element) delete element.dataset.cardFlip;
     setVisible(false);
     closeTimer.current = window.setTimeout(onClose, reduced ? 150 : 280);
   };
@@ -57,38 +117,24 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
     const previousOverflow = document.body.style.overflow;
     const card = details && !reduced ? trigger?.querySelector<HTMLElement>(".carousel-face") : undefined;
     const from = card?.getBoundingClientRect();
-    const cardAngle = card ? getComputedStyle(card).transform : "none";
     if (element && from?.width && from.height) element.dataset.cardFlip = "true";
     element?.showModal();
 
     let nextFrame = 0;
     let frame = 0;
-    let ghost: HTMLElement | undefined;
     if (element && card && from?.width && from.height) {
-      const to = element.getBoundingClientRect();
-      ghost = card.cloneNode(true) as HTMLElement;
-      ghost.className += " project-flip-ghost";
-      ghost.setAttribute("aria-hidden", "true");
-      Object.assign(ghost.style, {
-        left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`,
-      });
+      const { ghost, frames } = makeCardFlight(card, from, element.getBoundingClientRect());
+      flipGhost.current = ghost;
       element.append(ghost);
-      const matrix = new DOMMatrix(cardAngle === "none" ? undefined : cardAngle);
-      const angle = Math.atan2(matrix.b, matrix.a);
-      const move = `translate(${to.left - from.left}px, ${to.top - from.top}px)`;
-      entranceAnimation.current = ghost.animate([
-        { transform: `perspective(1400px) rotateZ(${angle * 0.35}rad)`, offset: 0 },
-        { transform: `perspective(1400px) translate(${(to.left - from.left) * 0.38}px, ${(to.top - from.top) * 0.38 - 18}px) rotateY(20deg) scale(1.06)`, offset: 0.34 },
-        { transform: `${move} perspective(1400px) scale(${to.width / from.width}, ${to.height / from.height}) rotateY(89deg)`, offset: 1 },
-      ], { duration: 430, easing: "cubic-bezier(.25,.72,.3,1)", fill: "forwards" });
-      entranceAnimation.current.onfinish = () => {
-        ghost?.remove();
+      flipAnimation.current = ghost.animate(frames, {
+        duration: 430, easing: "cubic-bezier(.25,.72,.3,1)", fill: "forwards",
+      });
+      flipAnimation.current.onfinish = () => {
+        ghost.remove();
+        flipGhost.current = undefined;
         delete element.dataset.cardFlip;
         setVisible(true);
-        entranceAnimation.current = element.animate([
-          { transform: "perspective(1400px) rotateY(-89deg)" },
-          { transform: "perspective(1400px) rotateY(0deg)" },
-        ], { duration: 280, easing: "cubic-bezier(.23,1,.32,1)" });
+        flipAnimation.current = element.animate(panelFlip, { duration: 280, easing: flipEase });
       };
     } else {
       if (element && trigger && trigger !== document.body) {
@@ -104,8 +150,8 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
       cancelAnimationFrame(frame);
       cancelAnimationFrame(nextFrame);
       clearTimeout(closeTimer.current);
-      entranceAnimation.current?.cancel();
-      ghost?.remove();
+      flipAnimation.current?.cancel();
+      flipGhost.current?.remove();
       element?.close();
       document.body.style.overflow = previousOverflow;
       trigger?.focus({ preventScroll: true });
