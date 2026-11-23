@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMotionPreference } from "./MotionSystem";
+import { Accordion, useMotionPreference } from "./MotionSystem";
 import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
 
@@ -11,6 +11,7 @@ const iconUrl = (name: string) => import.meta.env.BASE_URL + "assets/skills/" + 
 export default function SkillsPanel() {
   const { reduced } = useMotionPreference();
   const [index, setIndex] = useState(0);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
 
   useEffect(() => {
     if (reduced) return;
@@ -49,8 +50,12 @@ export default function SkillsPanel() {
       </div>
       <div className="skill-options">
         {data.skills.categories.map(({ name, items }) => (
-          <details key={name} name="portfolio-skill-group">
-            <summary>{name}<span aria-hidden="true">+</span></summary>
+          <Accordion
+            key={name}
+            title={name}
+            expanded={openGroup === name}
+            onExpandedChange={(open) => setOpenGroup(open ? name : null)}
+          >
             <div className="tags">
               {items.map((item) => (
                 <span key={item}>
@@ -59,7 +64,7 @@ export default function SkillsPanel() {
                 </span>
               ))}
             </div>
-          </details>
+          </Accordion>
         ))}
       </div>
     </div>

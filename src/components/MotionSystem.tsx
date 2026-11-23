@@ -373,14 +373,19 @@ export function Accordion({
   children,
   className = "",
   sheet = false,
+  expanded,
+  onExpandedChange,
 }: {
   title: string;
   children: ReactNode;
   className?: string;
   sheet?: boolean;
+  expanded?: boolean;
+  onExpandedChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false),
+  const [localOpen, setOpen] = useState(false),
     { reduced } = useMotionPreference();
+  const open = expanded ?? localOpen;
   const id = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}${useId().replace(/:/g, "")}`;
   useEffect(() => {
     const syncHash = () => {
@@ -400,10 +405,10 @@ export function Accordion({
         <button
           aria-expanded={open}
           aria-controls={id}
-          onClick={() => setOpen(!open)}
+          onClick={() => (onExpandedChange ?? setOpen)(!open)}
         >
           {title}
-          <motion.span aria-hidden="true" animate={{ rotate: open ? 45 : 0 }}>+</motion.span>
+          <motion.span aria-hidden="true" animate={{ rotate: open ? 45 : 0 }} transition={{ duration: reduced ? 0 : 0.25 }}>+</motion.span>
         </button>
       </h4>
       <AnimatePresence initial={false}>
@@ -413,7 +418,11 @@ export function Accordion({
             initial={{ height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
-            transition={{ duration: reduced ? 0 : sheet ? 0.62 : 0.3, ease: [0.23, 1, 0.32, 1] }}
+            transition={reduced
+              ? { duration: 0 }
+              : sheet
+                ? { type: "spring", stiffness: 130, damping: 19, mass: 0.95, restDelta: 0.8 }
+                : { duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
             className={sheet ? "accordion-panel accordion-sheet" : "accordion-panel"}
           >
             {sheet ? (

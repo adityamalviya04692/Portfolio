@@ -4187,19 +4187,10 @@ html[data-custom-pointer="idle"] .portfolio-cursor {
   object-fit: contain;
   filter: drop-shadow(0 0 2px #f4f0e6aa);
 }
-.skill-options details { border-top: 1px solid #ffffff38; }
-.skill-options summary { gap: 12px; }
-.skill-options summary span { transition: rotate 260ms var(--ease-out); }
-.skill-options details[open] summary span { rotate: 45deg; }
-.skill-options details[open] .tags { animation: skill-group-in 280ms var(--ease-out); }
-@keyframes skill-group-in { from { opacity: 0; transform: translateY(-5px); } }
-html[data-motion="off"] .skill-options details[open] .tags { animation: none; }
-html[data-motion="off"] .skill-options summary span { transition: none; }
-@media (prefers-reduced-motion: reduce) {
-  .skill-options details[open] .tags { animation: none; }
-  .skill-options summary span { transition: none; }
-}
-.skill-options .tags { padding-bottom: 16px; }
+.skill-options .motion-accordion { border-color: #ffffff38; }
+.skill-options .motion-accordion h4 { color: inherit; }
+.skill-options .motion-accordion h4 > button { gap: 12px; }
+.skill-options .accordion-panel > div { padding-bottom: 16px; }
 .skill-options .tags span { display: inline-flex; align-items: center; gap: 6px; }
 .skill-options .tags img { width: 18px; height: 18px; object-fit: contain; filter: drop-shadow(0 0 1.5px #f4f0e6aa); }
 @media (max-width: 760px) { .skills-panel { grid-template-columns: 1fr; } }
@@ -4218,20 +4209,23 @@ html[data-theme="dark"] .accordion-sheet { --sheet-blue: #0b1739; }
 .accordion-sheet::before,
 .accordion-sheet::after {
   content: "";
-  display: block;
+  position: absolute;
+  inset-inline: 0;
+  z-index: 1;
+  pointer-events: none;
   height: var(--sheet-radius);
   background: var(--sheet-blue);
 }
-.accordion-sheet::before { border-radius: 0 0 var(--sheet-radius) var(--sheet-radius); }
-.accordion-sheet::after { border-radius: var(--sheet-radius) var(--sheet-radius) 0 0; }
+.accordion-sheet::before { top: 0; border-radius: 0 0 var(--sheet-radius) var(--sheet-radius); }
+.accordion-sheet::after { bottom: 0; border-radius: var(--sheet-radius) var(--sheet-radius) 0 0; }
 .accordion-sheet > div {
   width: min(86%, 1080px);
   margin-inline: auto;
-  padding-block: clamp(28px, 5vw, 68px);
+  padding-block: calc(var(--sheet-radius) + clamp(28px, 5vw, 68px));
 }
 .accordion-sheet .skills-panel { color: inherit; padding-bottom: 0; }
 .accordion-sheet .skills-headline { color: #102b79; }
-.accordion-sheet .skill-options details { border-color: #102b7930; }
+.accordion-sheet .skill-options .motion-accordion { border-color: #102b7930; }
 .accordion-sheet .skill-options .tags span { border-color: #102b7940; }
 .accordion-sheet .skill-logo-slot img,
 .accordion-sheet .skill-options .tags img { filter: none; }
