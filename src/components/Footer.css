@@ -1,6 +1,6 @@
 .contact:has(.footer-ring) {
   isolation: isolate;
-  padding-bottom: clamp(60px, 6vw, 84px);
+  padding-bottom: 36px;
 }
 
 .contact:has(.footer-ring) > .section-wrap,
@@ -32,6 +32,14 @@
 }
 
 @media (max-width: 640px) {
+  .contact:has(.footer-ring) {
+    padding-bottom: 48px;
+  }
+
+  .contact:has(.footer-ring) > .back-top {
+    bottom: 0;
+  }
+
   .footer-ring-plane {
     left: 92%;
   }
