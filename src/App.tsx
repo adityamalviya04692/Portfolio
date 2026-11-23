@@ -60,6 +60,7 @@ function Portfolio() {
   const intro = { id: "intro", title: "Meet Aditya", link: "" };
   const videoProject =
     activeVideo.id === "intro" ? intro : skillProjects.find((project) => project.id === activeVideo.id);
+  const [activeResearchNote, setActiveResearchNote] = useState<string | null>(null);
   const [active, setActive] = useState("home"),
     [copied, setCopied] = useState(false),
     [slide, setSlide] = useState(0),
@@ -290,7 +291,7 @@ function Portfolio() {
             <ProjectGallery projects={skillProjects} onExplore={exploreProject} />
           </div>
         </section>
-        <section id="research" className="research-section" aria-labelledby="research-heading">
+        <section id="research" className="research-section" aria-labelledby="research-heading" onMouseLeave={() => setActiveResearchNote(null)}>
           <div className="section-wrap">
             <Reveal className="section-heading">
               <div><Scramble className="label-sticker" text="INDEPENDENT RESEARCH" /><h2 id="research-heading"><RippleWords text="Built on evidence" suffix={<span className="orange">.</span>} /></h2></div>
@@ -299,45 +300,45 @@ function Portfolio() {
             <Reveal>
               <article className="research-feature">
                 <div className="research-board" aria-label="Illustrated research evidence board">
-                  <motion.div className="research-note research-note-skew" initial={{ rotate: -7 }} whileHover={{ x: -38, y: -32, rotate: -11 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                  <div className={`research-note research-note-skew${activeResearchNote === "skew" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "skew"} onClick={() => setActiveResearchNote(activeResearchNote === "skew" ? null : "skew")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("skew"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>FIELD NOTE / 01</span>
                     <strong>ONE HOT KEY.<br />TOO MUCH WORK.</strong>
                     <div className="research-skew-bars" aria-hidden="true"><i /><i /><i /><i /></div>
                     <p>Skewed partitions can dominate a join.</p>
-                  </motion.div>
-                  <motion.div className="research-note research-note-aqe" initial={{ rotate: 6 }} whileHover={{ x: 30, y: -28, rotate: 10 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                  </div>
+                  <div className={`research-note research-note-aqe${activeResearchNote === "aqe" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "aqe"} onClick={() => setActiveResearchNote(activeResearchNote === "aqe" ? null : "aqe")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("aqe"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>FIELD NOTE / 02</span>
                     <strong>CAN AQE SPLIT IT?</strong>
                     <div className="research-split-diagram" aria-hidden="true"><b />→<b /><b /><b /></div>
                     <p>Advisory partition size mattered in the measured probes.</p>
-                  </motion.div>
-                  <motion.div className="research-note research-note-salt" initial={{ rotate: 5 }} whileHover={{ x: -28, y: 35, rotate: 8 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                  </div>
+                  <div className={`research-note research-note-salt${activeResearchNote === "salt" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "salt"} onClick={() => setActiveResearchNote(activeResearchNote === "salt" ? null : "salt")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("salt"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>FIELD NOTE / 03</span>
                     <strong>SPREAD THE KEY</strong>
                     <div className="research-salt-diagram" aria-hidden="true">HOT KEY <em>→</em> #0 · #1 · #2 · #3</div>
                     <p>Balance reduced skew against replicated rows.</p>
-                  </motion.div>
-                  <motion.div className="research-note research-note-trigger" initial={{ rotate: 4 }} whileHover={{ x: 34, y: -22, rotate: 7 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                  </div>
+                  <div className={`research-note research-note-trigger${activeResearchNote === "trigger" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "trigger"} onClick={() => setActiveResearchNote(activeResearchNote === "trigger" ? null : "trigger")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("trigger"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>CONFIGURATION / TRIGGER</span><strong>101:1 SKEW<br />RULE DID NOT FIRE</strong>
                     <div className="research-pencil-line" aria-hidden="true">hot partition &lt; advisory size → no split</div>
                     <p>The final adaptive plan showed partition coalescing. Lowering the advisory size engaged the skew rule.</p>
-                  </motion.div>
-                  <motion.div className="research-note research-note-replication" initial={{ rotate: 7 }} whileHover={{ x: 36, y: 30, rotate: 10 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                  </div>
+                  <div className={`research-note research-note-replication${activeResearchNote === "replication" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "replication"} onClick={() => setActiveResearchNote(activeResearchNote === "replication" ? null : "replication")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("replication"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>SHUFFLE RECORDS / REPLICATION</span><strong>11 vs 20,000</strong>
                     <div className="research-mini-table"><span>Selective salting</span><b>11 / salt</b><span>Uniform salting</span><b>20,000</b></div>
                     <p>The measured row-count ratio was 1,818. Runtime cost remained unresolved.</p>
-                  </motion.div>
-                  <motion.div className="research-note research-note-method" initial={{ rotate: -5 }} whileHover={{ x: -30, y: 32, rotate: -9 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                  </div>
+                  <div className={`research-note research-note-method${activeResearchNote === "method" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "method"} onClick={() => setActiveResearchNote(activeResearchNote === "method" ? null : "method")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("method"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>BENCHMARK / SKEWBENCH</span><strong>CONTROL THE NOISE</strong>
                     <div className="research-pencil-line" aria-hidden="true">baseline ≈ selective salt k=1</div>
                     <p>Fixed-seed cell order and warmup address the cold-JVM effect. Small speedups are judged against the control floor.</p>
-                  </motion.div>
-                  <motion.div className="research-note research-note-model" initial={{ rotate: -4 }} whileHover={{ x: -25, y: -26, rotate: -5 }} transition={{ type: "spring", stiffness: 170, damping: 18, mass: 0.9 }}>
+                  </div>
+                  <div className={`research-note research-note-model${activeResearchNote === "model" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "model"} onClick={() => setActiveResearchNote(activeResearchNote === "model" ? null : "model")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("model"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>COST MODEL / THEORY</span><strong>T(k) = aH/k + bP(k−1) + c</strong>
                     <div className="research-pencil-line" aria-hidden="true">less skew ↔ more replication</div>
                     <p>The predicted optimum is theoretical. This single-node study did not validate its runtime estimate.</p>
-                  </motion.div>
-                  <div className="research-figure research-paper">
+                  </div>
+                  <div className={`research-figure research-paper${activeResearchNote ? " is-shifted" : ""}`}>
                     <span className="research-kicker">SKEWBENCH / {data.research.year}</span>
                     <h3>THE SKEW QUESTION</h3>
                     <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1536" height="1024" loading="lazy" /></a>
