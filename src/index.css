@@ -4169,6 +4169,7 @@ html[data-custom-pointer="idle"] .portfolio-cursor {
   letter-spacing: -.052em;
   margin: 0;
 }
+.skills-headline em { font-family: Georgia, serif; font-weight: 400; }
 .skill-logo-slot {
   position: relative;
   display: inline-block;

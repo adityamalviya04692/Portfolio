@@ -24,7 +24,7 @@ export default function SkillsPanel() {
       <div>
         <p className="skills-headline">
           I use <span className="skill-logo-slot" title={activeSkill}><img key={activeSkill} src={iconUrl(activeSkill)} alt={activeSkill} /></span>{" "}
-          to turn on the pipelines that power better decisions<span className="orange">.</span>
+          to turn raw data into <em>answers</em><span className="orange">.</span>
         </p>
       </div>
       <div className="skill-options">
