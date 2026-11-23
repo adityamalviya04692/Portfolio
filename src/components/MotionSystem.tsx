@@ -102,7 +102,8 @@ export function MotionSystem({ children }: { children: ReactNode }) {
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <g className="pause-bars" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                <path d="M9 6v12m6-12v12" />
+                <path d="M9 6v12" />
+                <path d="M15 6v12" />
               </g>
               <path className="pause-play" fill="currentColor" d="M9 5.5 19 12 9 18.5Z" />
             </svg>
