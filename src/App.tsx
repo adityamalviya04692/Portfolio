@@ -63,7 +63,7 @@ function Portfolio() {
   const [activeResearchNote, setActiveResearchNote] = useState<string | null>(null);
   useEffect(() => {
     if (!activeResearchNote) return;
-    const timer = window.setTimeout(() => setActiveResearchNote(null), 4500);
+    const timer = window.setTimeout(() => setActiveResearchNote(null), 2400);
     return () => window.clearTimeout(timer);
   }, [activeResearchNote]);
   const [active, setActive] = useState("home"),
@@ -305,40 +305,40 @@ function Portfolio() {
             <Reveal>
               <article className="research-feature">
                 <div className="research-board" aria-label="Illustrated research evidence board">
-                  <div className={`research-note research-note-skew${activeResearchNote === "skew" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "skew"} onClick={() => setActiveResearchNote(activeResearchNote === "skew" ? null : "skew")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("skew"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
+                  <div className={`research-note research-note-skew${activeResearchNote === "skew" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "skew"} onMouseEnter={() => setActiveResearchNote("skew")} onClick={() => setActiveResearchNote(activeResearchNote === "skew" ? null : "skew")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("skew"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>FIELD NOTE / 01</span>
                     <strong>ONE HOT KEY.<br />TOO MUCH WORK.</strong>
                     <div className="research-skew-bars" aria-hidden="true"><i /><i /><i /><i /></div>
                     <p>Skewed partitions can dominate a join.</p>
                   </div>
-                  <div className={`research-note research-note-aqe${activeResearchNote === "aqe" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "aqe"} onClick={() => setActiveResearchNote(activeResearchNote === "aqe" ? null : "aqe")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("aqe"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
+                  <div className={`research-note research-note-aqe${activeResearchNote === "aqe" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "aqe"} onMouseEnter={() => setActiveResearchNote("aqe")} onClick={() => setActiveResearchNote(activeResearchNote === "aqe" ? null : "aqe")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("aqe"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>FIELD NOTE / 02</span>
                     <strong>CAN AQE SPLIT IT?</strong>
                     <div className="research-split-diagram" aria-hidden="true"><b />→<b /><b /><b /></div>
                     <p>Advisory partition size mattered in the measured probes.</p>
                   </div>
-                  <div className={`research-note research-note-salt${activeResearchNote === "salt" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "salt"} onClick={() => setActiveResearchNote(activeResearchNote === "salt" ? null : "salt")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("salt"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
+                  <div className={`research-note research-note-salt${activeResearchNote === "salt" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "salt"} onMouseEnter={() => setActiveResearchNote("salt")} onClick={() => setActiveResearchNote(activeResearchNote === "salt" ? null : "salt")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("salt"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>FIELD NOTE / 03</span>
                     <strong>SPREAD THE KEY</strong>
                     <div className="research-salt-diagram" aria-hidden="true">HOT KEY <em>→</em> #0 · #1 · #2 · #3</div>
                     <p>Balance reduced skew against replicated rows.</p>
                   </div>
-                  <div className={`research-note research-note-trigger${activeResearchNote === "trigger" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "trigger"} onClick={() => setActiveResearchNote(activeResearchNote === "trigger" ? null : "trigger")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("trigger"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
+                  <div className={`research-note research-note-trigger${activeResearchNote === "trigger" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "trigger"} onMouseEnter={() => setActiveResearchNote("trigger")} onClick={() => setActiveResearchNote(activeResearchNote === "trigger" ? null : "trigger")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("trigger"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>CONFIGURATION / TRIGGER</span><strong>101:1 SKEW<br />RULE DID NOT FIRE</strong>
                     <div className="research-pencil-line" aria-hidden="true">hot partition &lt; advisory size → no split</div>
                     <p>The final adaptive plan showed partition coalescing. Lowering the advisory size engaged the skew rule.</p>
                   </div>
-                  <div className={`research-note research-note-replication${activeResearchNote === "replication" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "replication"} onClick={() => setActiveResearchNote(activeResearchNote === "replication" ? null : "replication")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("replication"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
+                  <div className={`research-note research-note-replication${activeResearchNote === "replication" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "replication"} onMouseEnter={() => setActiveResearchNote("replication")} onClick={() => setActiveResearchNote(activeResearchNote === "replication" ? null : "replication")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("replication"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>SHUFFLE RECORDS / REPLICATION</span><strong>11 vs 20,000</strong>
                     <div className="research-mini-table"><span>Selective salting</span><b>11 / salt</b><span>Uniform salting</span><b>20,000</b></div>
                     <p>The measured row-count ratio was 1,818. Runtime cost remained unresolved.</p>
                   </div>
-                  <div className={`research-note research-note-method${activeResearchNote === "method" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "method"} onClick={() => setActiveResearchNote(activeResearchNote === "method" ? null : "method")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("method"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
+                  <div className={`research-note research-note-method${activeResearchNote === "method" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "method"} onMouseEnter={() => setActiveResearchNote("method")} onClick={() => setActiveResearchNote(activeResearchNote === "method" ? null : "method")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("method"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>BENCHMARK / SKEWBENCH</span><strong>CONTROL THE NOISE</strong>
                     <div className="research-pencil-line" aria-hidden="true">baseline ≈ selective salt k=1</div>
                     <p>Fixed-seed cell order and warmup address the cold-JVM effect. Small speedups are judged against the control floor.</p>
                   </div>
-                  <div className={`research-note research-note-model${activeResearchNote === "model" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "model"} onClick={() => setActiveResearchNote(activeResearchNote === "model" ? null : "model")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("model"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
+                  <div className={`research-note research-note-model${activeResearchNote === "model" ? " is-open" : ""}`} role="button" tabIndex={0} aria-expanded={activeResearchNote === "model"} onMouseEnter={() => setActiveResearchNote("model")} onClick={() => setActiveResearchNote(activeResearchNote === "model" ? null : "model")} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActiveResearchNote("model"); } else if (event.key === "Escape") setActiveResearchNote(null); }}>
                     <span>COST MODEL / THEORY</span><strong>T(k) = aH/k + bP(k−1) + c</strong>
                     <div className="research-pencil-line" aria-hidden="true">less skew ↔ more replication</div>
                     <p>The predicted optimum is theoretical. This single-node study did not validate its runtime estimate.</p>
