@@ -22,6 +22,7 @@ import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRip
 import ProjectArt from "./components/ProjectArt";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
+import SkillsPanel from "./components/SkillsPanel";
 import ProjectGallery from "./components/ProjectGallery";
 import {
   Accordion,
@@ -353,29 +354,7 @@ function Portfolio() {
             </div>
             <div id="skills" className="about-details">
               <Accordion title="Skills & capabilities">
-                <div className="detail-content skills-content">
-                  {data.skills.categories.map((c) => (
-                    <div key={c.name}>
-                      <h3>{c.name}</h3>
-                      <div className="tags">
-                        {c.items.map((i) => (
-                          <span key={i}>{i}</span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                  {data.capabilities.map((c) => (
-                    <div key={c.title}>
-                      <h3>{c.title}</h3>
-                      <p>{c.summary}</p>
-                      <ul>
-                        {c.points.map((p) => (
-                          <li key={p}>{p}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
+                <SkillsPanel />
               </Accordion>
               <Accordion title="Education & certifications">
                 <div className="detail-content">

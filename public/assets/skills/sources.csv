@@ -1,0 +1,56 @@
+name,group,kind,file,source
+PySpark,Data engineering,Family,pyspark.svg,https://icon-sets.iconify.design/logos/apache-spark/
+SQL / T-SQL,Data engineering,Symbol,sql-t-sql.svg,https://icon-sets.iconify.design/lucide/database/
+Python,Data engineering,Logo,python.svg,https://icon-sets.iconify.design/logos/python/
+Apache Spark,Data engineering,Logo,apache-spark.svg,https://icon-sets.iconify.design/logos/apache-spark/
+Spark SQL,Data engineering,Family,spark-sql.svg,https://icon-sets.iconify.design/logos/apache-spark/
+Spark Structured Streaming,Data engineering,Family,spark-structured-streaming.svg,https://icon-sets.iconify.design/logos/apache-spark/
+ETL / ELT,Data engineering,Symbol,etl-elt.svg,https://icon-sets.iconify.design/lucide/workflow/
+Spark Performance Tuning,Data engineering,Symbol,spark-performance-tuning.svg,https://icon-sets.iconify.design/lucide/gauge/
+Data Warehousing,Data engineering,Symbol,data-warehousing.svg,https://icon-sets.iconify.design/lucide/warehouse/
+Dimensional Data Modeling,Data engineering,Symbol,dimensional-data-modeling.svg,https://icon-sets.iconify.design/lucide/network/
+Medallion Architecture,Data engineering,Symbol,medallion-architecture.svg,https://icon-sets.iconify.design/lucide/layers/
+SCD Type 2,Data engineering,Symbol,scd-type-2.svg,https://icon-sets.iconify.design/lucide/rotate-ccw-clock/
+Azure Databricks,Azure & Databricks,Logo,azure-databricks.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-docs/databricks.svg
+Azure Data Factory (ADF),Azure & Databricks,Logo,azure-data-factory-adf.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/Data-Factory.svg
+ADLS Gen2,Azure & Databricks,Family,adls-gen2.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/Storage-Accounts.svg
+Apache Kafka,Azure & Databricks,Logo,apache-kafka.svg,https://icon-sets.iconify.design/logos/kafka-icon/
+Azure Event Hubs,Azure & Databricks,Logo,azure-event-hubs.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/Event-Hubs.svg
+Delta Lake,Azure & Databricks,Logo,delta-lake.svg,https://raw.githubusercontent.com/delta-io/delta/HEAD/docs/src/assets/delta-lake-logo-light.svg
+Unity Catalog,Azure & Databricks,Logo,unity-catalog.png,https://raw.githubusercontent.com/unitycatalog/unitycatalog/HEAD/docs/assets/images/uc-logo.png
+Databricks Jobs & Pipelines,Azure & Databricks,Family,databricks-jobs-pipelines.svg,https://icon-sets.iconify.design/logos/databricks-icon/
+Auto Loader,Azure & Databricks,Family,auto-loader.svg,https://icon-sets.iconify.design/logos/databricks-icon/
+Azure Key Vault,Azure & Databricks,Logo,azure-key-vault.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/Key-Vaults.svg
+Azure DevOps,Azure & Databricks,Logo,azure-devops.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/Azure-DevOps.svg
+Azure Blob Storage,Azure & Databricks,Family,azure-blob-storage.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/Storage-Container.svg
+Google Cloud Platform (GCP),Google Cloud & AI,Logo,google-cloud-platform-gcp.svg,https://icon-sets.iconify.design/logos/google-cloud/
+Databricks on Google Cloud,Google Cloud & AI,Family,databricks-on-google-cloud.svg,https://icon-sets.iconify.design/logos/databricks-icon/
+Vertex AI,Google Cloud & AI,Family,vertex-ai.svg,https://icon-sets.iconify.design/logos/google-cloud/
+Google Cloud Functions,Google Cloud & AI,Logo,google-cloud-functions.svg,https://icon-sets.iconify.design/logos/google-cloud-functions/
+Vector Databases,Google Cloud & AI,Symbol,vector-databases.svg,https://icon-sets.iconify.design/lucide/scatter-chart/
+Data Governance,"Governance, Quality & Delivery",Symbol,data-governance.svg,https://icon-sets.iconify.design/lucide/shield-check/
+Data Quality Frameworks,"Governance, Quality & Delivery",Symbol,data-quality-frameworks.svg,https://icon-sets.iconify.design/lucide/list-checks/
+Data Lineage,"Governance, Quality & Delivery",Symbol,data-lineage.svg,https://icon-sets.iconify.design/lucide/git-fork/
+RBAC,"Governance, Quality & Delivery",Symbol,rbac.svg,https://icon-sets.iconify.design/lucide/key-round/
+CI/CD,"Governance, Quality & Delivery",Symbol,ci-cd.svg,https://icon-sets.iconify.design/lucide/repeat/
+Git,"Governance, Quality & Delivery",Logo,git.svg,https://icon-sets.iconify.design/logos/git-icon/
+YAML,"Governance, Quality & Delivery",Logo,yaml.svg,https://icon-sets.iconify.design/logos/yaml/
+Docker,"Governance, Quality & Delivery",Logo,docker.svg,https://icon-sets.iconify.design/logos/docker-icon/
+Pytest,"Governance, Quality & Delivery",Logo,pytest.svg,https://icon-sets.iconify.design/simple-icons/pytest/
+SonarQube,"Governance, Quality & Delivery",Logo,sonarqube.svg,https://icon-sets.iconify.design/logos/sonarqube/
+Scrum Master,"Governance, Quality & Delivery",Symbol,scrum-master.svg,https://icon-sets.iconify.design/lucide/users/
+Code Reviews,"Governance, Quality & Delivery",Symbol,code-reviews.svg,https://icon-sets.iconify.design/lucide/git-pull-request/
+GitHub Copilot,"Governance, Quality & Delivery",Logo,github-copilot.svg,https://icon-sets.iconify.design/logos/github-copilot/
+Claude,"Governance, Quality & Delivery",Logo,claude.svg,https://icon-sets.iconify.design/logos/claude-icon/
+ChatGPT,"Governance, Quality & Delivery",Family,chatgpt.svg,https://icon-sets.iconify.design/logos/openai-icon/
+MS SQL Server,"Databases, APIs & BI",Logo,ms-sql-server.svg,https://icon-sets.iconify.design/simple-icons/microsoftsqlserver/
+MySQL,"Databases, APIs & BI",Logo,mysql.svg,https://icon-sets.iconify.design/logos/mysql-icon/
+PostgreSQL,"Databases, APIs & BI",Logo,postgresql.svg,https://icon-sets.iconify.design/logos/postgresql/
+Redis Cache,"Databases, APIs & BI",Logo,redis-cache.svg,https://icon-sets.iconify.design/logos/redis/
+FastAPI,"Databases, APIs & BI",Logo,fastapi.svg,https://icon-sets.iconify.design/logos/fastapi-icon/
+REST APIs,"Databases, APIs & BI",Symbol,rest-apis.svg,https://icon-sets.iconify.design/lucide/route/
+Azure API Management,"Databases, APIs & BI",Logo,azure-api-management.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/API-Management-Services.svg
+Power BI,"Databases, APIs & BI",Logo,power-bi.svg,https://icon-sets.iconify.design/logos/microsoft-power-bi/
+Apache Airflow,Working knowledge,Logo,apache-airflow.svg,https://icon-sets.iconify.design/logos/airflow-icon/
+Azure Synapse Analytics,Working knowledge,Logo,azure-synapse-analytics.svg,https://raw.githubusercontent.com/benc-uk/icon-collection/master/azure-icons/Azure-Synapse-Analytics.svg
+Delta Live Tables,Working knowledge,Family,delta-live-tables.svg,https://icon-sets.iconify.design/logos/databricks-icon/
