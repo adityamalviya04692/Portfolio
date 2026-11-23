@@ -45,6 +45,7 @@
       {
         "name": "Azure & Databricks",
         "items": [
+          "Azure Portal",
           "Azure Databricks",
           "Azure Data Factory (ADF)",
           "ADLS Gen2",
