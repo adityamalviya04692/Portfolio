@@ -5,7 +5,11 @@ import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
 
 const icons: Record<string, string> = skillIcons;
-const names = ["Python", ...Object.keys(icons).filter((name) => name !== "Python")];
+const rotation = new Map([[icons.Python, "Python"]]);
+for (const [name, file] of Object.entries(icons)) {
+  if (!rotation.has(file)) rotation.set(file, name);
+}
+const names = [...rotation.values()];
 const iconUrl = (name: string) => import.meta.env.BASE_URL + "assets/skills/" + icons[name];
 
 export default function SkillsPanel() {

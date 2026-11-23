@@ -1,10 +1,10 @@
 {
-  "PySpark": "pyspark.svg",
+  "PySpark": "apache-spark.svg",
   "SQL / T-SQL": "sql-t-sql.svg",
   "Python": "python.svg",
   "Apache Spark": "apache-spark.svg",
-  "Spark SQL": "spark-sql.svg",
-  "Spark Structured Streaming": "spark-structured-streaming.svg",
+  "Spark SQL": "apache-spark.svg",
+  "Spark Structured Streaming": "apache-spark.svg",
   "ETL / ELT": "etl-elt.svg",
   "Spark Performance Tuning": "spark-performance-tuning.svg",
   "Data Warehousing": "data-warehousing.svg",
@@ -19,13 +19,13 @@
   "Delta Lake": "delta-lake.svg",
   "Unity Catalog": "unity-catalog.png",
   "Databricks Jobs & Pipelines": "databricks-jobs-pipelines.svg",
-  "Auto Loader": "auto-loader.svg",
+  "Auto Loader": "databricks-jobs-pipelines.svg",
   "Azure Key Vault": "azure-key-vault.svg",
   "Azure DevOps": "azure-devops.svg",
   "Azure Blob Storage": "azure-blob-storage.svg",
   "Google Cloud Platform (GCP)": "google-cloud-platform-gcp.svg",
-  "Databricks on Google Cloud": "databricks-on-google-cloud.svg",
-  "Vertex AI": "vertex-ai.svg",
+  "Databricks on Google Cloud": "databricks-jobs-pipelines.svg",
+  "Vertex AI": "google-cloud-platform-gcp.svg",
   "Google Cloud Functions": "google-cloud-functions.svg",
   "Vector Databases": "vector-databases.svg",
   "Data Governance": "data-governance.svg",
@@ -53,5 +53,5 @@
   "Power BI": "power-bi.svg",
   "Apache Airflow": "apache-airflow.svg",
   "Azure Synapse Analytics": "azure-synapse-analytics.svg",
-  "Delta Live Tables": "delta-live-tables.svg"
+  "Delta Live Tables": "databricks-jobs-pipelines.svg"
 }
