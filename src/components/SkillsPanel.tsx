@@ -5,8 +5,26 @@ import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
 
 const icons: Record<string, string> = skillIcons;
-const rotation = new Map([[icons.Python, "Python"]]);
-for (const [name, file] of Object.entries(icons)) {
+const priority = [
+  "Azure Portal",
+  "Azure Databricks",
+  "Spark Structured Streaming",
+  "Python",
+  "SQL / T-SQL",
+  "YAML",
+  "Azure Data Factory (ADF)",
+  "Apache Kafka",
+  "Azure Event Hubs",
+  "Delta Lake",
+  "ADLS Gen2",
+  "Databricks Jobs & Pipelines",
+  "Unity Catalog",
+  "Apache Airflow",
+  "Azure DevOps",
+];
+const rotation = new Map<string, string>();
+for (const name of [...priority, ...Object.keys(icons)]) {
+  const file = icons[name];
   if (!rotation.has(file)) rotation.set(file, name);
 }
 const names = [...rotation.values()];
