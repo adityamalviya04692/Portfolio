@@ -88,22 +88,41 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
       : undefined;
     const destination = card?.getBoundingClientRect();
     if (element && card && destination?.width && destination.height) {
-      const { ghost, frames } = makeCardFlight(card, destination, element.getBoundingClientRect());
-      flipAnimation.current = element.animate([...panelFlip].reverse(), {
-        duration: 280, easing: "cubic-bezier(.64,0,.77,0)", fill: "forwards",
+      const box = element.getBoundingClientRect();
+      const scrollTop = element.scrollTop;
+      const front = element.querySelector<HTMLElement>(".project-dialog-front");
+      const { ghost } = makeCardFlight(card, destination, box);
+      const width = card.offsetWidth;
+      const height = card.offsetHeight;
+      const dx = destination.left + destination.width / 2 - (box.left + box.width / 2);
+      const dy = destination.top + destination.height / 2 - (box.top + box.height / 2);
+      const style = getComputedStyle(card).transform;
+      const matrix = new DOMMatrix(style === "none" ? undefined : style);
+      const angle = Math.atan2(matrix.b, matrix.a);
+      const background = getComputedStyle(element).backgroundColor;
+      const duration = 620;
+
+      const back = document.createElement("div");
+      back.className = "project-dialog-back";
+      back.setAttribute("aria-hidden", "true");
+      Object.assign(ghost.style, {
+        left: "0px", top: "0px",
+        transform: `scale(${box.width / width}, ${box.height / height})`,
       });
-      flipAnimation.current.onfinish = () => {
-        element.dataset.cardFlip = "true";
-        element.dataset.cardReturn = "true";
-        flipAnimation.current?.cancel();
-        // Keep the same easing and keyframes, played backward, so the card retraces its path.
-        flipGhost.current = ghost;
-        element.append(ghost);
-        flipAnimation.current = ghost.animate(frames, {
-          duration: 430, easing: "cubic-bezier(.25,.72,.3,1)", direction: "reverse", fill: "forwards",
-        });
-        flipAnimation.current.onfinish = onClose;
-      };
+      back.append(ghost);
+      flipGhost.current = back;
+      element.style.setProperty("--return-height", `${box.height}px`);
+      element.style.setProperty("--return-background", background);
+      element.style.setProperty("--return-duration", `${duration}ms`);
+      element.append(back);
+      element.dataset.cardReturn = "true";
+      if (front) front.scrollTop = scrollTop;
+
+      flipAnimation.current = element.animate([
+        { transform: "perspective(1800px) translate(0px, 0px) rotateZ(0rad) scale(1, 1) rotateY(0deg)" },
+        { transform: `perspective(1800px) translate(${dx}px, ${dy}px) rotateZ(${angle}rad) scale(${width / box.width}, ${height / box.height}) rotateY(180deg)` },
+      ], { duration, easing: "cubic-bezier(.35,.05,.28,1)", fill: "forwards" });
+      flipAnimation.current.onfinish = onClose;
       return;
     }
 
@@ -163,35 +182,37 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
       const box = event.currentTarget.getBoundingClientRect();
       if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) close();
     }}>
-      <header className="project-video-dialog-heading">
-        <div><span>{details ? `${details.category} · ${details.year}` : eyebrow}</span><h2 id="project-video-title">{project.title}<span className="orange">.</span></h2></div>
-        <button onClick={close} aria-label={details ? `Close ${project.title} details` : "Close video"}><X size={21} /></button>
-      </header>
-      <ProjectVideo id={project.id} title={project.title} index={index} link={project.link} kind={kind} active request={request} autoPlay={autoPlay} />
-      {details && (
-        <div className="project-explorer-body">
-          <div className="project-explorer-summary">
-            <p className="project-explorer-subtitle">{details.subtitle}</p>
-            {!!details.metrics?.length && (
-              <div className="project-explorer-metrics">
-                {details.metrics.slice(0, 2).map((metric) => <div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}
+      <div className="project-dialog-front">
+        <header className="project-video-dialog-heading">
+          <div><span>{details ? `${details.category} · ${details.year}` : eyebrow}</span><h2 id="project-video-title">{project.title}<span className="orange">.</span></h2></div>
+          <button onClick={close} aria-label={details ? `Close ${project.title} details` : "Close video"}><X size={21} /></button>
+        </header>
+        <ProjectVideo id={project.id} title={project.title} index={index} link={project.link} kind={kind} active request={request} autoPlay={autoPlay} />
+        {details && (
+          <div className="project-explorer-body">
+            <div className="project-explorer-summary">
+              <p className="project-explorer-subtitle">{details.subtitle}</p>
+              {!!details.metrics?.length && (
+                <div className="project-explorer-metrics">
+                  {details.metrics.slice(0, 2).map((metric) => <div key={metric.label}><strong>{metric.value}</strong><span>{metric.label}</span></div>)}
+                </div>
+              )}
+              <div className="tags">{details.stack.map((item) => <span key={item}>{item}</span>)}</div>
+              <div className="showcase-links">
+                <a className="showcase-primary" href={details.link} target="_blank" rel="noreferrer">Open app <ArrowUpRight size={16} /></a>
+                {details.github && <a href={details.github} target="_blank" rel="noreferrer"><Github size={16} /> Code <ArrowUpRight size={14} /></a>}
+                {details.document && <a href={asset(details.document)} target="_blank" rel="noreferrer"><FileText size={16} /> Case study <span>PDF</span></a>}
+                {details.presentation && <a href={asset(details.presentation)} download><Download size={16} /> Slides <span>PPTX</span></a>}
               </div>
-            )}
-            <div className="tags">{details.stack.map((item) => <span key={item}>{item}</span>)}</div>
-            <div className="showcase-links">
-              <a className="showcase-primary" href={details.link} target="_blank" rel="noreferrer">Open app <ArrowUpRight size={16} /></a>
-              {details.github && <a href={details.github} target="_blank" rel="noreferrer"><Github size={16} /> Code <ArrowUpRight size={14} /></a>}
-              {details.document && <a href={asset(details.document)} target="_blank" rel="noreferrer"><FileText size={16} /> Case study <span>PDF</span></a>}
-              {details.presentation && <a href={asset(details.presentation)} download><Download size={16} /> Slides <span>PPTX</span></a>}
+            </div>
+            <div className="project-explorer-text">
+              <section><h3>About</h3><p>{details.description}</p></section>
+              {details.problem && <section><h3>The problem</h3><p>{details.problem}</p></section>}
+              {details.approach && <section><h3>What I built</h3><p>{details.approach}</p></section>}
             </div>
           </div>
-          <div className="project-explorer-text">
-            <section><h3>About</h3><p>{details.description}</p></section>
-            {details.problem && <section><h3>The problem</h3><p>{details.problem}</p></section>}
-            {details.approach && <section><h3>What I built</h3><p>{details.approach}</p></section>}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </dialog>
   );
 }

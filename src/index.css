@@ -4240,7 +4240,30 @@ html[data-theme="dark"] .accordion-sheet { --sheet-blue: #0b1739; }
   box-shadow: none;
 }
 .project-video-dialog[data-card-flip="true"]::backdrop { opacity: 1; }
-.project-video-dialog[data-card-return="true"]::backdrop { animation: project-card-backdrop-out 430ms var(--ease-out) forwards; }
+dialog.project-video-dialog[data-card-return="true"] {
+  height: var(--return-height);
+  overflow: visible;
+  transform-style: preserve-3d;
+  transform-origin: center;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  transition: none;
+}
+.project-video-dialog[data-card-return="true"] .project-dialog-front,
+.project-dialog-back {
+  position: absolute;
+  inset: -1px;
+  backface-visibility: hidden;
+}
+.project-video-dialog[data-card-return="true"] .project-dialog-front {
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--return-background);
+}
+.project-dialog-back { transform: rotateY(180deg); pointer-events: none; }
+.project-dialog-back .project-flip-ghost { position: absolute; }
+.project-video-dialog[data-card-return="true"]::backdrop { animation: project-card-backdrop-out var(--return-duration) var(--ease-out) forwards; }
 @keyframes project-card-backdrop-out { to { opacity: 0; } }
 
 .project-video-dialog[data-card-flip="true"] > :not(.project-flip-ghost, .portfolio-cursor) { opacity: 0; }
