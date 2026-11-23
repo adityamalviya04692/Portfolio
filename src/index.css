@@ -4434,7 +4434,7 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
   }
 }
 /* A selected evidence note opens above the paper while the paper makes room. */
-.research-note { cursor: pointer; rotate: 0deg; transition: transform 500ms cubic-bezier(.18,.8,.23,1), rotate 500ms cubic-bezier(.18,.8,.23,1), width 500ms cubic-bezier(.18,.8,.23,1), box-shadow 500ms ease; }
+.research-note { cursor: pointer; rotate: 0deg; transition: transform 620ms linear(0, .035, .13, .3, .5, .69, .84, .95, 1.025, 1.04, 1.025, 1), rotate 620ms ease, width 620ms ease, box-shadow 620ms ease, z-index 0s 620ms; }
 .research-note:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .research-note-skew { rotate: -7deg; }
 .research-note-aqe { rotate: 6deg; }
@@ -4443,9 +4443,9 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
 .research-note-replication { rotate: 7deg; }
 .research-note-method { rotate: -5deg; }
 .research-note-model { rotate: -4deg; }
-.research-paper.is-shifted { transform: translateX(18px) rotate(-1deg); }
-.research-note.is-open { z-index: 3; width: 60%; rotate: 0deg; transform: translate(8%, -8%); box-shadow: 0 28px 55px #102b7960; }
-.research-note-aqe.is-open, .research-note-trigger.is-open, .research-note-replication.is-open { transform: translate(-20%, -8%); }
+.research-paper.is-shifted { transform: translateX(26px) rotate(-1deg); }
+.research-note.is-open { z-index: 3; width: 60%; rotate: 0deg; transform: translate(17%, -10%); box-shadow: 0 28px 55px #102b7960; transition-delay: 0s, 0s, 0s, 0s, 180ms; }
+.research-note-aqe.is-open, .research-note-trigger.is-open, .research-note-replication.is-open { transform: translate(-28%, -10%); }
 @media (min-width: 1024px) and (min-height: 700px) {
   .research-section { padding-block: 32px; }
   .research-section .section-heading { margin-bottom: 12px; }
