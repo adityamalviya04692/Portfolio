@@ -4229,7 +4229,11 @@ html[data-custom-pointer="idle"] .portfolio-cursor {
   background: var(--cream);
   color: #292820;
 }
-html[data-theme="dark"] .accordion-sheet { --sheet-blue: #0b1739; }
+html[data-theme="dark"] .accordion-sheet {
+  --sheet-blue: #0b1739;
+  background: var(--night-card);
+  color: var(--ink);
+}
 .accordion-sheet::before,
 .accordion-sheet::after {
   content: "";
@@ -4255,7 +4259,14 @@ html[data-theme="dark"] .accordion-sheet { --sheet-blue: #0b1739; }
 .accordion-sheet .skill-logo-slot img,
 .accordion-sheet .skill-options .tags img { filter: none; }
 
-.project-video-dialog[data-card-flip="true"] {
+html[data-theme="dark"] .accordion-sheet .skills-headline { color: var(--ink); }
+html[data-theme="dark"] .accordion-sheet .skill-options .motion-accordion { border-color: var(--night-line); }
+html[data-theme="dark"] .accordion-sheet .skill-options .tags span { border-color: var(--night-line); background: var(--night-well); }
+html[data-theme="dark"] .accordion-sheet :is(.skill-logo-slot, .tags) img {
+  filter: drop-shadow(0 0 1.5px #f4f0e6aa);
+}
+
+dialog.project-video-dialog[data-card-flip="true"] {
   opacity: 1;
   transform: none;
   transition: none;
