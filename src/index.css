@@ -4332,7 +4332,6 @@ dialog.project-video-dialog[data-card-return="true"] {
 }
 .about-editorial-inner { max-width: 1080px; margin: auto; }
 .about-editorial header { border-bottom: 1px solid #ffffff35; padding-bottom: 16px; }
-.about-editorial-kicker { font: 700 11px/1.4 "Space Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: #f2bd83; }
 .about-editorial h2 { color: var(--cream); font-size: clamp(32px, 5.7vw, 76px); line-height: 1; letter-spacing: -.065em; margin-top: 8px; }
 .about-editorial h2 em { font-family: Georgia, serif; font-weight: 400; }
 .about-editorial-layout { display: grid; grid-template-columns: minmax(125px, .64fr) minmax(0, 1.1fr) minmax(0, 1.1fr); align-items: center; gap: clamp(20px, 3vw, 42px); margin-top: 24px; }

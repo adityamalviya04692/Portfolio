@@ -61,7 +61,7 @@ export default function ExperienceTimeline() {
     <section id="experience" className="experience blue-section" aria-labelledby="experience-heading">
       <div className="section-wrap experience-wrap">
         <div className="experience-header">
-          <span className="experience-date">Professional experience</span>
+          <span className="label-sticker light">PROFESSIONAL EXPERIENCE</span>
           <h2 id="experience-heading">
             <RippleWord>Built</RippleWord>{" "}<RippleWord>in</RippleWord>{" "}
             <RippleWord><em>production</em></RippleWord><span className="orange">.</span>

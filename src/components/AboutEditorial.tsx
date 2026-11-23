@@ -21,7 +21,7 @@ export default function AboutEditorial({ onIntro }: { onIntro: (trigger: HTMLBut
     <div className="about-editorial">
       <div className="about-editorial-inner">
         <header>
-          <span className="about-editorial-kicker">A little about me</span>
+          <span className="label-sticker light">A LITTLE ABOUT ME</span>
           <h2>Big on data<span className="orange">.</span> Bigger on <em>impact</em><span className="orange">.</span></h2>
         </header>
         <div className="about-editorial-layout">
