@@ -1,5 +1,6 @@
 const pointerQuery = "(hover: hover) and (pointer: fine)";
-const ease = "cubic-bezier(.23, 1, .32, 1)";
+const ease = "cubic-bezier(.2, .8, .2, 1)";
+const spring = "linear(0, .03, .12, .28, .49, .68, .82, .93, 1.01, 1.04, 1.035, 1.02, 1.005, 1)";
 
 export function attachProjectCardMotion(grid: HTMLDivElement) {
   const media = window.matchMedia(pointerQuery);
@@ -9,6 +10,7 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
     if (face) cards.set(card, { face });
   });
   let active: HTMLElement | null = null;
+  let pending: number | undefined;
 
   function move(card: HTMLElement, front: boolean) {
     const entry = cards.get(card);
@@ -19,12 +21,12 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
 
     const position = Number(card.style.getPropertyValue("--fan-position"));
     const side = position < 0 ? -1 : 1;
-    const distance = Math.min(46, face.offsetWidth * 0.25);
+    const distance = Math.min(28, face.offsetWidth * 0.15);
     const pose = (x: number, y: number, angle = 1) =>
       `translate(${x}px, calc(var(--fan-drop) + ${y}px)) rotate(calc(var(--fan-angle) * ${angle}))`;
 
     const animate = (from: string, to: string, duration: number, done: () => void) => {
-      const animation = face.animate({ transform: [from, to] }, { duration, easing: ease, fill: "forwards" });
+      const animation = face.animate({ transform: [from, to] }, { duration, easing: spring, fill: "forwards" });
       entry.animation = animation;
       animation.onfinish = () => {
         if (entry.animation !== animation) return;
@@ -33,13 +35,13 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
       };
     };
 
-    const clearance = pose(side * distance, front ? -3 : -15);
-    animate(from, clearance, 180, () => {
+    const clearance = pose(side * distance, front ? -7 : -10);
+    animate(from, clearance, 250, () => {
       if (front) card.style.zIndex = String(cards.size + 1);
       else card.style.removeProperty("z-index");
-      animate(clearance, front ? pose(side * 14, -23, 0.75) : pose(0, 0), 310, () => {
+      animate(clearance, front ? pose(side * 10, -17, 0.82) : pose(0, 0), 390, () => {
         if (front) {
-          face.style.transform = pose(side * 14, -23, 0.75);
+          face.style.transform = pose(side * 10, -17, 0.82);
         } else face.style.removeProperty("transform");
         entry.animation = undefined;
       });
@@ -58,11 +60,24 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
     const target = event.target instanceof Element
       ? event.target.closest<HTMLElement>(".carousel-card")
       : null;
-    setActive(target && cards.has(target) ? target : null);
+    const next = target && cards.has(target) ? target : null;
+    if (next === active) {
+      window.clearTimeout(pending);
+      pending = undefined;
+      return;
+    }
+    window.clearTimeout(pending);
+    pending = window.setTimeout(() => setActive(next), 80);
   }
 
-  function onLeave() { setActive(null); }
+  function onLeave() {
+    window.clearTimeout(pending);
+    pending = undefined;
+    setActive(null);
+  }
   function reset() {
+    window.clearTimeout(pending);
+    pending = undefined;
     active = null;
     for (const [card, entry] of cards) {
       entry.animation?.cancel();
