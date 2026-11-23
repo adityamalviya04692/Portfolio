@@ -3948,11 +3948,12 @@ html[data-theme="dark"] .showcase-film-play {
   --tilt: 25deg;
   --depth: clamp(48px, 6vw, 86px);
   display: grid;
-  grid-template-columns: repeat(var(--project-count), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--deck-size, var(--project-count)), minmax(0, 1fr));
   padding: 30px 2% calc(var(--depth) + 58px);
   overflow-x: clip;
   isolation: isolate;
 }
+.project-card-grid[data-deck-compact] { padding-inline: 8%; }
 .carousel-card {
   min-width: 0;
   position: relative;

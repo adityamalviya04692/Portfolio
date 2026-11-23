@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, Download, FileText, Github, X } from "lucide-react";
 import ProjectVideo from "./ProjectVideo";
+import { prepareProjectDeck } from "./projectCardMotion";
 import { useMotionPreference } from "./MotionSystem";
 
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
@@ -75,6 +76,7 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
   const closeTimer = useRef<number>();
   const flipAnimation = useRef<Animation>();
   const flipGhost = useRef<HTMLElement>();
+  const deck = useRef<ReturnType<typeof prepareProjectDeck>>();
   const close = () => {
     if (closing) return;
     const element = dialog.current;
@@ -82,6 +84,7 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
     flipGhost.current?.remove();
     element?.querySelector("video")?.pause();
     setClosing(true);
+    deck.current?.openSlot();
 
     const card = details && !reduced && visible
       ? returnFocusTo?.querySelector<HTMLElement>(".carousel-face")
@@ -128,9 +131,9 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
 
     if (element) delete element.dataset.cardFlip;
     setVisible(false);
-    closeTimer.current = window.setTimeout(onClose, reduced ? 150 : 280);
+    closeTimer.current = window.setTimeout(onClose, reduced ? 150 : deck.current ? 520 : 280);
   };
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = dialog.current;
     const trigger = returnFocusTo || document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
@@ -164,6 +167,7 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
         nextFrame = requestAnimationFrame(() => setVisible(true));
       });
     }
+    if (details && trigger) deck.current = prepareProjectDeck(trigger, reduced);
     document.body.style.overflow = "hidden";
     return () => {
       cancelAnimationFrame(frame);
@@ -171,6 +175,8 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
       clearTimeout(closeTimer.current);
       flipAnimation.current?.cancel();
       flipGhost.current?.remove();
+      deck.current?.restore();
+      deck.current = undefined;
       element?.close();
       document.body.style.overflow = previousOverflow;
       trigger?.focus({ preventScroll: true });
