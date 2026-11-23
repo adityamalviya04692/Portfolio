@@ -353,7 +353,7 @@ function Portfolio() {
               ))}
             </div>
             <div id="skills" className="about-details">
-              <Accordion title="Skills & capabilities">
+              <Accordion title="Skills & capabilities" sheet>
                 <SkillsPanel />
               </Accordion>
               <Accordion title="Education & certifications">

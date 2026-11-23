@@ -372,10 +372,12 @@ export function Accordion({
   title,
   children,
   className = "",
+  sheet = false,
 }: {
   title: string;
   children: ReactNode;
   className?: string;
+  sheet?: boolean;
 }) {
   const [open, setOpen] = useState(false),
     { reduced } = useMotionPreference();
@@ -408,13 +410,22 @@ export function Accordion({
         {open && (
           <motion.div
             id={id}
-            initial={{ height: reduced ? "auto" : 0, opacity: 0 }}
+            initial={{ height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: reduced ? "auto" : 0, opacity: 0 }}
-            transition={{ duration: reduced ? 0 : 0.3, ease: [0.23, 1, 0.32, 1] }}
-            className="accordion-panel"
+            exit={{ height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
+            transition={{ duration: reduced ? 0 : sheet ? 0.62 : 0.3, ease: [0.23, 1, 0.32, 1] }}
+            className={sheet ? "accordion-panel accordion-sheet" : "accordion-panel"}
           >
-            <div>{children}</div>
+            {sheet ? (
+              <motion.div
+                initial={reduced ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: reduced ? 1 : 0, y: reduced ? 0 : 6 }}
+                transition={{ duration: reduced ? 0 : 0.34, ease: [0.23, 1, 0.32, 1] }}
+              >
+                {children}
+              </motion.div>
+            ) : <div>{children}</div>}
           </motion.div>
         )}
       </AnimatePresence>
