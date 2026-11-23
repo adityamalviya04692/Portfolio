@@ -3369,8 +3369,12 @@ html[data-motion="off"] .showcase-film-preview .showcase-film-play { transform: 
   html .motion-controls .pause-toggle :is(.pause-bars, .pause-play) {
     transition: transform .7s cubic-bezier(.65, 0, .35, 1), opacity .5s ease !important;
   }
-  .pause-toggle:not([aria-pressed="true"]):hover .pause-bars { transform: rotate(18deg); }
-  .pause-toggle[aria-pressed="true"]:hover .pause-play { transform: scale(1.12); }
+  html .motion-controls .pause-toggle .pause-bars path {
+    transition: transform .55s cubic-bezier(.65, 0, .35, 1) !important;
+  }
+  .pause-toggle:not([aria-pressed="true"]):hover .pause-bars path:first-child { transform: translateX(-1.8px); }
+  .pause-toggle:not([aria-pressed="true"]):hover .pause-bars path:last-child { transform: translateX(1.8px); }
+  .pause-toggle[aria-pressed="true"]:hover .pause-play { transform: translateX(1.6px) scale(1.12); }
 }
 
 /* -- The switch itself: night spreads from the button (ThemeToggle.tsx) -- */
