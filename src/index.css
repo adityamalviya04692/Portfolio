@@ -4024,7 +4024,7 @@ html[data-theme="dark"] .showcase-film-play {
 }
 
 /* -- Dialog motion: grows out of the card that opened it, content settles a beat later -- */
-.project-video-dialog { opacity: 0; transform: translateY(18px) scale(.94); transition: opacity 240ms ease, transform 260ms cubic-bezier(.4, 0, 1, 1); }
+.project-video-dialog { opacity: 0; transform: translateY(18px) scale(.94); transition: opacity 240ms var(--ease-out), transform 280ms var(--ease-out); }
 .project-video-dialog[data-visible="true"] { opacity: 1; transform: none; transition: opacity 380ms cubic-bezier(.22, 1, .36, 1), transform 520ms cubic-bezier(.22, 1, .36, 1); }
 .project-video-dialog::backdrop { opacity: 0; backdrop-filter: blur(0); transition: opacity 280ms ease, backdrop-filter 280ms ease; }
 .project-video-dialog[data-visible="true"]::backdrop { opacity: 1; backdrop-filter: blur(7px); transition: opacity 450ms ease, backdrop-filter 450ms ease; }
@@ -4176,7 +4176,7 @@ html[data-custom-pointer="idle"] .portfolio-cursor {
   width: 1em;
   height: 1em;
   vertical-align: -.14em;
-  background: #fffdf7;
+  overflow: hidden;
   border-radius: .17em;
 }
 .skill-logo-slot img {
@@ -4185,15 +4185,21 @@ html[data-custom-pointer="idle"] .portfolio-cursor {
   width: 76%;
   height: 76%;
   object-fit: contain;
-  animation: skill-logo-in 170ms ease-out;
+  filter: drop-shadow(0 0 2px #f4f0e6aa);
 }
-@keyframes skill-logo-in { from { opacity: .35; } to { opacity: 1; } }
-html[data-motion="off"] .skill-logo-slot img { animation: none; }
-@media (prefers-reduced-motion: reduce) { .skill-logo-slot img { animation: none; } }
 .skill-options details { border-top: 1px solid #ffffff38; }
 .skill-options summary { gap: 12px; }
+.skill-options summary span { transition: rotate 260ms var(--ease-out); }
 .skill-options details[open] summary span { rotate: 45deg; }
+.skill-options details[open] .tags { animation: skill-group-in 280ms var(--ease-out); }
+@keyframes skill-group-in { from { opacity: 0; transform: translateY(-5px); } }
+html[data-motion="off"] .skill-options details[open] .tags { animation: none; }
+html[data-motion="off"] .skill-options summary span { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .skill-options details[open] .tags { animation: none; }
+  .skill-options summary span { transition: none; }
+}
 .skill-options .tags { padding-bottom: 16px; }
 .skill-options .tags span { display: inline-flex; align-items: center; gap: 6px; }
-.skill-options .tags img { width: 18px; height: 18px; object-fit: contain; background: #fffdf7; padding: 2px; border-radius: 3px; }
+.skill-options .tags img { width: 18px; height: 18px; object-fit: contain; filter: drop-shadow(0 0 1.5px #f4f0e6aa); }
 @media (max-width: 760px) { .skills-panel { grid-template-columns: 1fr; } }

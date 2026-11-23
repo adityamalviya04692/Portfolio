@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useMotionPreference } from "./MotionSystem";
 import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
@@ -19,11 +20,30 @@ export default function SkillsPanel() {
 
   const activeSkill = names[reduced ? 0 : index];
 
+  useEffect(() => {
+    if (reduced) return;
+    const nextLogo = new Image();
+    nextLogo.src = iconUrl(names[(index + 1) % names.length]);
+  }, [index, reduced]);
+
   return (
     <div className="detail-content skills-content skills-panel">
       <div>
         <p className="skills-headline">
-          I use <span className="skill-logo-slot" title={activeSkill}><img key={activeSkill} src={iconUrl(activeSkill)} alt={activeSkill} /></span>{" "}
+          I use{" "}
+          <span className="skill-logo-slot" title={activeSkill} role="img" aria-label={activeSkill}>
+            <AnimatePresence initial={false}>
+              <motion.img
+                key={activeSkill}
+                src={iconUrl(activeSkill)}
+                alt=""
+                initial={reduced ? false : { opacity: 0, y: "18%", scale: 0.94 }}
+                animate={{ opacity: 1, y: "0%", scale: 1 }}
+                exit={{ opacity: 0, y: "-18%", scale: 0.94 }}
+                transition={{ duration: reduced ? 0 : 0.28, ease: [0.23, 1, 0.32, 1] }}
+              />
+            </AnimatePresence>
+          </span>{" "}
           to turn raw data into <em>answers</em><span className="orange">.</span>
         </p>
       </div>
@@ -39,13 +59,6 @@ export default function SkillsPanel() {
                 </span>
               ))}
             </div>
-          </details>
-        ))}
-        {data.capabilities.map(({ title, summary, points }) => (
-          <details key={title} name="portfolio-skill-group">
-            <summary>{title}<span aria-hidden="true">+</span></summary>
-            <p>{summary}</p>
-            <ul>{points.map((point) => <li key={point}>{point}</li>)}</ul>
           </details>
         ))}
       </div>

@@ -43,23 +43,6 @@
   "skills": {
     "categories": [
       {
-        "name": "Core Data Engineering",
-        "items": [
-          "PySpark",
-          "SQL / T-SQL",
-          "Python",
-          "Apache Spark",
-          "Spark SQL",
-          "Spark Structured Streaming",
-          "ETL / ELT",
-          "Spark Performance Tuning",
-          "Data Warehousing",
-          "Dimensional Data Modeling",
-          "Medallion Architecture",
-          "SCD Type 2"
-        ]
-      },
-      {
         "name": "Azure & Databricks",
         "items": [
           "Azure Databricks",
@@ -73,7 +56,17 @@
           "Auto Loader",
           "Azure Key Vault",
           "Azure DevOps",
-          "Azure Blob Storage"
+          "Azure Blob Storage",
+          "PySpark",
+          "Apache Spark",
+          "Spark SQL",
+          "Spark Structured Streaming",
+          "ETL / ELT",
+          "Spark Performance Tuning",
+          "Medallion Architecture",
+          "SCD Type 2",
+          "Apache Airflow",
+          "Delta Live Tables"
         ]
       },
       {
@@ -109,6 +102,10 @@
       {
         "name": "Databases, APIs & BI",
         "items": [
+          "SQL / T-SQL",
+          "Python",
+          "Data Warehousing",
+          "Dimensional Data Modeling",
           "MS SQL Server",
           "MySQL",
           "PostgreSQL",
@@ -116,57 +113,13 @@
           "FastAPI",
           "REST APIs",
           "Azure API Management",
-          "Power BI"
-        ]
-      },
-      {
-        "name": "Working knowledge",
-        "items": [
-          "Apache Airflow",
-          "Azure Synapse Analytics",
-          "Delta Live Tables"
+          "Power BI",
+          "Azure Synapse Analytics"
         ]
       }
     ]
   },
-  "capabilities": [
-    {
-      "title": "Data Engineering",
-      "summary": "End-to-end ETL/ELT on Azure — ingestion through to modelled, query-ready tables.",
-      "points": [
-        "Medallion-architecture lakehouses (Bronze / Silver / Gold) on Delta Lake",
-        "Streaming ingestion with Event Hubs, Kafka and Structured Streaming (30–40 GB/day); batch loads with Delta MERGE and SCD Type 2 (5-7 GB/day)",
-        "Layer-wise data quality checks and Unity Catalog governance, access control and lineage"
-      ]
-    },
-    {
-      "title": "Performance & Cost",
-      "summary": "Making existing pipelines cheaper and faster rather than just bigger.",
-      "points": [
-        "Data-skew remediation via key salting and Adaptive Query Execution",
-        "Databricks cluster right-sizing plus Delta OPTIMIZE, Z-ORDER and partitioning",
-        "Reusable, parameterised ADF workflows built for maintainability"
-      ]
-    },
-    {
-      "title": "Platform & CI/CD",
-      "summary": "I collaborate with DevOps colleagues on repeatable data pipeline releases.",
-      "points": [
-        "Worked with the DevOps team during ADF and Databricks pipeline builds and releases",
-        "Prepare Azure DevOps YAML files and run CI/CD deployments of feature branches to Dev for integration testing",
-        "Containerised services with Docker for environment parity"
-      ]
-    },
-    {
-      "title": "Team Leadership & Delivery",
-      "summary": "Leading a 4-member offshore team as Scrum Master since 2025.",
-      "points": [
-        "Run daily stand-ups and sprint planning; maintain Azure DevOps boards",
-        "Mentor juniors and approve their PySpark and SQL pull requests",
-        "AI-assisted delivery with GitHub Copilot, Claude and ChatGPT in VS Code"
-      ]
-    }
-  ],
+  "capabilities": [],
   "experience": [
     {
       "company": "Tata Consultancy Services",

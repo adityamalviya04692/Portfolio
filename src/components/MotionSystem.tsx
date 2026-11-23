@@ -122,10 +122,10 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={reduced ? false : { opacity: 0, y: 38, filter: "blur(6px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      initial={reduced ? false : { opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, delay, ease: [0.23, 1, 0.32, 1] }}
     >
       {children}
     </motion.div>
@@ -411,7 +411,7 @@ export function Accordion({
             initial={{ height: reduced ? "auto" : 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: reduced ? "auto" : 0, opacity: 0 }}
-            transition={{ duration: reduced ? 0 : 0.35 }}
+            transition={{ duration: reduced ? 0 : 0.3, ease: [0.23, 1, 0.32, 1] }}
             className="accordion-panel"
           >
             <div>{children}</div>
