@@ -42,8 +42,10 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
   const [closing, setClosing] = useState(false);
   const { reduced } = useMotionPreference();
   const closeTimer = useRef<number>();
+  const entranceAnimation = useRef<Animation>();
   const close = () => {
     if (closing) return;
+    entranceAnimation.current?.cancel();
     dialog.current?.querySelector("video")?.pause();
     setClosing(true);
     setVisible(false);
@@ -53,22 +55,57 @@ export default function ProjectVideoDialog({ project, details, autoPlay = true, 
     const element = dialog.current;
     const trigger = returnFocusTo || document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
+    const card = details && !reduced ? trigger?.querySelector<HTMLElement>(".carousel-face") : undefined;
+    const from = card?.getBoundingClientRect();
+    const cardAngle = card ? getComputedStyle(card).transform : "none";
+    if (element && from?.width && from.height) element.dataset.cardFlip = "true";
     element?.showModal();
-    // Grow out of the card that opened the dialog.
-    if (element && trigger && trigger !== document.body) {
-      const box = element.getBoundingClientRect(), from = trigger.getBoundingClientRect();
-      element.style.transformOrigin = `${from.left + from.width / 2 - box.left}px ${from.top + from.height / 2 - box.top}px`;
-    }
-    // Two frames commit the starting style before transitioning the modal in.
+
     let nextFrame = 0;
-    const frame = requestAnimationFrame(() => {
-      nextFrame = requestAnimationFrame(() => setVisible(true));
-    });
+    let frame = 0;
+    let ghost: HTMLElement | undefined;
+    if (element && card && from?.width && from.height) {
+      const to = element.getBoundingClientRect();
+      ghost = card.cloneNode(true) as HTMLElement;
+      ghost.className += " project-flip-ghost";
+      ghost.setAttribute("aria-hidden", "true");
+      Object.assign(ghost.style, {
+        left: `${from.left}px`, top: `${from.top}px`, width: `${from.width}px`, height: `${from.height}px`,
+      });
+      element.append(ghost);
+      const matrix = new DOMMatrix(cardAngle === "none" ? undefined : cardAngle);
+      const angle = Math.atan2(matrix.b, matrix.a);
+      const move = `translate(${to.left - from.left}px, ${to.top - from.top}px)`;
+      entranceAnimation.current = ghost.animate([
+        { transform: `perspective(1400px) rotateZ(${angle * 0.35}rad)`, offset: 0 },
+        { transform: `perspective(1400px) translate(${(to.left - from.left) * 0.38}px, ${(to.top - from.top) * 0.38 - 18}px) rotateY(20deg) scale(1.06)`, offset: 0.34 },
+        { transform: `${move} perspective(1400px) scale(${to.width / from.width}, ${to.height / from.height}) rotateY(89deg)`, offset: 1 },
+      ], { duration: 430, easing: "cubic-bezier(.25,.72,.3,1)", fill: "forwards" });
+      entranceAnimation.current.onfinish = () => {
+        ghost?.remove();
+        delete element.dataset.cardFlip;
+        setVisible(true);
+        entranceAnimation.current = element.animate([
+          { transform: "perspective(1400px) rotateY(-89deg)" },
+          { transform: "perspective(1400px) rotateY(0deg)" },
+        ], { duration: 280, easing: "cubic-bezier(.23,1,.32,1)" });
+      };
+    } else {
+      if (element && trigger && trigger !== document.body) {
+        const box = element.getBoundingClientRect(), triggerBox = trigger.getBoundingClientRect();
+        element.style.transformOrigin = `${triggerBox.left + triggerBox.width / 2 - box.left}px ${triggerBox.top + triggerBox.height / 2 - box.top}px`;
+      }
+      frame = requestAnimationFrame(() => {
+        nextFrame = requestAnimationFrame(() => setVisible(true));
+      });
+    }
     document.body.style.overflow = "hidden";
     return () => {
       cancelAnimationFrame(frame);
       cancelAnimationFrame(nextFrame);
       clearTimeout(closeTimer.current);
+      entranceAnimation.current?.cancel();
+      ghost?.remove();
       element?.close();
       document.body.style.overflow = previousOverflow;
       trigger?.focus({ preventScroll: true });

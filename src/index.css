@@ -4229,3 +4229,29 @@ html[data-theme="dark"] .accordion-sheet { --sheet-blue: #0b1739; }
 .accordion-sheet .skill-options .tags span { border-color: #102b7940; }
 .accordion-sheet .skill-logo-slot img,
 .accordion-sheet .skill-options .tags img { filter: none; }
+
+.project-video-dialog[data-card-flip="true"] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  overflow: visible;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.project-video-dialog[data-card-flip="true"]::backdrop { opacity: 1; }
+.project-video-dialog[data-card-flip="true"] > :not(.project-flip-ghost, .portfolio-cursor) { opacity: 0; }
+.project-video-dialog .project-flip-ghost {
+  position: fixed;
+  z-index: 1;
+  margin: 0;
+  pointer-events: none;
+  transform-origin: top left;
+  grid-template-rows: minmax(0, 1fr) auto;
+  backface-visibility: hidden;
+}
+.project-flip-ghost .carousel-caption {
+  background: var(--project-accent, #102b79);
+  color: var(--project-on-accent, white);
+}
+.project-flip-ghost .carousel-caption :is(.showcase-subtitle, .carousel-thumb-chip) { color: inherit; }

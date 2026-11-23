@@ -1,101 +1,84 @@
-const desktopPointer = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
-const clamp = (value: number, limit: number) => Math.max(-limit, Math.min(limit, value));
+const pointerQuery = "(hover: hover) and (pointer: fine)";
+const ease = "cubic-bezier(.23, 1, .32, 1)";
 
 export function attachProjectCardMotion(grid: HTMLDivElement) {
-  const region = grid.parentElement;
-  if (!region) return;
+  const media = window.matchMedia(pointerQuery);
+  const cards = new Map<HTMLElement, { face: HTMLElement; animation?: Animation }>();
+  grid.querySelectorAll<HTMLElement>(".carousel-card").forEach((card) => {
+    const face = card.querySelector<HTMLElement>(".carousel-face");
+    if (face) cards.set(card, { face });
+  });
+  let active: HTMLElement | null = null;
 
-  const media = window.matchMedia(desktopPointer);
-  const cards = Array.from(grid.querySelectorAll<HTMLElement>(".carousel-thumb"), (button) => ({
-    face: button.querySelector<HTMLElement>(".carousel-face")!,
-    x: 0, y: 0, vx: 0, vy: 0, targetX: 0, targetY: 0,
-  }));
-  let pointer: { x: number; y: number; time: number } | undefined;
-  let frame = 0;
-  let lastTime = 0;
+  function move(card: HTMLElement, front: boolean) {
+    const entry = cards.get(card);
+    if (!entry) return;
+    const { face } = entry;
+    const from = getComputedStyle(face).transform;
+    entry.animation?.cancel();
 
-  function animate(time: number) {
-    const dt = Math.max(0, Math.min((time - lastTime) / 1000, 1 / 30));
-    const decay = Math.exp(-7.5 * dt);
-    lastTime = time;
-    let moving = false;
+    const position = Number(card.style.getPropertyValue("--fan-position"));
+    const side = position < 0 ? -1 : 1;
+    const distance = Math.min(46, face.offsetWidth * 0.25);
+    const pose = (x: number, y: number, angle = 1) =>
+      `translate(${x}px, calc(var(--fan-drop) + ${y}px)) rotate(calc(var(--fan-angle) * ${angle}))`;
 
-    for (const card of cards) {
-      // The input fades when the pointer stops. The spring carries the visible return.
-      card.targetX *= decay;
-      card.targetY *= decay;
-      card.vx += ((card.targetX - card.x) * 240 - card.vx * 25) * dt;
-      card.vy += ((card.targetY - card.y) * 240 - card.vy * 25) * dt;
-      card.x += card.vx * dt;
-      card.y += card.vy * dt;
+    const animate = (from: string, to: string, duration: number, done: () => void) => {
+      const animation = face.animate({ transform: [from, to] }, { duration, easing: ease, fill: "forwards" });
+      entry.animation = animation;
+      animation.onfinish = () => {
+        if (entry.animation !== animation) return;
+        done();
+        animation.cancel();
+      };
+    };
 
-      const settling = Math.max(
-        Math.abs(card.targetX), Math.abs(card.targetY), Math.abs(card.x), Math.abs(card.y),
-        Math.abs(card.vx) / 20, Math.abs(card.vy) / 20,
-      ) > 0.04;
-      if (settling) {
-        card.face.style.translate = `${card.x.toFixed(2)}px ${card.y.toFixed(2)}px`;
-        card.face.style.rotate = `${(card.x * 0.16).toFixed(2)}deg`;
-        moving = true;
-      } else {
-        card.x = card.y = card.vx = card.vy = card.targetX = card.targetY = 0;
-        card.face.style.removeProperty("translate");
-        card.face.style.removeProperty("rotate");
-      }
-    }
-    frame = moving ? requestAnimationFrame(animate) : 0;
+    const clearance = pose(side * distance, front ? -3 : -15);
+    animate(from, clearance, 180, () => {
+      if (front) card.style.zIndex = String(cards.size + 1);
+      else card.style.removeProperty("z-index");
+      animate(clearance, front ? pose(side * 14, -23, 0.75) : pose(0, 0), 310, () => {
+        if (front) {
+          face.style.transform = pose(side * 14, -23, 0.75);
+        } else face.style.removeProperty("transform");
+        entry.animation = undefined;
+      });
+    });
+  }
+
+  function setActive(next: HTMLElement | null) {
+    if (next === active) return;
+    if (active) move(active, false);
+    active = next;
+    if (next) move(next, true);
   }
 
   function onMove(event: PointerEvent) {
     if (!media.matches || event.pointerType !== "mouse") return;
-
-    const next = { x: event.clientX, y: event.clientY, time: event.timeStamp };
-    const previous = pointer;
-    pointer = next;
-    if (!previous) return;
-
-    const elapsed = Math.max(8, Math.min(80, next.time - previous.time));
-    const impulseX = clamp((next.x - previous.x) / elapsed * 32, 65);
-    const impulseY = clamp((next.y - previous.y) / elapsed * 27, 52);
-
-    for (const card of cards) {
-      const { x, y, width, height } = card.face.getBoundingClientRect();
-      const dx = (next.x - x - width / 2) / (width * 1.2);
-      const dy = (next.y - y - height / 2) / (height * 0.82);
-      const proximity = Math.max(0, 1 - Math.hypot(dx, dy));
-      const weight = proximity * proximity * (3 - 2 * proximity);
-      card.targetX = impulseX * weight;
-      card.targetY = impulseY * weight;
-    }
-
-    if (!frame && (impulseX || impulseY)) {
-      lastTime = performance.now();
-      frame = requestAnimationFrame(animate);
-    }
+    const target = event.target instanceof Element
+      ? event.target.closest<HTMLElement>(".carousel-card")
+      : null;
+    setActive(target && cards.has(target) ? target : null);
   }
 
-  function forgetPointer() {
-    pointer = undefined;
-  }
-
+  function onLeave() { setActive(null); }
   function reset() {
-    forgetPointer();
-    cancelAnimationFrame(frame);
-    frame = 0;
-    for (const card of cards) {
-      card.x = card.y = card.vx = card.vy = card.targetX = card.targetY = 0;
-      card.face.style.removeProperty("translate");
-      card.face.style.removeProperty("rotate");
+    active = null;
+    for (const [card, entry] of cards) {
+      entry.animation?.cancel();
+      entry.animation = undefined;
+      entry.face.style.removeProperty("transform");
+      card.style.removeProperty("z-index");
     }
   }
 
-  region.addEventListener("pointermove", onMove, { passive: true });
-  region.addEventListener("pointerleave", forgetPointer);
+  grid.addEventListener("pointermove", onMove, { passive: true });
+  grid.addEventListener("pointerleave", onLeave);
   media.addEventListener("change", reset);
   return () => {
     reset();
-    region.removeEventListener("pointermove", onMove);
-    region.removeEventListener("pointerleave", forgetPointer);
+    grid.removeEventListener("pointermove", onMove);
+    grid.removeEventListener("pointerleave", onLeave);
     media.removeEventListener("change", reset);
   };
 }
