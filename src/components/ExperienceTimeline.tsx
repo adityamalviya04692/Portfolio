@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Activity } from "lucide-react";
 import entries from "../data/experience.json";
 import { RippleWord } from "./HeadingRipples";
-import { Accordion, useMotionPreference } from "./MotionSystem";
+import { Accordion, Scramble, useMotionPreference } from "./MotionSystem";
 import "./ExperienceTimeline.css";
 
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
@@ -10,7 +9,7 @@ const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 export default function ExperienceTimeline() {
   const timeline = useRef<HTMLDivElement>(null);
   const { reduced } = useMotionPreference();
-  const today = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeZone: "Asia/Kolkata" }).format(new Date());
+  const today = new Intl.DateTimeFormat("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" }).format(new Date());
 
   useEffect(() => {
     const rail = timeline.current;
@@ -34,8 +33,7 @@ export default function ExperienceTimeline() {
       const distance = Math.max(0, Math.min(height, window.innerHeight * 0.78 - top));
       rail.style.setProperty("--rail-progress", String(Math.max(0, (distance - 14) / Math.max(1, height - 14))));
       for (const row of rows) {
-        const markerTop = parseFloat(getComputedStyle(row, "::before").top);
-        row.toggleAttribute("data-rail-reached", distance >= row.offsetTop + markerTop);
+        row.toggleAttribute("data-rail-reached", distance >= row.offsetTop);
       }
     };
     const schedule = () => {
@@ -61,7 +59,7 @@ export default function ExperienceTimeline() {
     <section id="experience" className="experience blue-section" aria-labelledby="experience-heading">
       <div className="section-wrap experience-wrap">
         <div className="experience-header">
-          <span className="label-sticker light">PROFESSIONAL EXPERIENCE</span>
+          <Scramble className="label-sticker light" text="PROFESSIONAL EXPERIENCE" />
           <h2 id="experience-heading">
             <RippleWord>Built</RippleWord>{" "}<RippleWord>in</RippleWord>{" "}
             <RippleWord><em>production</em></RippleWord><span className="orange">.</span>
@@ -73,15 +71,14 @@ export default function ExperienceTimeline() {
           <p className="experience-employment">Senior Data Engineer &amp; Scrum Master · Mar 2026–present</p>
         </div>
         <div className="experience-timeline" ref={timeline}>
-          <span className="experience-timeline-start">{today} · Present</span>
           {entries.map((entry, index) => (
             <article
               className="experience-entry"
               key={entry.title}
               onFocus={(event) => event.currentTarget.classList.add("is-shown")}
             >
+              <span className="experience-timeline-label">{index === 0 ? `${today} · Present` : entry.period}</span>
               <div className="experience-entry-copy">
-                <span className="experience-date">{index === 0 && <Activity size={16} aria-hidden="true" />}{entry.period}</span>
                 <div className="experience-project-heading">
                   <img className={`experience-project-logo logo-${entry.logoAlt.toLowerCase().replace(/ /g, "-")}`} src={asset(entry.logo)} alt={entry.logoAlt} />
                   <h3>{entry.title}</h3>

@@ -280,7 +280,7 @@ function Portfolio() {
           <div className="section-wrap">
             <Reveal className="section-heading">
               <div>
-                <span className="label-sticker">PERSONAL PROJECTS</span>
+                <Scramble className="label-sticker" text="PERSONAL PROJECTS" />
                 <h2 id="projects-heading"><RippleWords text="Built to explore" suffix={<span className="orange">.</span>} /></h2>
               </div>
               <p>Tools I built to explore reel-first search, orchestration, <br />document AI, data quality, pipeline design, Spark diagnostics and SQL.</p>
@@ -291,7 +291,7 @@ function Portfolio() {
         <section id="research" className="research-section" aria-labelledby="research-heading">
           <div className="section-wrap">
             <Reveal className="section-heading">
-              <div><span className="label-sticker">INDEPENDENT RESEARCH</span><h2 id="research-heading"><RippleWords text="Built on evidence" suffix={<span className="orange">.</span>} /></h2></div>
+              <div><Scramble className="label-sticker" text="INDEPENDENT RESEARCH" /><h2 id="research-heading"><RippleWords text="Built on evidence" suffix={<span className="orange">.</span>} /></h2></div>
               <p>Testing the assumptions behind <br />Spark performance tuning.</p>
             </Reveal>
             <Reveal>
@@ -323,9 +323,7 @@ function Portfolio() {
           <div className="section-wrap">
             <Reveal className="section-heading">
               <div>
-                <span className="label-sticker">
-                  <Scramble text="INDEPENDENT WORK" />
-                </span>
+                <Scramble className="label-sticker" text="INDEPENDENT WORK" />
                 <h2>
                   <RippleWords text="Built end to end" suffix={<span className="orange">.</span>} />
                 </h2>
@@ -448,9 +446,7 @@ function Portfolio() {
         <section id="contact" className="contact blue-section">
           <div className="section-wrap">
             <Reveal>
-              <span className="label-sticker light">
-                <Scramble text="HAVE SOMETHING IN MIND?" />
-              </span>
+              <Scramble className="label-sticker light" text="HAVE SOMETHING IN MIND?" />
               <h2>
                 <RippleWords text="Let's work" />
                 <br />
@@ -542,7 +538,7 @@ function Portfolio() {
                 alt="Moriveda live storefront artwork"
               />
               <div className="case-body">
-                <span className="label-sticker">FREELANCE · MAY–JUN 2026</span>
+                <Scramble className="label-sticker" text="FREELANCE · MAY–JUN 2026" />
                 <h2 id="case-title">Moriveda</h2>
                 <p>{moriveda.description}</p>
                 <h3>What I built</h3>
