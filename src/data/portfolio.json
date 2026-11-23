@@ -71,16 +71,6 @@
         ]
       },
       {
-        "name": "Google Cloud & AI",
-        "items": [
-          "Google Cloud Platform (GCP)",
-          "Databricks on Google Cloud",
-          "Vertex AI",
-          "Google Cloud Functions",
-          "Vector Databases"
-        ]
-      },
-      {
         "name": "Governance, Quality & Delivery",
         "items": [
           "Data Governance",
@@ -94,10 +84,7 @@
           "Pytest",
           "SonarQube",
           "Scrum Master",
-          "Code Reviews",
-          "GitHub Copilot",
-          "Claude",
-          "ChatGPT"
+          "Code Reviews"
         ]
       },
       {
@@ -116,6 +103,23 @@
           "Azure API Management",
           "Power BI",
           "Azure Synapse Analytics"
+        ]
+      },
+      {
+        "name": "Google Cloud & AI",
+        "items": [
+          "Google Cloud Platform (GCP)",
+          "Databricks on Google Cloud",
+          "Vertex AI",
+          "Google Cloud Functions",
+          "Vector Databases",
+          "ChatGPT",
+          "Claude",
+          "Google Gemini",
+          "Google Antigravity",
+          "VS Code",
+          "GitHub Copilot",
+          "Microsoft Copilot"
         ]
       }
     ]

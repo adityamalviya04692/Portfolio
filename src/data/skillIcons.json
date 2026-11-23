@@ -54,5 +54,9 @@
   "Power BI": "power-bi.svg",
   "Apache Airflow": "apache-airflow.svg",
   "Azure Synapse Analytics": "azure-synapse-analytics.svg",
-  "Delta Live Tables": "databricks-jobs-pipelines.svg"
+  "Delta Live Tables": "databricks-jobs-pipelines.svg",
+  "Google Gemini": "google-gemini.svg",
+  "Google Antigravity": "google-antigravity.svg",
+  "VS Code": "vs-code.svg",
+  "Microsoft Copilot": "microsoft-copilot.svg"
 }
