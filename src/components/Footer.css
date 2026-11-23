@@ -1,17 +1,22 @@
+.contact:has(.footer-ring) {
+  padding-bottom: 0;
+}
+
 .footer-ring {
   position: relative;
   height: clamp(105px, 17vw, 200px);
   overflow: hidden;
+  margin-top: 24px;
   perspective: 1000px;
   pointer-events: none;
-  color-scheme: dark;
+
 }
 
 .footer-ring-plane {
   position: absolute;
   top: 100%;
   left: 50%;
-  width: clamp(420px, 78vw, 1000px);
+  width: clamp(420px, 72vw, 950px);
   aspect-ratio: 1;
   transform: translate(-50%, -50%) rotateX(64deg) rotateZ(-12deg);
 }

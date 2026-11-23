@@ -20,6 +20,7 @@ import data from "./data/portfolio.json";
 import PortfolioCursor from "./components/PortfolioCursor";
 import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRipples";
 import ExperienceTimeline from "./components/ExperienceTimeline";
+import "./components/Footer.css";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
 import AboutEditorial from "./components/AboutEditorial";
@@ -36,6 +37,8 @@ import {
   Tilt,
   useMotionPreference,
 } from "./components/MotionSystem";
+const LOGO_ANGLES = Array.from({ length: 12 }, (_, index) => index * 30);
+
 const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`;
 const profile = data.profile,
   email = `mailto:${profile.social.email}`;
@@ -492,6 +495,18 @@ function Portfolio() {
             <div className="availability">
               <span className="status-dot" />
               {profile.availability} <span>·</span> Mumbai, India
+            </div>
+          </div>
+          <div className="footer-ring" aria-hidden="true">
+            <div className="footer-ring-plane">
+              <svg className="footer-ring-wheel" viewBox="0 0 640 640">
+                <defs>
+                  <image id="footer-ring-logo" href={asset("am-monogram-v1.svg")} x="-53" y="27" width="106" height="106" />
+                </defs>
+                {LOGO_ANGLES.map((angle) => (
+                  <use key={angle} href="#footer-ring-logo" transform={`rotate(${angle} 320 320) translate(320)`} />
+                ))}
+              </svg>
             </div>
           </div>
           <a href="#home" className="back-top">

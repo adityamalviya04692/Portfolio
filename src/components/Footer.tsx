@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Copy, Check, Download } from 'lucide-react'
 import { usePortfolio, asset } from '../hooks/usePortfolio'
 import SocialLinks from './SocialLinks'
-import './Footer.css'
 
 const NAV = [
   { id: 'about', label: 'About' },
@@ -10,8 +9,6 @@ const NAV = [
   { id: 'skills', label: 'Skills' },
   { id: 'projects', label: 'Projects' },
 ]
-
-const LOGO_ANGLES = Array.from({ length: 12 }, (_, index) => index * 30)
 
 export default function Footer() {
   const { profile } = usePortfolio()
@@ -26,7 +23,7 @@ export default function Footer() {
   }
 
   return (
-    <footer id="contact" className="relative z-10 border-t border-line px-5 pt-20 sm:px-8">
+    <footer id="contact" className="relative z-10 border-t border-line px-5 pt-20 pb-8 sm:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-12 md:grid-cols-3">
           <div>
@@ -80,18 +77,6 @@ export default function Footer() {
           <p className="mono text-[11px] text-neutral-600">
             Built with React · TypeScript · Vite · Tailwind
           </p>
-        </div>
-      </div>
-      <div className="footer-ring" aria-hidden="true">
-        <div className="footer-ring-plane">
-          <svg className="footer-ring-wheel" viewBox="0 0 640 640">
-            <defs>
-              <image id="footer-ring-logo" href={asset('am-monogram-v1.svg')} x="-53" y="27" width="106" height="106" />
-            </defs>
-            {LOGO_ANGLES.map((angle) => (
-              <use key={angle} href="#footer-ring-logo" transform={`rotate(${angle} 320 320) translate(320)`} />
-            ))}
-          </svg>
         </div>
       </div>
     </footer>
