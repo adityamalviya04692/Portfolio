@@ -4453,3 +4453,18 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
 @media (prefers-reduced-motion: reduce) {
   .research-note { transition: none; }
 }
+
+#freelance {padding-inline:0;overflow:visible}
+#freelance > .section-wrap {padding-inline:clamp(18px,4vw,60px)}
+.monitor-scene{height:230svh}
+.monitor-sticky{height:100svh;position:sticky;top:0;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(64px,9vh,90px) max(5vw,calc((100vw - 1200px)/2)) 24px}
+.monitor-heading.section-heading{position:relative;margin:0;z-index:2;pointer-events:none;opacity:var(--copy-opacity,0)}
+.monitor-stage{position:absolute;inset:0;opacity:0}
+.monitor-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.monitor-explore.button{position:absolute;left:50%;top:var(--screen-y,44%);translate:-50% -50%;margin:0;background:var(--orange);color:#222;white-space:nowrap}
+.monitor-caption{z-index:2;display:flex;align-items:center;justify-content:space-between;color:var(--ink)}
+.monitor-caption strong{opacity:var(--copy-opacity,0)}.monitor-caption output{margin:0 10px}
+.monitor-caption button{border:1px solid currentColor;color:inherit;background:transparent;border-radius:50%;width:36px;height:36px}
+.monitor-caption button:hover,.monitor-caption button:focus-visible{background:var(--orange);color:#222}
+.monitor-scene [hidden]{display:none!important}
+.monitor-scene[data-reduced="true"]{height:100svh}

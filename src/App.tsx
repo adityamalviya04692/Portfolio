@@ -3,8 +3,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight,
   ArrowDown,
-  ArrowLeft,
-  ArrowRight,
   Download,
   Github,
   Linkedin,
@@ -33,7 +31,6 @@ import {
   MotionSystem,
   Reveal,
   Scramble,
-  Tilt,
   useMotionPreference,
 } from "./components/MotionSystem";
 const LOGO_ANGLES = Array.from({ length: 12 }, (_, index) => index * 30);
@@ -68,11 +65,28 @@ function Portfolio() {
   }, [activeResearchNote]);
   const [active, setActive] = useState("home"),
     [copied, setCopied] = useState(false),
-    [slide, setSlide] = useState(0),
     [caseOpen, setCaseOpen] = useState(false);
   const navigation = useRef<HTMLElement>(null);
   const dialog = useRef<HTMLDialogElement>(null),
     { reduced } = useMotionPreference();
+  useEffect(() => {
+    const scene = document.querySelector(".monitor-scene")!;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      const script = document.createElement("script");
+      script.src = asset("monitor/model.js");
+      const start = () => {
+        const controls = document.createElement("script");
+        controls.src = asset("monitor/turn.js");
+        document.body.append(controls);
+      };
+      script.onload = start;
+      document.body.append(script);
+    }, { rootMargin: "800px" });
+    observer.observe(scene);
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     const fragment = window.location.hash.slice(1);
     const target = document.getElementById(fragment === "profile" ? "about" : fragment);
@@ -369,73 +383,17 @@ function Portfolio() {
           </div>
         </section>
         <section id="freelance" className="projects freelance-section">
-          <div className="section-wrap">
-            <Reveal className="section-heading">
-              <div>
-                <Scramble className="label-sticker" text="INDEPENDENT WORK" />
-                <h2>
-                  <RippleWords text="Built end to end" suffix={<span className="orange">.</span>} />
-                </h2>
+          <div className="monitor-scene" data-reduced={reduced}>
+            <div className="monitor-sticky">
+              <div className="monitor-heading section-heading"><div><span className="label-sticker">INDEPENDENT WORK</span><h2>Built end to end<span className="orange">.</span></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
+              <div className="monitor-stage">
+                <img className="monitor-poster" loading="lazy" src={asset("monitor/turn/0.webp")} alt="Moriveda storefront monitor"/>
+                <button hidden className="monitor-explore button" onClick={() => setCaseOpen(true)}>Explore the build <ArrowUpRight size={18}/></button>
               </div>
-              <p>
-                One brand. Every layer.
-                <br />
-                From idea to a live storefront.
-              </p>
-            </Reveal>
-            <Reveal>
-              <article className="freelance-feature">
-                <Tilt className="moriveda-preview">
-                  <div className="live-browser-bar">
-                    <span>● ● ●</span>
-                    <span>moriveda.in</span>
-                    <a
-                      href={moriveda.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="Visit live Moriveda website"
-                    >
-                      <ArrowUpRight size={16} />
-                    </a>
-                  </div>
-                  <div className="live-image-stage">
-                    <AnimatePresence mode="wait" initial={false}>
-                      <motion.img
-                        key={slide}
-                        src={asset(`assets/moriveda-live-${slide + 1}.webp`)}
-                        alt={`Original Moriveda storefront hero artwork, slide ${slide + 1}`}
-                        initial={{ opacity: 0, scale: reduced ? 1 : 1.04 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.4 }}
-                      />
-                    </AnimatePresence>
-                    <button
-                      className="preview-open"
-                      onClick={() => setCaseOpen(true)}
-                    >
-                      Explore the build <ArrowUpRight size={20} />
-                    </button>
-                  </div>
-                  <div className="carousel-controls">
-                    <span>ORIGINAL ARTWORK FROM THE LIVE STOREFRONT</span>
-                    <div>
-                      <button
-                        aria-label="Previous Moriveda image"
-                        onClick={() => setSlide((slide + 2) % 3)}
-                      >
-                        <ArrowLeft size={16} />
-                      </button>
-                      <span>{slide + 1} / 3</span>
-                      <button
-                        aria-label="Next Moriveda image"
-                        onClick={() => setSlide((slide + 1) % 3)}
-                      >
-                        <ArrowRight size={16} />
-                      </button>
-                    </div>
-                  </div>
-                </Tilt>
+              <div className="monitor-caption"><strong>Moriveda.</strong><small id="hint">Scroll to reveal ↓</small><div id="slides" hidden><button aria-label="Previous screenshot">←</button><output>1 / 3</output><button aria-label="Next screenshot">→</button></div></div>
+            </div>
+          </div>
+          <div className="section-wrap"><Reveal><article className="freelance-feature">
                 <div className="freelance-copy">
                   <div>
                     <div className="project-meta">
