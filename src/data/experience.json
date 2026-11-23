@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Engine History Analysis",
+    "period": "Current project",
+    "account": "Rolls-Royce Digital · TCS",
+    "role": "Senior Data Engineer",
+    "summary": "Designed and operated an Azure lakehouse for engine data, from streaming ingestion to tables ready for reporting.",
+    "contributions": [
+      "Built batch and streaming pipelines on Azure Databricks and ADF.",
+      "Cut a critical PySpark job from 52 to 14 minutes and helped lower Azure costs by about 40%.",
+      "Led a four-person offshore team as Scrum Master.",
+      "Architected and owned ETL pipelines in Databricks Jobs & Pipelines (PySpark, Spark SQL) that process files through a Bronze/Silver/Gold Medallion Lakehouse on Delta Lake and ADLS Gen2, plus 7 production Azure Data Factory (ADF) pipelines for ingestion and ETL/ELT flows, modeling 50–60 Star Schema tables for Power BI.",
+      "Engineered streaming ingestion of 30–40 GB/day with Azure Event Hubs, Apache Kafka and Spark Structured Streaming, plus 5–7 GB/day of incremental batch loads using Auto Loader and SCD Type 2 Delta MERGE upserts, orchestrated through Databricks Jobs with daily Gold-layer refreshes.",
+      "Reduced a critical PySpark job's runtime by 73% (52 min to 14 min) and eliminated recurring executor out-of-memory failures by first applying selective key salting to a skewed join, then enabling and configuring Adaptive Query Execution (AQE) skew-join handling.",
+      "Lowered Azure platform costs by ~40% through right-sized Databricks job clusters, shorter job runtimes, Delta Lake OPTIMIZE and Z-ORDER with table partitioning, and parameterized, reusable ADF pipelines.",
+      "Built Python data quality checks (deduplication, null handling) into the Bronze and Silver layers, governed tables through Unity Catalog (RBAC, data lineage), and secured credentials with Azure Key Vault-backed secret scopes and service principals.",
+      "Deliver ~4 user stories and 2 bug fixes per sprint on feature branches merged into develop and main; prepare Azure DevOps YAML files and run CI/CD deployments of each branch to Dev for integration testing ahead of DevOps-owned promotion to Stage (limited-user UAT) and Production.",
+      "Lead a 4-member offshore team as Scrum Master across 27 two-week sprints and 3 production releases: daily stand-ups with UK client stakeholders, sprint planning on Azure DevOps Boards, mentoring 4 junior engineers and reviewing pull requests.",
+      "Use AI-assisted development (GitHub Copilot, Claude and ChatGPT in VS Code) to automate repetitive coding and test writing and raise code quality across the team."
+    ],
+    "logo": "experience-rolls-royce.svg",
+    "logoAlt": "Rolls-Royce",
+    "image": "experience-engine-history.jpg",
+    "imageAlt": "Illustrative Engine History Analysis run-history dashboard shown in a laptop frame"
+  },
+  {
+    "title": "Assumptions Management",
+    "period": "Earlier Rolls-Royce project",
+    "account": "Rolls-Royce Digital · TCS",
+    "role": "Backend Development and Data Engineer",
+    "summary": "Built FastAPI data services and improved end-to-end processing with Redis caching and T-SQL tuning.",
+    "contributions": [
+      "Built containerized FastAPI services with role-based access.",
+      "Cut processing time from 5–7 to 3–4 minutes with Redis and T-SQL tuning.",
+      "Maintained Pytest coverage and cleared SonarQube quality gates.",
+      "Developed containerized (Docker) FastAPI data services with RBAC and Azure API Management over Microsoft SQL Server and Azure Blob Storage; cut the web app's end-to-end processing time (including pipeline runs) from 5–7 min to 3–4 min via Redis caching and T-SQL query optimization.",
+      "Maintained 95–100% Pytest coverage on every branch and cleared all SonarQube quality-gate findings (reliability, security, maintainability, coverage, cognitive complexity) before merges to develop and main.",
+      "Early on, shadowed client technical walkthroughs and leadership reviews to learn the Rolls-Royce domain."
+    ],
+    "logo": "experience-rolls-royce.svg",
+    "logoAlt": "Rolls-Royce",
+    "image": "experience-assumptions.jpg",
+    "imageAlt": "Cropped laptop view of the Assumptions Management Weibull upload concept"
+  },
+  {
+    "title": "Smartrac R&D Data and AI Platform",
+    "period": "Dec 2021 – Jan 2022",
+    "account": "Avery Dennison · TCS",
+    "role": "Backend Engineer",
+    "summary": "Prepared RFID research data with Databricks on Google Cloud.",
+    "contributions": [
+      "Prepared 10–15 GB of RFID research data for model training.",
+      "Worked on a document Q&A workflow using Vertex AI, Cloud Functions, and vector search."
+    ],
+    "logo": "avery-dennison-logo.png",
+    "logoAlt": "Avery Dennison",
+    "image": "experience-smartrac.jpg",
+    "imageAlt": "Avery Dennison Smartrac chatbot concept with web search, HR chat, RAG file access and document search"
+  },
+  {
+    "title": "GradeUp",
+    "period": "Jul – Nov 2021",
+    "account": "BYJU’S · Internship",
+    "role": "Backend Developer",
+    "summary": "Built backend features for GradeUp’s exam-preparation platform using Python and Django.",
+    "contributions": [
+      "Developed Python and Django backend features for GradeUp’s exam-preparation platform."
+    ],
+    "logo": "experience-gradeup.png",
+    "logoAlt": "GradeUp",
+    "image": "experience-gradeup.jpg",
+    "imageAlt": "Archived GradeUp exam-preparation homepage from August 2021 displayed in a laptop frame"
+  }
+]

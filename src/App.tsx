@@ -19,7 +19,7 @@ import {
 import data from "./data/portfolio.json";
 import PortfolioCursor from "./components/PortfolioCursor";
 import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRipples";
-import ProjectArt from "./components/ProjectArt";
+import ExperienceTimeline from "./components/ExperienceTimeline";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
 import AboutEditorial from "./components/AboutEditorial";
@@ -275,130 +275,7 @@ function Portfolio() {
             </div>
           </div>
         </section>
-        <section id="experience" className="experience blue-section">
-          <div className="section-wrap">
-            <Reveal>
-              <span className="label-sticker light">
-                <Scramble text="PROFESSIONAL EXPERIENCE" />
-              </span>
-              <h2>
-                <RippleWords text="Built in production" suffix={<span className="orange">.</span>} />
-              </h2>
-              <div className="employer-heading">
-                <img className="employer-logo" src={asset("assets/tcs-logo.jpg")} alt="Tata Consultancy Services logo" />
-                <div>
-                  <span className="employer-label">EMPLOYER</span>
-                  <h3>Tata Consultancy Services</h3>
-                  <p>
-                    Senior Data Engineer & Scrum Master (Mar 2026–present) · Data Engineer (Dec 2021–Mar 2026)
-                  </p>
-                </div>
-                <span>
-                  DEC 2021 — PRESENT
-                  <br />
-                  Mumbai, India
-                </span>
-              </div>
-              <p className="experience-intro">Rolls-Royce Digital account · Feb 2022 – present</p>
-            </Reveal>
-            <div className="professional-grid">
-              {data.experience[0].projects.map((p, i) => (
-                <Reveal key={p.name} delay={i * 0.12}>
-                  <article className="professional-card">
-                    <div className="experience-account">
-                      <div className="account-logo rolls-royce-logo"><img src={asset("assets/rolls-royce-plc.svg")} alt="Rolls-Royce plc logo" /></div>
-                      <div><strong>Rolls-Royce Digital</strong><span>TCS client account · Feb 2022 – present</span></div>
-                    </div>
-                    <div className="assignment-meta">
-                      <span>0{i + 1} / TCS · ROLLS-ROYCE DIGITAL</span>
-                      <span>{p.period}</span>
-                    </div>
-                    <h3>{p.name}</h3>
-                    <p>
-                      {i === 0
-                        ? "End-to-end Azure lakehouse engineering, governance, and Spark performance optimization."
-                        : "Production FastAPI data services, access control, and reliable cloud deployments."}
-                    </p>
-                    <ProjectArt type={i === 0 ? "pipeline" : "backend"} />
-                    <div className="assignment-impact">
-                      {i === 0 ? (
-                        <>
-                          <strong>52 → 14 min</strong>
-                          <span>
-                            ~73% shorter Spark runtime · ~40% lower Azure costs
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <strong>5–7 → 3–4 min</strong>
-                          <span>
-                            End-to-end processing time via Redis caching & T-SQL tuning
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    <Accordion title={`View ${p.name} contributions`}>
-                      <ul>
-                        {p.highlights.map((h) => (
-                          <li key={h}>{h}</li>
-                        ))}
-                      </ul>
-                    </Accordion>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-            <Reveal className="earlier-experience-heading">
-              <span className="label-sticker light">EARLIER EXPERIENCE</span>
-              <h3>Earlier experience, in full.</h3>
-              <p>Avery Dennison client work at TCS and a separate earlier BYJU’S internship.</p>
-            </Reveal>
-            <div className="professional-grid earlier-experience-grid">
-              <Reveal>
-                <article className="professional-card">
-                  <div className="experience-account">
-                    <div className="account-logo"><img src={asset("assets/avery-dennison-logo.png")} alt="Avery Dennison logo" /></div>
-                    <div><strong>Avery Dennison</strong><span>TCS client account · Smartrac RFID division</span></div>
-                  </div>
-                  <div className="assignment-meta">
-                    <span>DATA ENGINEER &amp; BACKEND DEVELOPER</span>
-                    <span>DEC 2021 — JAN 2022</span>
-                  </div>
-                  <h3>Smartrac R&amp;D Data and AI Platform</h3>
-                  <p>Prepared RFID research data for an AI-powered tool using Databricks on Google Cloud Platform.</p>
-                  <ProjectArt type="smartrac" />
-                  <div className="assignment-impact">
-                    <strong>GCP + Databricks</strong>
-                    <span>Data pipelines, backend services and semantic search</span>
-                  </div>
-                  <ul className="experience-highlights">
-                    <li>Ingested, cleansed and prepared a 10–15 GB batch RFID R&amp;D dataset on Databricks for ML model training.</li>
-                    <li>Built a production RAG document Q&amp;A tool on Vertex AI, Cloud Functions, Vertex AI Vector Search and ChromaDB that lets researchers upload and query up to 4 documents at once.</li>
-                  </ul>
-                </article>
-              </Reveal>
-              <Reveal delay={0.12}>
-                <article className="professional-card">
-                  <div className="experience-account">
-                    <div className="account-logo"><img src={asset("assets/byjus-logo.png")} alt="BYJU’S logo" /></div>
-                    <div><strong>BYJU’S</strong><span>Separate internship · GradeUp · Remote from Hyderabad</span></div>
-                  </div>
-                  <div className="assignment-meta">
-                    <span>PYTHON DEVELOPER INTERN</span>
-                    <span>JUL — NOV 2021</span>
-                  </div>
-                  <h3>Python development for GradeUp</h3>
-                  <p>Developed Python and Django backend features for GradeUp’s exam-preparation web platform.</p>
-                  <ProjectArt type="byjus" />
-                  <div className="assignment-impact">
-                    <strong>Python development</strong>
-                    <span>BYJU’S · GradeUp · internship</span>
-                  </div>
-                </article>
-              </Reveal>
-            </div>
-          </div>
-        </section>
+        <ExperienceTimeline />
         <section id="projects" className="projects showcase-section" aria-labelledby="projects-heading">
           <div className="section-wrap">
             <Reveal className="section-heading">
