@@ -356,7 +356,7 @@ function Portfolio() {
               <Accordion title="Skills & capabilities" sheet>
                 <SkillsPanel />
               </Accordion>
-              <Accordion title="Education & certifications">
+              <Accordion title="Education & certifications" sheet>
                 <div className="detail-content">
                   {data.certifications.map((c) => (
                     <p key={c.code}>

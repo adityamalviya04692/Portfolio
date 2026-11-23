@@ -415,14 +415,18 @@ export function Accordion({
         {open && (
           <motion.div
             id={id}
-            initial={{ height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
-            transition={reduced
-              ? { duration: 0 }
-              : sheet
-                ? { type: "spring", stiffness: 130, damping: 19, mass: 0.95, restDelta: 0.8 }
-                : { duration: 0.35, ease: [0.23, 1, 0.32, 1] }}
+            initial={sheet && !reduced
+              ? { height: 0, "--sheet-pull": "16px" }
+              : { height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
+            animate={sheet && !reduced
+              ? { height: "auto", "--sheet-pull": "0px",
+                  transition: { duration: 0.85, ease: [0.16, 0.7, 0.29, 1] } }
+              : { height: "auto", opacity: 1 }}
+            exit={sheet && !reduced
+              ? { height: 0, "--sheet-pull": "16px",
+                  transition: { duration: 0.7, ease: [0.62, 0, 0.87, 0.36] } }
+              : { height: reduced ? "auto" : 0, opacity: sheet ? 1 : 0 }}
+            transition={{ duration: reduced ? 0 : 0.35, ease: [0.23, 1, 0.32, 1] }}
             className={sheet ? "accordion-panel accordion-sheet" : "accordion-panel"}
           >
             {sheet ? (
