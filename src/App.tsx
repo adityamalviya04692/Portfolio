@@ -388,7 +388,6 @@ function Portfolio() {
               <div className="monitor-heading section-heading"><div><span className="label-sticker">INDEPENDENT WORK</span><h2>Built end to end<span className="orange">.</span></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
               <div className="monitor-stage">
                 <img className="monitor-poster" loading="lazy" src={asset("monitor/turn/0.webp")} alt="Moriveda storefront monitor"/>
-                <button hidden className="monitor-explore button" onClick={() => setCaseOpen(true)}>Explore the build <ArrowUpRight size={18}/></button>
               </div>
               <div className="monitor-caption"><small id="hint">Scroll to reveal ↓</small><div id="slides" hidden><button aria-label="Previous screenshot">←</button><output>1 / 3</output><button aria-label="Next screenshot">→</button></div></div>
             </div>

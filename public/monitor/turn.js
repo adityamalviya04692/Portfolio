@@ -1,7 +1,6 @@
 const scene = document.querySelector('.monitor-scene');
 const stage = document.querySelector('.monitor-stage');
 const monitor = document.querySelector('.monitor-poster');
-const explore = document.querySelector('.monitor-explore');
 const controls = document.querySelector('#slides');
 const hint = document.querySelector('#hint');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -76,7 +75,7 @@ function paint(now) {
       lastPose = pose;
     }
     monitor.style.opacity = '0';
-    explore.hidden = controls.hidden = index !== 100;
+    controls.hidden = index !== 100;
     hint.hidden = index === 100;
     if (target !== position) requestPaint();
     return;
@@ -86,7 +85,7 @@ function paint(now) {
   if (image.complete && image.naturalWidth) {
     if (monitor.src !== image.src) monitor.src = image.src;
     const ready = index === 100;
-    explore.hidden = controls.hidden = !ready;
+    controls.hidden = !ready;
     hint.hidden = ready;
     monitor.alt = ready ? 'Moriveda storefront on the monitor' : index < 50 ? 'Silver monitor viewed from the rear' : 'Monitor turning toward the viewer';
   }
