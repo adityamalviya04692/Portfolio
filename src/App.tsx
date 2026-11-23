@@ -22,6 +22,7 @@ import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRip
 import ProjectArt from "./components/ProjectArt";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
+import AboutEditorial from "./components/AboutEditorial";
 import SkillsPanel from "./components/SkillsPanel";
 import ProjectGallery from "./components/ProjectGallery";
 import {
@@ -43,8 +44,6 @@ const skillProjects = data.projects.filter((project) => project.id !== "moriveda
 
 function Portfolio() {
   const [activeVideo, setActiveVideo] = useState({ id: "", request: 0, explore: false });
-  const [waveBlocked, setWaveBlocked] = useState(false);
-  const portraitWave = useRef<HTMLVideoElement>(null);
   const videoTrigger = useRef<HTMLElement | null>(null);
   const playProject = (id: string, trigger?: HTMLElement) => {
     if (trigger) videoTrigger.current = trigger;
@@ -66,27 +65,6 @@ function Portfolio() {
   const navigation = useRef<HTMLElement>(null);
   const dialog = useRef<HTMLDialogElement>(null),
     { reduced } = useMotionPreference();
-  useEffect(() => {
-    const video = portraitWave.current;
-    if (!video || reduced) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      const inView = entry.isIntersecting && entry.intersectionRatio >= 0.4;
-      if (!inView) {
-        video.pause();
-        if (video.currentTime > 0) video.currentTime = 0;
-      } else if (!activeVideo.id && !video.ended) {
-        void video.play().catch((reason: DOMException) => {
-          if (reason.name === "NotAllowedError") setWaveBlocked(true);
-        });
-      }
-    }, { threshold: 0.4 });
-    observer.observe(video);
-    return () => {
-      observer.disconnect();
-      video.pause();
-    };
-  }, [reduced, activeVideo.id]);
   useEffect(() => {
     const target = document.getElementById(window.location.hash.slice(1));
     const frame = requestAnimationFrame(() =>
@@ -260,88 +238,8 @@ function Portfolio() {
         </HeroFrame>
         <AvatarPortal />
         <section id="profile" className="about blue-section">
+          <AboutEditorial onIntro={(trigger) => playProject("intro", trigger)} />
           <div className="section-wrap">
-            <div className="about-top">
-              <Reveal>
-                <Tilt>
-                  <div className="portrait-card">
-                    <div className="portrait-caption">
-                      <RippleWords text="THE HUMAN BEHIND THE CODE ↘" />
-                    </div>
-                    <button
-                      className="portrait-play"
-                      onClick={(event) => playProject("intro", event.currentTarget)}
-                      aria-label="Play Aditya's 70-second video intro"
-                      aria-haspopup="dialog"
-                    >
-                      <img
-                        src={asset(profile.avatar)}
-                        alt="Aditya Malviya"
-                        loading="lazy"
-                      />
-                      {!reduced && (
-                        <video
-                          ref={portraitWave}
-                          className="portrait-wave"
-                          src={asset("assets/videos/profile-wave.mp4")}
-                          poster={asset(profile.avatar)}
-                          muted
-                          playsInline
-                          preload="none"
-                          aria-hidden="true"
-                          onPlaying={() => setWaveBlocked(false)}
-                        />
-                      )}
-                      <span className="portrait-play-badge">
-                        <span className="portrait-play-icon">
-                          <Play size={16} fill="currentColor" />
-                        </span>
-                        Watch my intro <small>1:10</small>
-                      </span>
-                    </button>
-                    {waveBlocked && !reduced && (
-                      <button
-                        className="portrait-wave-retry"
-                        onClick={() => {
-                          void portraitWave.current?.play().catch(() => {});
-                        }}
-                      >
-                        Play welcome wave
-                      </button>
-                    )}
-                    <div className="photo-bottom">
-                      <strong><RippleWord>Aditya.</RippleWord></strong>
-                      <span>
-                        Mumbai, India <MapPin size={14} />
-                      </span>
-                    </div>
-                  </div>
-                </Tilt>
-              </Reveal>
-              <Reveal className="about-copy" delay={0.1}>
-                <span className="label-sticker light">
-                  <Scramble text="A LITTLE ABOUT ME" />
-                </span>
-                <h2>
-                  <RippleWords text="Big on data." />
-                  <br />
-                  <RippleWords text="Bigger on" />{" "}<RippleWord className="heading-accent">impact.</RippleWord>
-                </h2>
-                <p>{profile.bio}</p>
-                <p className="secondary-copy">{profile.bioSecondary}</p>
-                <a
-                  className="button cream-button"
-                  href={asset(profile.resume)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Download resume <Download size={17} />
-                </a>
-                <a className="resume-docx-link" href={asset(profile.resumeDocx)} download>
-                  Download DOCX for applications
-                </a>
-              </Reveal>
-            </div>
             <div className="stats">
               {data.stats.map((stat, i) => (
                 <Reveal key={stat.label} delay={i * 0.08}>
