@@ -16,7 +16,7 @@ export function attachProjectCardMotion(grid: HTMLDivElement) {
 
   function animate(time: number) {
     const dt = Math.max(0, Math.min((time - lastTime) / 1000, 1 / 30));
-    const decay = Math.exp(-9 * dt);
+    const decay = Math.exp(-7.5 * dt);
     lastTime = time;
     let moving = false;
 
