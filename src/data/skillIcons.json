@@ -18,7 +18,7 @@
   "Apache Kafka": "apache-kafka.svg",
   "Azure Event Hubs": "azure-event-hubs.svg",
   "Delta Lake": "delta-lake.svg",
-  "Unity Catalog": "unity-catalog.png",
+  "Unity Catalog": "unity-catalog.svg",
   "Databricks Jobs & Pipelines": "databricks-jobs-pipelines.svg",
   "Auto Loader": "databricks-jobs-pipelines.svg",
   "Azure Key Vault": "azure-key-vault.svg",

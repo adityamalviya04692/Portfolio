@@ -22,7 +22,7 @@ import "./components/Footer.css";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
 import AboutEditorial from "./components/AboutEditorial";
-import SkillsPanel from "./components/SkillsPanel";
+import SkillsShowcase from "./components/SkillsShowcase";
 import ProjectGallery from "./components/ProjectGallery";
 import {
   Accordion,
@@ -159,7 +159,7 @@ function Portfolio() {
       <PortfolioCursor />
       <HeadingRipples />
       <header
-        className={`site-header ${["about", "experience", "contact"].includes(active) ? "on-blue" : ""}`}
+        className={`site-header ${["about", "education", "experience", "contact"].includes(active) ? "on-blue" : ""}`}
       >
         <a className="monogram" href="#home" aria-label="Aditya Malviya home">
           <RippleWord>a<span className="monogram-accent">m.</span></RippleWord>
@@ -190,6 +190,10 @@ function Portfolio() {
       <main>
         <HeroFrame>
           <section className="hero" id="home">
+            <div className="zero-flow-aura" aria-hidden="true">
+              <span className="zero-orb zero-orb-a" />
+              <span className="zero-orb zero-orb-b" />
+            </div>
             <div className="hero-copy">
               <Reveal>
                 <div className="eyebrow">
@@ -272,10 +276,12 @@ function Portfolio() {
                 </Reveal>
               ))}
             </div>
-            <div id="skills" className="about-details">
-              <Accordion title="Skills & capabilities" sheet>
-                <SkillsPanel />
-              </Accordion>
+          </div>
+        </section>
+        <SkillsShowcase />
+        <section id="education" className="education-band blue-section" aria-label="Education and certifications">
+          <div className="section-wrap">
+            <div className="about-details">
               <Accordion title="Education & certifications" sheet>
                 <div className="detail-content">
                   {data.certifications.map((c) => (
