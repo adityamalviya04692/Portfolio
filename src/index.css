@@ -4457,10 +4457,11 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
 #freelance {padding-inline:0;overflow:visible}
 #freelance > .section-wrap {padding-inline:clamp(18px,4vw,60px)}
 #freelance .freelance-copy {padding-top:0}
-#freelance > .section-wrap {margin-top:-12px}
+#freelance > .section-wrap {margin-top:-28px}
 .monitor-scene{height:230svh}
 .monitor-sticky{height:100svh;position:sticky;top:0;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(64px,9vh,90px) max(5vw,calc((100vw - 1200px)/2)) 8px}
 .monitor-heading.section-heading{position:relative;margin:0;z-index:2;pointer-events:none;opacity:var(--copy-opacity,0)}
+.monitor-heading [data-ripple], .monitor-heading .label-sticker{pointer-events:auto}
 .monitor-stage{position:absolute;inset:0;opacity:0}
 .monitor-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .monitor-caption{z-index:2;display:flex;align-items:center;justify-content:flex-end;color:var(--ink)}

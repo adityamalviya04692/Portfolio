@@ -385,7 +385,7 @@ function Portfolio() {
         <section id="freelance" className="projects freelance-section">
           <div className="monitor-scene" data-reduced={reduced}>
             <div className="monitor-sticky">
-              <div className="monitor-heading section-heading"><div><span className="label-sticker">INDEPENDENT WORK</span><h2>Built end to end<span className="orange">.</span></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
+              <div className="monitor-heading section-heading"><div><Scramble className="label-sticker" text="INDEPENDENT WORK" /><h2><RippleWords text="Built end to end" suffix={<span className="orange">.</span>} /></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
               <div className="monitor-stage">
                 <img className="monitor-poster" loading="lazy" src={asset("monitor/turn/0.webp")} alt="Moriveda storefront monitor"/>
               </div>
