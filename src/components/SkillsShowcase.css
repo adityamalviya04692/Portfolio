@@ -301,6 +301,49 @@ html[data-theme="dark"] .skills-orbit-layer {
   transform: translateY(-1px);
 }
 
+/* Selected Category Skills Grid below "I use ... to turn raw data into answers." — fits cleanly with zero scrollbar */
+.skills-selected-panel {
+  margin-top: 16px;
+  max-width: min(540px, 45vw);
+  overflow: hidden;
+}
+
+.skills-selected-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 7px;
+}
+
+.skills-selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(244, 240, 230, 0.18);
+  background: rgba(244, 240, 230, 0.08);
+  color: #f4f0e6;
+  font-family: "DM Sans", sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.skills-selected-chip:hover {
+  border-color: rgba(237, 136, 56, 0.65);
+  background: rgba(237, 136, 56, 0.14);
+  transform: translateY(-1px);
+}
+
+.skills-selected-chip img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 /* Right-Side Animated Browse-by-Category Dropdown WITH Expandable Skill List */
 .skills-cat-wrap {
   position: relative;
@@ -428,47 +471,15 @@ html[data-theme="dark"] .skills-cat-option:hover {
   background: rgba(128, 128, 128, 0.16);
 }
 
-.skills-cat-list-panel {
-  overflow: hidden;
-}
 
-.skills-cat-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: 8px 6px 10px;
-}
 
-.skills-cat-tags span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(16, 43, 121, 0.22);
-  background: rgba(16, 43, 121, 0.05);
-  font-size: 10.5px;
-  font-weight: 500;
-}
-
-html[data-theme="dark"] .skills-cat-tags span {
-  border-color: #2a3150;
-  background: #1e2439;
-}
-
-.skills-cat-tags img {
-  width: 14px;
-  height: 14px;
-  object-fit: contain;
-}
-
-/* SHARED STAGE FOR 2-ARC ORBIT (BIG ICONS + SMALL LABELS) & VERTICAL HANGING STRING */
+/* SHARED STAGE FOR 3-ARC ORBIT */
 .skills-stream-wrap {
   position: relative;
   width: 100%;
   flex: 1 1 auto;
-  min-height: 290px;
-  margin-top: -6px;
+  min-height: 310px;
+  margin-top: 8px;
   overflow: hidden;
 }
 
@@ -478,13 +489,6 @@ html[data-theme="dark"] .skills-cat-tags span {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
   will-change: transform, opacity;
-  transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.skills-arc-stage.is-dimmed {
-  opacity: 0 !important;
-  transform: translate3d(0, -34px, 0) scale(0.95) !important;
-  pointer-events: none;
 }
 
 /* FRAMELESS ZERO-STYLE MONOCHROME -> FULL-COLOR HOVER LOGOS */
@@ -630,6 +634,9 @@ html[data-theme="dark"] .skills-cat-tags span {
   }
   .skills-orbit-head {
     max-width: 100%;
+  }
+  .skills-selected-panel {
+    max-width: 72vw;
   }
   .skills-vstring-bead {
     left: 78%;

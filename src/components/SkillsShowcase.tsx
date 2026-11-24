@@ -341,8 +341,8 @@ const SKILL_ROTATION = [
 const ARC_ROWS = [
   {
     baseSpeed: 0.000017,
-    yOffset: 10,
-    curve: 78,
+    yOffset: 30,
+    curve: 84,
     items: [
       { label: "Databricks", icon: "azure-databricks.svg" },
       { label: "PySpark", icon: "apache-spark.svg" },
@@ -360,8 +360,8 @@ const ARC_ROWS = [
   },
   {
     baseSpeed: -0.000015,
-    yOffset: 82,
-    curve: 86,
+    yOffset: 108,
+    curve: 84,
     items: [
       { label: "Python", icon: "python.svg" },
       { label: "SQL", icon: "sql-t-sql.svg" },
@@ -379,8 +379,8 @@ const ARC_ROWS = [
   },
   {
     baseSpeed: 0.000014,
-    yOffset: 154,
-    curve: 94,
+    yOffset: 186,
+    curve: 84,
     items: [
       { label: "GCP", icon: "google-cloud-platform-gcp.svg" },
       { label: "Gemini", icon: "google-gemini.svg" },
@@ -455,27 +455,36 @@ function VerticalBeadString({
     return () => cancelAnimationFrame(rafId);
   }, [items, reduced]);
 
-  // Directional pull physics:
-  // Selecting category BELOW (dir > 0) -> old vertical string pulled DOWN (+260px), new drops from TOP (-260px)
-  // Selecting category ABOVE (dir < 0) -> old vertical string pulled UP (-260px), new rises from BELOW (+260px)
   const enterY = direction >= 0 ? -260 : 260;
-  const exitY = direction >= 0 ? 280 : -280;
+  const vstringVariants = {
+    enter: (dir: number) => ({
+      opacity: 0,
+      y: dir >= 0 ? -280 : 280,
+      scale: 0.96,
+    }),
+    center: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { type: "spring" as const, stiffness: 180, damping: 19, mass: 0.95 },
+    },
+    exit: (dir: number) => ({
+      opacity: 0,
+      y: dir >= 0 ? 280 : -320,
+      scale: 0.94,
+      transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
+    }),
+  };
 
   return (
     <motion.div
       ref={stageRef}
       className="skills-vstring-stage"
-      initial={reduced ? false : { opacity: 0, y: enterY }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        transition: { type: "spring", stiffness: 180, damping: 19, mass: 0.95 },
-      }}
-      exit={{
-        opacity: 0,
-        y: exitY,
-        transition: { duration: 0.34, ease: [0.32, 0, 0.67, 0] },
-      }}
+      custom={direction}
+      variants={vstringVariants}
+      initial={reduced ? false : "enter"}
+      animate="center"
+      exit="exit"
     >
       {items.map((name, i) => {
         const iconFile = iconMap[name];
@@ -1187,19 +1196,25 @@ export default function SkillsShowcase() {
   // null = 2-arc Orbit; 0..3 = Selected category vertical hanging string + expanded list in right dropdown!
   const [selectedCatIdx, setSelectedCatIdx] = useState<number | null>(null);
   const [stringDir, setStringDir] = useState<number>(1);
+  const catActiveRef = useRef(false);
+  const orbitResumeAtRef = useRef(0);
 
   const handleSelectCategory = (idx: number | null) => {
     if (idx === selectedCatIdx) {
-      // Clicking the already-selected category keeps dropdown open (or toggles back to orbit if null)
       return;
     }
-    if (idx !== null && selectedCatIdx !== null) {
+    if (idx === null) {
+      setStringDir(-1);
+      catActiveRef.current = false;
+      orbitResumeAtRef.current = performance.now() + 140;
+    } else if (selectedCatIdx !== null) {
       setStringDir(idx > selectedCatIdx ? 1 : -1);
+      catActiveRef.current = true;
     } else {
       setStringDir(1);
+      catActiveRef.current = true;
     }
     setSelectedCatIdx(idx);
-    // Keep dropdown open so the user sees the animated skill list on the right side!
   };
 
   useEffect(() => {
@@ -1615,6 +1630,7 @@ export default function SkillsShowcase() {
     let smoothMX = 0;
     let smoothMY = 0;
     let lastFrame = performance.now();
+    let orbitReveal = catActiveRef.current ? 0 : 1;
     const rowPhase = [0, 0, 0];
     const clamp = (v: number, min = 0, max = 1) => Math.min(max, Math.max(min, v));
 
@@ -1711,8 +1727,13 @@ export default function SkillsShowcase() {
       }
 
       const arcIn = clamp((smoothP - 0.54) / 0.16);
-      arcStage.style.opacity = String(arcIn);
-      arcStage.style.transform = `translate3d(0, ${((1 - arcIn) * 34).toFixed(1)}px, 0)`;
+      const nowActive = catActiveRef.current;
+      const targetOrbit = nowActive ? 0 : now >= orbitResumeAtRef.current ? 1 : 0;
+      orbitReveal += (targetOrbit - orbitReveal) * (nowActive ? 0.16 : 0.1);
+      const arcVis = arcIn * orbitReveal;
+      arcStage.style.opacity = arcVis.toFixed(4);
+      arcStage.style.transform = `translate3d(0, ${((1 - arcVis) * 32).toFixed(1)}px, 0) scale(${(0.96 + 0.04 * arcVis).toFixed(4)})`;
+      arcStage.style.pointerEvents = arcVis > 0.5 ? "auto" : "none";
 
       const W = arcStage.clientWidth || window.innerWidth;
       // Generous span for big 66px icons so every badge has crisp breathing room
@@ -1778,7 +1799,7 @@ export default function SkillsShowcase() {
         <div className="skills-orbit-layer">
           {/* VERTICAL INVISIBLE STRING TIED TO TOP-CENTER OF DESKTOP */}
           <div className="skills-vstring-overlay" aria-label="Selected category vertical skill string">
-            <AnimatePresence mode="popLayout" custom={stringDir}>
+            <AnimatePresence custom={stringDir}>
               {selectedCategory && (
                 <VerticalBeadString
                   key={selectedCategory.name}
@@ -1825,6 +1846,41 @@ export default function SkillsShowcase() {
                   </button>
                 )}
               </div>
+
+              <AnimatePresence>
+                {selectedCategory && (
+                  <motion.div
+                    key={selectedCategory.name}
+                    className="skills-selected-panel"
+                    aria-label={`${selectedCategory.name} skills`}
+                    initial={reduced ? false : { opacity: 0, height: 0, marginTop: 0 }}
+                    animate={{ opacity: 1, height: "auto", marginTop: 16 }}
+                    exit={reduced ? undefined : { opacity: 0, height: 0, marginTop: 0 }}
+                    transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <div className="skills-selected-grid">
+                      {selectedCategory.items.map((item, i) => (
+                        <motion.span
+                          key={item}
+                          className="skills-selected-chip"
+                          initial={reduced ? false : { opacity: 0, y: 8, scale: 0.94 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{
+                            duration: 0.24,
+                            delay: Math.min(i, 16) * 0.018,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                        >
+                          {iconMap[item] && (
+                            <img src={assetUrl(`assets/skills/${iconMap[item]}`)} alt="" loading="lazy" />
+                          )}
+                          {item}
+                        </motion.span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Right-side Animated Dropdown displaying expandable category list */}
@@ -1878,35 +1934,11 @@ export default function SkillsShowcase() {
                           <button
                             type="button"
                             className={`skills-cat-option ${isSelected ? "is-active" : ""}`}
-                            aria-expanded={isSelected}
                             onClick={() => handleSelectCategory(idx)}
                           >
                             <span>{name}</span>
                             <span className="skills-cat-option-count">{items.length}</span>
                           </button>
-
-                          <AnimatePresence initial={false}>
-                            {isSelected && (
-                              <motion.div
-                                className="skills-cat-list-panel"
-                                initial={reduced ? false : { height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                              >
-                                <div className="skills-cat-tags">
-                                  {items.map((item) => (
-                                    <span key={item}>
-                                      {iconMap[item] && (
-                                        <img src={assetUrl(`assets/skills/${iconMap[item]}`)} alt="" loading="lazy" />
-                                      )}
-                                      {item}
-                                    </span>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
                         </div>
                       );
                     })}
@@ -1916,10 +1948,10 @@ export default function SkillsShowcase() {
             </div>
           </div>
 
-          {/* 2-ARC ORBIT STAGE (BIG 66PX ICONS + SMALL 10PX LABELS) */}
+          {/* 3-ARC ORBIT STAGE */}
           <div className="skills-stream-wrap" aria-label="Skills and capabilities orbital stream">
             <div
-              className={`skills-arc-stage ${selectedCategory ? "is-dimmed" : ""}`}
+              className="skills-arc-stage"
               ref={arcStageRef}
               aria-hidden={Boolean(selectedCategory)}
             />
