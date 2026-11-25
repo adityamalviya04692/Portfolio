@@ -17,11 +17,13 @@ import {
 import data from "./data/portfolio.json";
 import PortfolioCursor from "./components/PortfolioCursor";
 import HeadingRipples, { RippleWord, RippleWords } from "./components/HeadingRipples";
+import DeltaNavbar from "./components/DeltaNavbar";
 import ExperienceTimeline from "./components/ExperienceTimeline";
 import "./components/Footer.css";
 import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
 import AboutEditorial from "./components/AboutEditorial";
+import SkillsPanel from "./components/SkillsPanel";
 import SkillsShowcase from "./components/SkillsShowcase";
 import ProjectGallery from "./components/ProjectGallery";
 import {
@@ -66,9 +68,8 @@ function Portfolio() {
   const [active, setActive] = useState("home"),
     [copied, setCopied] = useState(false),
     [caseOpen, setCaseOpen] = useState(false);
-  const navigation = useRef<HTMLElement>(null);
   const dialog = useRef<HTMLDialogElement>(null),
-    { reduced } = useMotionPreference();
+    { reduced, introPhase } = useMotionPreference();
   useEffect(() => {
     const scene = document.querySelector(".monitor-scene")!;
     const observer = new IntersectionObserver(([entry]) => {
@@ -119,19 +120,7 @@ function Portfolio() {
       cancelAnimationFrame(scheduled);
     };
   }, []);
-  useEffect(() => {
-    const nav = navigation.current;
-    if (!nav || nav.scrollWidth <= nav.clientWidth) return;
-    const link = nav.querySelector('[aria-current="location"]');
-    const navBox = nav.getBoundingClientRect();
-    const linkBox = link?.getBoundingClientRect();
-    nav.scrollTo({
-      left: linkBox
-        ? nav.scrollLeft + linkBox.left - navBox.left + (linkBox.width - nav.clientWidth) / 2
-        : 0,
-      behavior: reduced ? "instant" : "smooth",
-    });
-  }, [active, reduced]);
+
   useEffect(() => {
     if (caseOpen) {
       dialog.current?.showModal();
@@ -158,36 +147,25 @@ function Portfolio() {
       </a>
       <PortfolioCursor />
       <HeadingRipples />
-      <header
-        className={`site-header ${["about", "education", "experience", "contact"].includes(active) ? "on-blue" : ""}`}
+      <DeltaNavbar
+        active={active}
+        email={email}
+        onBlue={["about", "education", "experience", "contact"].includes(active)}
+      />
+      <motion.main
+        initial={reduced ? false : { opacity: 0.12, scale: 1.035, y: 20 }}
+        animate={
+          introPhase === "loading" && !reduced
+            ? { opacity: 0.12, scale: 1.035, y: 20 }
+            : { opacity: 1, scale: 1, y: 0 }
+        }
+        transition={
+          reduced
+            ? { duration: 0 }
+            : { type: "spring", stiffness: 96, damping: 21, mass: 0.95, delay: 0.08 }
+        }
+        style={{ transformOrigin: "50% 0%" }}
       >
-        <a className="monogram" href="#home" aria-label="Aditya Malviya home">
-          <RippleWord>a<span className="monogram-accent">m.</span></RippleWord>
-        </a>
-        <motion.nav ref={navigation} layoutScroll aria-label="Main navigation">
-          {["about", "experience", "projects", "research", "freelance", "contact"].map((id) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              aria-current={active === id ? "location" : undefined}
-              className={active === id ? "active" : ""}
-            >
-              {active === id && (
-                <motion.span
-                  className="nav-indicator"
-                  layoutId="nav-pill"
-                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                />
-              )}
-              <RippleWord>{id}</RippleWord>
-            </a>
-          ))}
-        </motion.nav>
-        <a className="contact-pill" href={email}>
-          <span><RippleWords text="Get in touch" /></span> <ArrowUpRight size={17} />
-        </a>
-      </header>
-      <main>
         <HeroFrame>
           <section className="hero" id="home">
             <div className="zero-flow-aura" aria-hidden="true">
@@ -278,10 +256,15 @@ function Portfolio() {
             </div>
           </div>
         </section>
-        <SkillsShowcase />
-        <section id="education" className="education-band blue-section" aria-label="Education and certifications">
+        {!reduced && <SkillsShowcase />}
+        <section id={reduced ? "skills" : "education"} className="education-band blue-section" aria-label={reduced ? "Skills, education and certifications" : "Education and certifications"}>
           <div className="section-wrap">
             <div className="about-details">
+              {reduced && (
+                <Accordion title="Skills & capabilities" sheet>
+                  <SkillsPanel />
+                </Accordion>
+              )}
               <Accordion title="Education & certifications" sheet>
                 <div className="detail-content">
                   {data.certifications.map((c) => (
@@ -394,8 +377,36 @@ function Portfolio() {
               <div className="monitor-heading section-heading"><div><Scramble className="label-sticker" text="INDEPENDENT WORK" /><h2><RippleWords text="Built end to end" suffix={<span className="orange">.</span>} /></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
               <div className="monitor-stage">
                 <img className="monitor-poster" loading="lazy" src={asset("monitor/turn/0.webp")} alt="Moriveda storefront monitor"/>
+                <div className="monitor-screen-overlay" id="screen-mouse-layer" role="button" tabIndex={0} aria-label="Interactive Moriveda storefront preview — click to switch pages">
+                  <div className="monitor-screen-sheen" aria-hidden="true" />
+                  <div className="monitor-click-ripple" aria-hidden="true" />
+                  <div className="monitor-cursor" data-shape="arrow" aria-hidden="true">
+                    {/* Authentic macOS black pointer arrow with crisp white outline */}
+                    <svg className="monitor-cursor-arrow" viewBox="0 0 28 28" width="24" height="24" fill="none">
+                      <path
+                        d="M5.2 2.4L5.2 21.8L9.9 17.3L13.1 24.4L16.2 23.0L13.0 16.0L19.4 16.0L5.2 2.4Z"
+                        fill="#111111"
+                        stroke="#FFFFFF"
+                        strokeWidth="1.65"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {/* Authentic macOS pointing hand cursor when hovering clickable button */}
+                    <svg className="monitor-cursor-hand" viewBox="0 0 28 28" width="24" height="24" fill="none">
+                      <path
+                        d="M11.6 3.6C11.6 2.6 12.4 1.9 13.3 1.9C14.2 1.9 15.0 2.6 15.0 3.6V11.2C15.5 10.6 16.3 10.4 17.0 10.7C17.6 10.9 18.0 11.4 18.2 11.9C18.8 11.5 19.6 11.4 20.3 11.8C20.9 12.1 21.3 12.7 21.4 13.3C22.1 13.1 22.9 13.4 23.4 14.0C23.8 14.5 23.9 15.1 23.9 15.8L23.5 19.8C23.2 22.5 21.1 24.7 18.3 24.7H13.4C11.3 24.7 9.4 23.6 8.3 21.8L5.3 16.8C4.8 16.0 5.0 14.9 5.8 14.4C6.6 13.9 7.7 14.1 8.3 14.9L11.6 18.4V3.6Z"
+                        fill="#FFFFFF"
+                        stroke="#111111"
+                        strokeWidth="1.5"
+                        strokeLinejoin="round"
+                        strokeLinecap="round"
+                      />
+                      <path d="M15.0 11.6V15.4M18.2 12.2V15.8M21.3 13.6V16.2" stroke="#111111" strokeWidth="1.2" strokeLinecap="round" />
+                    </svg>
+                  </div>
+                </div>
               </div>
-              <div className="monitor-caption"><small id="hint">Scroll to reveal ↓</small><div id="slides" hidden><button aria-label="Previous screenshot">←</button><output>1 / 3</output><button aria-label="Next screenshot">→</button></div></div>
+              <div className="monitor-caption"><small id="hint">Scroll to reveal ↓</small></div>
             </div>
           </div>
           <div className="section-wrap"><Reveal><article className="freelance-feature">
@@ -522,7 +533,7 @@ function Portfolio() {
             BACK TO TOP ↑
           </a>
         </section>
-      </main>
+      </motion.main>
       {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} details={activeVideo.explore && videoProject.id !== "intro" ? skillProjects.find((project) => project.id === videoProject.id) : undefined} autoPlay={!activeVideo.explore} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request, explore: false }))} />}
       <dialog
         ref={dialog}

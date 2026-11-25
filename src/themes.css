@@ -1,0 +1,1982 @@
+/* ======================================================================
+   3 Full-Site Color Theme Variations (each with Bright + Dark themes)
+   Activated via html[data-palette="forest" | "cobalt" | "plum"].
+   When data-palette is unset or "original", the original portfolio colors apply.
+   ====================================================================== */
+
+/* Smooth cross-fade when switching palettes (unless reduced motion) */
+html.palette-fading *,
+html.palette-fading *::before,
+html.palette-fading *::after {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease,
+    box-shadow 0.45s ease,
+    fill 0.45s ease !important;
+}
+
+/* ======================================================================
+   VERSION 1 — FOREST & COPPER
+   Light: Warm Alabaster (#f5f3ec) · Deep Forest Pine (#113b31) · Burnished Copper (#c86432)
+   Dark:  Obsidian Moss (#0b1210)  · Deep Pine Night (#0a211b)  · Glowing Copper (#e07b47)
+   ====================================================================== */
+
+html[data-palette="forest"] {
+  --cream: #f5f3ec;
+  --orange: #c86432;
+  --blue: #113b31;
+  --section-blue: #113b31;
+  --ink: #1d231e;
+  --cursor-ink: #2b382e;
+  --cursor-tint: #113b3120;
+  --cursor-outline: #1c6b579c;
+  color: var(--ink);
+  background: var(--cream);
+}
+
+html[data-palette="forest"] ::selection {
+  background: #c86432;
+  color: #fff;
+}
+
+html[data-palette="forest"] a:focus-visible,
+html[data-palette="forest"] button:focus-visible,
+html[data-palette="forest"] summary:focus-visible {
+  outline-color: #c86432;
+}
+
+/* Header, nav, controls, loader */
+html[data-palette="forest"] nav {
+  background: #ebe8deeb;
+  border-color: #ffffff52;
+}
+html[data-palette="forest"] .site-header nav a:hover {
+  color: #b55424;
+}
+html[data-palette="forest"] .on-blue nav {
+  background: #0d2e26b8;
+}
+html[data-palette="forest"] .on-blue .nav-indicator {
+  background: #257a65;
+}
+html[data-palette="forest"] .motion-controls button {
+  background: #ebe8dedf;
+  border-color: #8f968a38;
+  color: #1d231e;
+}
+html[data-palette="forest"] .motion-controls button[aria-pressed="true"]:not(.theme-toggle) {
+  background: #c86432;
+  color: #fff;
+}
+html[data-palette="forest"] .theme-toggle {
+  color: #c86432;
+}
+html[data-palette="forest"] .reading-progress {
+  background: #c86432;
+}
+html[data-palette="forest"] .loader-cube span {
+  background: #113b31;
+}
+html[data-palette="forest"] .loader-cube span + span,
+html[data-palette="forest"] .loader-line:after {
+  background: #c86432;
+}
+
+/* Hero */
+html[data-palette="forest"] h1 > span:first-of-type,
+html[data-palette="forest"] .name-letter {
+  background-image: linear-gradient(110deg, #c86432, #a86b3e, #1d6b58, #c86432);
+}
+html[data-palette="forest"] .name-dot {
+  color: #1d6b58;
+}
+html[data-palette="forest"] .role-sticker,
+html[data-palette="forest"] .label-sticker {
+  background: #1b4d40;
+}
+html[data-palette="forest"] .label-sticker.light {
+  color: #113b31;
+  background: #e6e3d5;
+}
+html[data-palette="forest"] .hero-copy > p,
+html[data-palette="forest"] .hero-copy p {
+  color: #545e56;
+}
+html[data-palette="forest"] .scene-note {
+  background: #faf8f2dd;
+  border-color: #d6d3c4;
+}
+html[data-palette="forest"] .hero-bottom > a {
+  border-color: #b8bca9;
+}
+
+/* Meet the Engineer Portal */
+html[data-palette="forest"] .avatar-journey {
+  background: #113b31;
+}
+html[data-palette="forest"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #216b59 0%, #113b31 54%, #08201a 100%);
+}
+html[data-palette="forest"] .portal-topline {
+  color: #a4dfc9;
+}
+html[data-palette="forest"] .portal-grid {
+  background-image:
+    linear-gradient(#5ce0b52b 1px, transparent 1px),
+    linear-gradient(90deg, #5ce0b52b 1px, transparent 1px);
+}
+html[data-palette="forest"] .portal-stars {
+  background-image: radial-gradient(circle, #8ae3c455 1px, transparent 1.4px);
+}
+html[data-palette="forest"] .portal-base {
+  background: linear-gradient(#2d9a7c99, #08241d);
+  box-shadow:
+    0 12px 0 #07221b,
+    0 17px 0 #2e8f7255,
+    0 0 60px #42d9ab80;
+}
+html[data-palette="forest"] .portal-base i {
+  border-color: #5ce8bc;
+  box-shadow: 0 0 14px #3fd1a5;
+}
+html[data-palette="forest"] .portal-base i:nth-child(3) {
+  border-color: #5ce8bc88;
+}
+html[data-palette="forest"] .portal-base > span {
+  background: #082b22;
+  border-color: #3f8a74;
+  color: #8cf5d4;
+}
+html[data-palette="forest"] .portal-callout {
+  border-color: #63c7a78c;
+  background: #1d6b5738;
+  color: #e4fff6;
+}
+html[data-palette="forest"] .portal-callout:after {
+  background: #64e0b8;
+}
+html[data-palette="forest"] .portal-callout:before {
+  background: #8bf5d4;
+  box-shadow: 0 0 12px #5ee8bc;
+}
+html[data-palette="forest"] .eng-particles i {
+  background: #8cf5d4;
+  box-shadow: 0 0 8px #42d9ab;
+}
+html[data-palette="forest"] .pe-glow {
+  filter: blur(6px) saturate(1.35) hue-rotate(-28deg);
+}
+
+/* About, Stats, Accordions, Skills Sheet */
+html[data-palette="forest"] .about-editorial-photo {
+  background: #0a241e;
+  box-shadow: 0 8px 20px #04141055;
+}
+html[data-palette="forest"] .about-editorial-frame {
+  background: #0c2a23;
+}
+html[data-palette="forest"] .about-editorial-watch {
+  color: #113b31;
+  background: #f5f3ec;
+}
+html[data-palette="forest"] .about-editorial-watch:hover {
+  background: #f6d5b8;
+}
+html[data-palette="forest"] .about-editorial-watch small {
+  color: #2f5e52;
+}
+html[data-palette="forest"] .about-editorial-bio p + p,
+html[data-palette="forest"] .about-copy > p.secondary-copy,
+html[data-palette="forest"] .stats span,
+html[data-palette="forest"] .detail-content,
+html[data-palette="forest"] .accordion-panel ul {
+  color: #bdd6cd;
+}
+html[data-palette="forest"] .about-editorial-bio em,
+html[data-palette="forest"] .about-copy h2 .heading-accent,
+html[data-palette="forest"] .stats strong {
+  color: #f0b284;
+}
+html[data-palette="forest"] .button:hover {
+  background: #df9662;
+}
+html[data-palette="forest"] .accordion-sheet {
+  --sheet-blue: #113b31;
+  color: #1d231e;
+}
+html[data-palette="forest"] .accordion-sheet .skills-headline {
+  color: #113b31;
+}
+html[data-palette="forest"] .accordion-sheet .skill-options .motion-accordion {
+  border-color: #113b3130;
+}
+html[data-palette="forest"] .accordion-sheet .skill-options .tags span {
+  border-color: #113b3140;
+}
+
+/* Experience Timeline */
+html[data-palette="forest"] .experience-timeline {
+  --rail-surface: #113b31;
+}
+html[data-palette="forest"] .experience-timeline::before {
+  background: linear-gradient(#f0b284, #7bc2ab 78%, #7bc2ab35);
+}
+html[data-palette="forest"] .experience-timeline-label {
+  border-color: #f0b284;
+  color: #f0b284;
+}
+html[data-palette="forest"] .experience-employment,
+html[data-palette="forest"] .experience-entry-copy p,
+html[data-palette="forest"] .experience-entry .accordion-panel ul {
+  color: #cbe0d8;
+}
+html[data-palette="forest"] .experience-entry-copy .experience-project-account {
+  color: #f0b284;
+}
+html[data-palette="forest"] .experience-entry-visual {
+  background: #d2e3dc;
+}
+
+/* Projects, Research, Freelance, Contact */
+html[data-palette="forest"] .showcase-card,
+html[data-palette="forest"] .project-video-dialog {
+  border-color: #d4d3c5;
+  background: #fcfbf7;
+}
+html[data-palette="forest"] .showcase-film-play {
+  color: #fff;
+}
+html[data-palette="forest"] .showcase-film-preview:hover .showcase-film-play {
+  background: #da7541;
+}
+html[data-palette="forest"] .research-section {
+  background: #e9e7dc;
+  border-color: #d2d1c2;
+}
+html[data-palette="forest"] .research-note::before {
+  background: #c8643299;
+}
+html[data-palette="forest"] .case-study-button {
+  background: #113b31;
+}
+html[data-palette="forest"] .case-study-button:hover {
+  background: #c86432;
+}
+html[data-palette="forest"] .freelance-metrics strong {
+  color: #9e542a;
+}
+html[data-palette="forest"] .contact {
+  background-image: radial-gradient(ellipse at 90% 100%, #1f6956, transparent 60%);
+}
+html[data-palette="forest"] .contact h2 .heading-accent {
+  color: #9cd4c1;
+}
+html[data-palette="forest"] .contact-lower p,
+html[data-palette="forest"] .copy-email,
+html[data-palette="forest"] .availability {
+  color: #b7d4c9;
+}
+html[data-palette="forest"] .contact .back-top:hover {
+  color: #f0b284;
+}
+
+/* --- FOREST & COPPER: DARK MODE --- */
+html[data-palette="forest"][data-theme="dark"] {
+  --ink: #e8ece6;
+  --orange: #e07b47;
+  --blue: #2b806a;
+  --section-blue: #0a211b;
+  --night: #0b1210;
+  --night-2: #101a17;
+  --night-card: #14211d;
+  --night-well: #1b2c27;
+  --night-line: #273e37;
+  --night-muted: #9eb0a8;
+  --night-faint: #7d8f87;
+  --cursor-ink: #f3b086;
+  --cursor-tint: #f0a47620;
+  --cursor-outline: #e07b47a8;
+  background: var(--night);
+  color: var(--ink);
+}
+html[data-palette="forest"][data-theme="dark"] nav {
+  background: #12201ce6;
+  border-color: #ffffff14;
+}
+html[data-palette="forest"][data-theme="dark"] .site-header nav a:hover {
+  color: #f09c6d;
+}
+html[data-palette="forest"][data-theme="dark"] .on-blue nav {
+  background: #0a241dc4;
+}
+html[data-palette="forest"][data-theme="dark"] .motion-controls button {
+  background: #162621e0;
+  border-color: #ffffff1c;
+  color: #e4ebe7;
+}
+html[data-palette="forest"][data-theme="dark"] .motion-controls .theme-toggle[aria-pressed="true"] {
+  background: #162621e0;
+  color: #f5d89e;
+}
+html[data-palette="forest"][data-theme="dark"] .hero-frame {
+  background:
+    radial-gradient(circle at 90% 13%, #fff3d6 0 26px, #ffe6b866 28px, #ffd69422 52px, transparent 110px),
+    radial-gradient(circle, #ffffffd9 0.8px, transparent 1.4px) 0 0 / 150px 150px,
+    radial-gradient(circle, #c8ffe999 0.7px, transparent 1.3px) 40px 70px / 230px 230px,
+    radial-gradient(circle, #ffe4bf66 1px, transparent 1.6px) 110px 20px / 310px 310px,
+    radial-gradient(ellipse 45% 38% at 78% 30%, #1d7a5c4d, transparent 70%),
+    radial-gradient(ellipse 40% 35% at 62% 78%, #c8643230, transparent 70%),
+    radial-gradient(ellipse 35% 40% at 12% 85%, #165e4a38, transparent 70%),
+    linear-gradient(180deg, #08100d 0%, #0d1b16 55%, #122620 100%);
+}
+html[data-palette="forest"][data-theme="dark"] .name-letter,
+html[data-palette="forest"][data-theme="dark"] h1 > span:first-of-type {
+  background-image: linear-gradient(110deg, #e07b47, #e6a87c, #6ad6b3, #e07b47);
+}
+html[data-palette="forest"][data-theme="dark"] .role-sticker,
+html[data-palette="forest"][data-theme="dark"] .label-sticker {
+  background: #1c4c3f;
+}
+html[data-palette="forest"][data-theme="dark"] .label-sticker.light {
+  background: #1d352e;
+  color: #e6ebe6;
+}
+html[data-palette="forest"][data-theme="dark"] .hero-copy > p,
+html[data-palette="forest"][data-theme="dark"] .hero-copy p {
+  color: #bcc8c1;
+}
+html[data-palette="forest"][data-theme="dark"] .scene-note {
+  background: #14211ddd;
+  border-color: var(--night-line);
+}
+html[data-palette="forest"][data-theme="dark"] .hero-bottom > a {
+  border-color: #2f4940;
+}
+html[data-palette="forest"][data-theme="dark"] .ld-night {
+  background:
+    radial-gradient(ellipse 4.5% 4% at 29.6% 29.6%, #fff 0 40%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 51.2% 31.2%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 65.3% 36.4%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 23% 34% at 33% 46%, #fff3dc 0%, #e8d6bd 40%, transparent 100%),
+    radial-gradient(ellipse 32% 32% at 57% 44%, #d6f5ea 0%, #a9decb 45%, transparent 100%),
+    radial-gradient(ellipse 22% 30% at 18% 18%, #b3decb 0%, transparent 100%),
+    radial-gradient(ellipse 64% 66% at 52% 54%, #6ba392 0%, #4b7f6f 45%, #234d41 78%, #0b1c17 100%);
+}
+html[data-palette="forest"][data-theme="dark"] .ld-night-light {
+  background:
+    radial-gradient(ellipse 5% 4.5% at 29.6% 30%, #fff1c8f0 0%, transparent 70%),
+    radial-gradient(ellipse 19% 28% at 31% 44%, #ffa96366 0%, transparent 72%),
+    radial-gradient(ellipse 24% 18% at 57% 42%, #47d1a842 0%, transparent 72%),
+    radial-gradient(ellipse 14% 9% at 60% 50%, #40e8b826 0%, transparent 75%),
+    radial-gradient(ellipse 7% 8% at 51.2% 31.2%, #7ae8c533 0%, transparent 80%),
+    radial-gradient(ellipse 7% 8% at 65.3% 36.4%, #7ae8c533 0%, transparent 80%);
+}
+html[data-palette="forest"][data-theme="dark"] .avatar-journey {
+  background: #0a211b;
+}
+html[data-palette="forest"][data-theme="dark"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #195445 0%, #0a211b 56%, #05110e 100%);
+}
+html[data-palette="forest"][data-theme="dark"] .accordion-sheet {
+  --sheet-blue: #0a211b;
+  background: var(--night-card);
+  color: var(--ink);
+}
+html[data-palette="forest"][data-theme="dark"] .accordion-sheet .skills-headline {
+  color: var(--ink);
+}
+html[data-palette="forest"][data-theme="dark"] .experience-timeline {
+  --rail-surface: #0a211b;
+}
+html[data-palette="forest"][data-theme="dark"] .showcase-card,
+html[data-palette="forest"][data-theme="dark"] .project-video-dialog {
+  background: var(--night-card);
+  border-color: var(--night-line);
+}
+html[data-palette="forest"][data-theme="dark"] .showcase-links .showcase-primary,
+html[data-palette="forest"][data-theme="dark"] .showcase-links .showcase-watch,
+html[data-palette="forest"][data-theme="dark"] .case-study-button {
+  background: #226b58;
+  border-color: #226b58;
+  color: #fff;
+}
+html[data-palette="forest"][data-theme="dark"] .showcase-links .showcase-watch:hover,
+html[data-palette="forest"][data-theme="dark"] .case-study-button:hover {
+  background: #e07b47;
+  border-color: #e07b47;
+}
+html[data-palette="forest"][data-theme="dark"] .research-section {
+  background: var(--night-2);
+  border-color: var(--night-line);
+}
+html[data-palette="forest"][data-theme="dark"] .research-kicker {
+  color: #79d4b6;
+}
+html[data-palette="forest"][data-theme="dark"] .research-paper .research-kicker {
+  color: #113b31;
+}
+html[data-palette="forest"][data-theme="dark"] .project-explorer-metrics strong {
+  color: #79d4b6;
+}
+html[data-palette="forest"][data-theme="dark"] .freelance-metrics strong {
+  color: #f0b284;
+}
+html[data-palette="forest"][data-theme="dark"] .showcase-film-play {
+  color: #170d06;
+}
+
+
+/* ======================================================================
+   VERSION 2 — OBSIDIAN & COBALT
+   Light: Cool Porcelain (#f6f7fb) · Midnight Ink (#131829) · Electric Cobalt (#2d5bff)
+   Dark:  Pure Obsidian (#090b10)  · Deep Graphite (#0d111d) · Vivid Cobalt (#5b82ff)
+   ====================================================================== */
+
+html[data-palette="cobalt"] {
+  --cream: #f6f7fb;
+  --orange: #2d5bff;
+  --blue: #131829;
+  --section-blue: #131829;
+  --ink: #141824;
+  --cursor-ink: #1a2442;
+  --cursor-tint: #2d5bff1f;
+  --cursor-outline: #2d5bff9c;
+  color: var(--ink);
+  background: var(--cream);
+}
+
+html[data-palette="cobalt"] ::selection {
+  background: #2d5bff;
+  color: #fff;
+}
+
+html[data-palette="cobalt"] a:focus-visible,
+html[data-palette="cobalt"] button:focus-visible,
+html[data-palette="cobalt"] summary:focus-visible {
+  outline-color: #2d5bff;
+}
+
+/* Header, nav, controls, loader */
+html[data-palette="cobalt"] nav {
+  background: #eaedf7eb;
+  border-color: #ffffff66;
+}
+html[data-palette="cobalt"] .site-header nav a:hover {
+  color: #2d5bff;
+}
+html[data-palette="cobalt"] .on-blue nav {
+  background: #141b30c4;
+}
+html[data-palette="cobalt"] .on-blue .nav-indicator {
+  background: #2d5bff;
+}
+html[data-palette="cobalt"] .motion-controls button {
+  background: #eaedf7df;
+  border-color: #8f9bb838;
+  color: #141824;
+}
+html[data-palette="cobalt"] .motion-controls button[aria-pressed="true"]:not(.theme-toggle) {
+  background: #2d5bff;
+  color: #fff;
+}
+html[data-palette="cobalt"] .theme-toggle {
+  color: #2d5bff;
+}
+html[data-palette="cobalt"] .reading-progress {
+  background: #2d5bff;
+}
+html[data-palette="cobalt"] .loader-cube span {
+  background: #131829;
+}
+html[data-palette="cobalt"] .loader-cube span + span,
+html[data-palette="cobalt"] .loader-line:after {
+  background: #2d5bff;
+}
+
+/* Hero */
+html[data-palette="cobalt"] h1 > span:first-of-type,
+html[data-palette="cobalt"] .name-letter {
+  background-image: linear-gradient(110deg, #2d5bff, #4e46e5, #0095d9, #2d5bff);
+}
+html[data-palette="cobalt"] .name-dot {
+  color: #0095d9;
+}
+html[data-palette="cobalt"] .role-sticker,
+html[data-palette="cobalt"] .label-sticker {
+  background: #1f2947;
+}
+html[data-palette="cobalt"] .label-sticker.light {
+  color: #131829;
+  background: #e4e8f5;
+}
+html[data-palette="cobalt"] .hero-copy > p,
+html[data-palette="cobalt"] .hero-copy p {
+  color: #4f566b;
+}
+html[data-palette="cobalt"] .scene-note {
+  background: #ffffffdd;
+  border-color: #d6dceb;
+}
+html[data-palette="cobalt"] .hero-bottom > a {
+  border-color: #bec7db;
+}
+
+/* Meet the Engineer Portal */
+html[data-palette="cobalt"] .avatar-journey {
+  background: #131829;
+}
+html[data-palette="cobalt"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #1f3b8c 0%, #131829 54%, #080b14 100%);
+}
+html[data-palette="cobalt"] .portal-topline {
+  color: #a9c4ff;
+}
+html[data-palette="cobalt"] .portal-grid {
+  background-image:
+    linear-gradient(#5b82ff2e 1px, transparent 1px),
+    linear-gradient(90deg, #5b82ff2e 1px, transparent 1px);
+}
+html[data-palette="cobalt"] .portal-base {
+  background: linear-gradient(#3461e099, #090f24);
+  box-shadow:
+    0 12px 0 #090e21,
+    0 17px 0 #3461e055,
+    0 0 60px #4f8dff80;
+}
+html[data-palette="cobalt"] .portal-base i {
+  border-color: #70a3ff;
+  box-shadow: 0 0 14px #457eff;
+}
+html[data-palette="cobalt"] .portal-base > span {
+  background: #0c1430;
+  border-color: #4464b8;
+  color: #9dc2ff;
+}
+html[data-palette="cobalt"] .portal-callout {
+  border-color: #6b96ff8c;
+  background: #24408f38;
+  color: #eaf1ff;
+}
+html[data-palette="cobalt"] .portal-callout:after {
+  background: #70a3ff;
+}
+html[data-palette="cobalt"] .portal-callout:before {
+  background: #9cc0ff;
+  box-shadow: 0 0 12px #5b82ff;
+}
+html[data-palette="cobalt"] .eng-particles i {
+  background: #9cc0ff;
+  box-shadow: 0 0 8px #5b82ff;
+}
+
+/* About, Stats, Accordions, Skills Sheet */
+html[data-palette="cobalt"] .about-editorial-photo {
+  background: #0d1221;
+  box-shadow: 0 8px 20px #05081260;
+}
+html[data-palette="cobalt"] .about-editorial-frame {
+  background: #101628;
+}
+html[data-palette="cobalt"] .about-editorial-watch {
+  color: #131829;
+  background: #f6f7fb;
+}
+html[data-palette="cobalt"] .about-editorial-watch:hover {
+  background: #d8e3ff;
+}
+html[data-palette="cobalt"] .about-editorial-watch small {
+  color: #3b4b75;
+}
+html[data-palette="cobalt"] .about-editorial-bio p + p,
+html[data-palette="cobalt"] .about-copy > p.secondary-copy,
+html[data-palette="cobalt"] .stats span,
+html[data-palette="cobalt"] .detail-content,
+html[data-palette="cobalt"] .accordion-panel ul {
+  color: #b8c2db;
+}
+html[data-palette="cobalt"] .about-editorial-bio em,
+html[data-palette="cobalt"] .about-copy h2 .heading-accent,
+html[data-palette="cobalt"] .stats strong {
+  color: #82a8ff;
+}
+html[data-palette="cobalt"] .button:hover {
+  background: #c7d7ff;
+}
+html[data-palette="cobalt"] .accordion-sheet {
+  --sheet-blue: #131829;
+  color: #141824;
+}
+html[data-palette="cobalt"] .accordion-sheet .skills-headline {
+  color: #131829;
+}
+html[data-palette="cobalt"] .accordion-sheet .skill-options .motion-accordion {
+  border-color: #13182928;
+}
+html[data-palette="cobalt"] .accordion-sheet .skill-options .tags span {
+  border-color: #13182938;
+}
+
+/* Experience Timeline */
+html[data-palette="cobalt"] .experience-timeline {
+  --rail-surface: #131829;
+}
+html[data-palette="cobalt"] .experience-timeline::before {
+  background: linear-gradient(#7aa2ff, #546fa8 78%, #546fa835);
+}
+html[data-palette="cobalt"] .experience-timeline-label {
+  border-color: #7aa2ff;
+  color: #93b5ff;
+}
+html[data-palette="cobalt"] .experience-employment,
+html[data-palette="cobalt"] .experience-entry-copy p,
+html[data-palette="cobalt"] .experience-entry .accordion-panel ul {
+  color: #c8d2e8;
+}
+html[data-palette="cobalt"] .experience-entry-copy .experience-project-account {
+  color: #82a8ff;
+}
+html[data-palette="cobalt"] .experience-entry-visual {
+  background: #dce3f5;
+}
+
+/* Projects, Research, Freelance, Contact */
+html[data-palette="cobalt"] .showcase-card,
+html[data-palette="cobalt"] .project-video-dialog {
+  border-color: #d7dceb;
+  background: #ffffff;
+}
+html[data-palette="cobalt"] .showcase-copy .tags span,
+html[data-palette="cobalt"] .research-copy .tags span {
+  background: #eef1f9;
+  border-color: #dce2f0;
+}
+html[data-palette="cobalt"] .showcase-film-play {
+  color: #fff;
+}
+html[data-palette="cobalt"] .showcase-film-preview:hover .showcase-film-play {
+  background: #4770ff;
+}
+html[data-palette="cobalt"] .research-section {
+  background: #eceff7;
+  border-color: #d6dceb;
+}
+html[data-palette="cobalt"] .research-kicker {
+  color: #2d5bff;
+}
+html[data-palette="cobalt"] .research-note::before {
+  background: #2d5bff88;
+}
+html[data-palette="cobalt"] .research-mini-table b,
+html[data-palette="cobalt"] .research-salt-diagram em,
+html[data-palette="cobalt"] .project-explorer-text h3 {
+  color: #2d5bff;
+}
+html[data-palette="cobalt"] .case-study-button {
+  background: #131829;
+}
+html[data-palette="cobalt"] .case-study-button:hover {
+  background: #2d5bff;
+}
+html[data-palette="cobalt"] .freelance-metrics strong {
+  color: #2d5bff;
+}
+html[data-palette="cobalt"] .contact {
+  background-image: radial-gradient(ellipse at 90% 100%, #2446a8, transparent 60%);
+}
+html[data-palette="cobalt"] .contact h2 .heading-accent {
+  color: #82a8ff;
+}
+html[data-palette="cobalt"] .contact-lower p,
+html[data-palette="cobalt"] .copy-email,
+html[data-palette="cobalt"] .availability {
+  color: #b4c3e3;
+}
+html[data-palette="cobalt"] .contact .back-top:hover {
+  color: #82a8ff;
+}
+
+/* --- OBSIDIAN & COBALT: DARK MODE --- */
+html[data-palette="cobalt"][data-theme="dark"] {
+  --ink: #edf0f7;
+  --orange: #5b82ff;
+  --blue: #3b66f5;
+  --section-blue: #0d111d;
+  --night: #090b10;
+  --night-2: #0f121b;
+  --night-card: #141824;
+  --night-well: #1b2030;
+  --night-line: #283047;
+  --night-muted: #9aa4bd;
+  --night-faint: #7c859e;
+  --cursor-ink: #8cb0ff;
+  --cursor-tint: #5b82ff24;
+  --cursor-outline: #5b82ffb0;
+  background: var(--night);
+  color: var(--ink);
+}
+html[data-palette="cobalt"][data-theme="dark"] nav {
+  background: #121622e6;
+  border-color: #ffffff14;
+}
+html[data-palette="cobalt"][data-theme="dark"] .site-header nav a:hover {
+  color: #82a8ff;
+}
+html[data-palette="cobalt"][data-theme="dark"] .on-blue nav {
+  background: #0c101dc8;
+}
+html[data-palette="cobalt"][data-theme="dark"] .motion-controls button {
+  background: #151a28e0;
+  border-color: #ffffff1c;
+  color: #e6ebf5;
+}
+html[data-palette="cobalt"][data-theme="dark"] .motion-controls .theme-toggle[aria-pressed="true"] {
+  background: #151a28e0;
+  color: #b8d0ff;
+}
+html[data-palette="cobalt"][data-theme="dark"] .hero-frame {
+  background:
+    radial-gradient(circle at 90% 13%, #eef4ff 0 26px, #cfe0ff66 28px, #8db4ff22 52px, transparent 110px),
+    radial-gradient(circle, #ffffffd9 0.8px, transparent 1.4px) 0 0 / 150px 150px,
+    radial-gradient(circle, #a8c7ff99 0.7px, transparent 1.3px) 40px 70px / 230px 230px,
+    radial-gradient(circle, #d6e4ff66 1px, transparent 1.6px) 110px 20px / 310px 310px,
+    radial-gradient(ellipse 45% 38% at 78% 30%, #2d5bff45, transparent 70%),
+    radial-gradient(ellipse 40% 35% at 62% 78%, #00a6fb38, transparent 70%),
+    radial-gradient(ellipse 35% 40% at 12% 85%, #3730a333, transparent 70%),
+    linear-gradient(180deg, #07090f 0%, #0c101d 55%, #11172a 100%);
+}
+html[data-palette="cobalt"][data-theme="dark"] .name-letter,
+html[data-palette="cobalt"][data-theme="dark"] h1 > span:first-of-type {
+  background-image: linear-gradient(110deg, #5b82ff, #8eaaff, #52d1ff, #5b82ff);
+}
+html[data-palette="cobalt"][data-theme="dark"] .role-sticker,
+html[data-palette="cobalt"][data-theme="dark"] .label-sticker {
+  background: #1f2b4d;
+}
+html[data-palette="cobalt"][data-theme="dark"] .label-sticker.light {
+  background: #1e2740;
+  color: #e6ebf5;
+}
+html[data-palette="cobalt"][data-theme="dark"] .hero-copy > p,
+html[data-palette="cobalt"][data-theme="dark"] .hero-copy p {
+  color: #b5bfd6;
+}
+html[data-palette="cobalt"][data-theme="dark"] .scene-note {
+  background: #141824dd;
+  border-color: var(--night-line);
+}
+html[data-palette="cobalt"][data-theme="dark"] .hero-bottom > a {
+  border-color: #2f3a59;
+}
+html[data-palette="cobalt"][data-theme="dark"] .avatar-journey {
+  background: #0d111d;
+}
+html[data-palette="cobalt"][data-theme="dark"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #1c357a 0%, #0d111d 56%, #06080f 100%);
+}
+html[data-palette="cobalt"][data-theme="dark"] .accordion-sheet {
+  --sheet-blue: #0d111d;
+  background: var(--night-card);
+  color: var(--ink);
+}
+html[data-palette="cobalt"][data-theme="dark"] .accordion-sheet .skills-headline {
+  color: var(--ink);
+}
+html[data-palette="cobalt"][data-theme="dark"] .experience-timeline {
+  --rail-surface: #0d111d;
+}
+html[data-palette="cobalt"][data-theme="dark"] .showcase-card,
+html[data-palette="cobalt"][data-theme="dark"] .project-video-dialog {
+  background: var(--night-card);
+  border-color: var(--night-line);
+}
+html[data-palette="cobalt"][data-theme="dark"] .showcase-links .showcase-primary,
+html[data-palette="cobalt"][data-theme="dark"] .showcase-links .showcase-watch,
+html[data-palette="cobalt"][data-theme="dark"] .case-study-button {
+  background: #2d5bff;
+  border-color: #2d5bff;
+  color: #fff;
+}
+html[data-palette="cobalt"][data-theme="dark"] .showcase-links .showcase-watch:hover,
+html[data-palette="cobalt"][data-theme="dark"] .case-study-button:hover {
+  background: #5b82ff;
+  border-color: #5b82ff;
+}
+html[data-palette="cobalt"][data-theme="dark"] .research-section {
+  background: var(--night-2);
+  border-color: var(--night-line);
+}
+html[data-palette="cobalt"][data-theme="dark"] .research-kicker,
+html[data-palette="cobalt"][data-theme="dark"] .project-explorer-metrics strong,
+html[data-palette="cobalt"][data-theme="dark"] .freelance-metrics strong {
+  color: #82a8ff;
+}
+html[data-palette="cobalt"][data-theme="dark"] .research-paper .research-kicker {
+  color: #2d5bff;
+}
+html[data-palette="cobalt"][data-theme="dark"] .showcase-film-play {
+  color: #fff;
+}
+
+
+/* ======================================================================
+   VERSION 3 — PLUM & AMBER
+   Light: Warm Linen Ivory (#f8f3ef) · Deep Aubergine (#2f1636) · Terracotta Coral (#d95843)
+   Dark:  Velvet Aubergine (#110a14) · Deep Plum Night (#1c0c24) · Warm Coral (#f0745b)
+   ====================================================================== */
+
+html[data-palette="plum"] {
+  --cream: #f8f3ef;
+  --orange: #d95843;
+  --blue: #2f1636;
+  --section-blue: #2f1636;
+  --ink: #261b24;
+  --cursor-ink: #3d2138;
+  --cursor-tint: #5c276920;
+  --cursor-outline: #8a3f999c;
+  color: var(--ink);
+  background: var(--cream);
+}
+
+html[data-palette="plum"] ::selection {
+  background: #d95843;
+  color: #fff;
+}
+
+html[data-palette="plum"] a:focus-visible,
+html[data-palette="plum"] button:focus-visible,
+html[data-palette="plum"] summary:focus-visible {
+  outline-color: #d95843;
+}
+
+/* Header, nav, controls, loader */
+html[data-palette="plum"] nav {
+  background: #efe6dfeb;
+  border-color: #ffffff52;
+}
+html[data-palette="plum"] .site-header nav a:hover {
+  color: #c24532;
+}
+html[data-palette="plum"] .on-blue nav {
+  background: #281130c2;
+}
+html[data-palette="plum"] .on-blue .nav-indicator {
+  background: #8d429e;
+}
+html[data-palette="plum"] .motion-controls button {
+  background: #efe6dfdf;
+  border-color: #a6949e38;
+  color: #261b24;
+}
+html[data-palette="plum"] .motion-controls button[aria-pressed="true"]:not(.theme-toggle) {
+  background: #d95843;
+  color: #fff;
+}
+html[data-palette="plum"] .theme-toggle {
+  color: #d95843;
+}
+html[data-palette="plum"] .reading-progress {
+  background: #d95843;
+}
+html[data-palette="plum"] .loader-cube span {
+  background: #2f1636;
+}
+html[data-palette="plum"] .loader-cube span + span,
+html[data-palette="plum"] .loader-line:after {
+  background: #d95843;
+}
+
+/* Hero */
+html[data-palette="plum"] h1 > span:first-of-type,
+html[data-palette="plum"] .name-letter {
+  background-image: linear-gradient(110deg, #d95843, #b5456c, #6a368a, #d95843);
+}
+html[data-palette="plum"] .name-dot {
+  color: #6a368a;
+}
+html[data-palette="plum"] .role-sticker,
+html[data-palette="plum"] .label-sticker {
+  background: #472252;
+}
+html[data-palette="plum"] .label-sticker.light {
+  color: #2f1636;
+  background: #ece0e8;
+}
+html[data-palette="plum"] .hero-copy > p,
+html[data-palette="plum"] .hero-copy p {
+  color: #665560;
+}
+html[data-palette="plum"] .scene-note {
+  background: #fcf8f5dd;
+  border-color: #dfd2cc;
+}
+html[data-palette="plum"] .hero-bottom > a {
+  border-color: #cbbbc4;
+}
+
+/* Meet the Engineer Portal */
+html[data-palette="plum"] .avatar-journey {
+  background: #2f1636;
+}
+html[data-palette="plum"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #662e75 0%, #2f1636 54%, #18091c 100%);
+}
+html[data-palette="plum"] .portal-topline {
+  color: #e3b8ed;
+}
+html[data-palette="plum"] .portal-grid {
+  background-image:
+    linear-gradient(#e08cf52b 1px, transparent 1px),
+    linear-gradient(90deg, #e08cf52b 1px, transparent 1px);
+}
+html[data-palette="plum"] .portal-stars {
+  background-image: radial-gradient(circle, #e8a8f555 1px, transparent 1.4px);
+}
+html[data-palette="plum"] .portal-base {
+  background: linear-gradient(#9445a899, #1c0a21);
+  box-shadow:
+    0 12px 0 #1b0a21,
+    0 17px 0 #8a3e9e55,
+    0 0 60px #d97ef080;
+}
+html[data-palette="plum"] .portal-base i {
+  border-color: #e89eff;
+  box-shadow: 0 0 14px #d173eb;
+}
+html[data-palette="plum"] .portal-base i:nth-child(3) {
+  border-color: #e89eff88;
+}
+html[data-palette="plum"] .portal-base > span {
+  background: #240c2b;
+  border-color: #824494;
+  color: #f3c4ff;
+}
+html[data-palette="plum"] .portal-callout {
+  border-color: #d68de88c;
+  background: #5c266b38;
+  color: #fceeff;
+}
+html[data-palette="plum"] .portal-callout:after {
+  background: #e096f5;
+}
+html[data-palette="plum"] .portal-callout:before {
+  background: #f3c4ff;
+  box-shadow: 0 0 12px #d97ef0;
+}
+html[data-palette="plum"] .eng-particles i {
+  background: #f3c4ff;
+  box-shadow: 0 0 8px #d97ef0;
+}
+html[data-palette="plum"] .pe-glow {
+  filter: blur(6px) saturate(1.35) hue-rotate(85deg);
+}
+
+/* About, Stats, Accordions, Skills Sheet */
+html[data-palette="plum"] .about-editorial-photo {
+  background: #200d26;
+  box-shadow: 0 8px 20px #1206175c;
+}
+html[data-palette="plum"] .about-editorial-frame {
+  background: #25102c;
+}
+html[data-palette="plum"] .about-editorial-watch {
+  color: #2f1636;
+  background: #f8f3ef;
+}
+html[data-palette="plum"] .about-editorial-watch:hover {
+  background: #fad7c8;
+}
+html[data-palette="plum"] .about-editorial-watch small {
+  color: #5e3869;
+}
+html[data-palette="plum"] .about-editorial-bio p + p,
+html[data-palette="plum"] .about-copy > p.secondary-copy,
+html[data-palette="plum"] .stats span,
+html[data-palette="plum"] .detail-content,
+html[data-palette="plum"] .accordion-panel ul {
+  color: #dbc6e0;
+}
+html[data-palette="plum"] .about-editorial-bio em,
+html[data-palette="plum"] .about-copy h2 .heading-accent,
+html[data-palette="plum"] .stats strong {
+  color: #f7c079;
+}
+html[data-palette="plum"] .button:hover {
+  background: #f2a988;
+}
+html[data-palette="plum"] .accordion-sheet {
+  --sheet-blue: #2f1636;
+  color: #261b24;
+}
+html[data-palette="plum"] .accordion-sheet .skills-headline {
+  color: #2f1636;
+}
+html[data-palette="plum"] .accordion-sheet .skill-options .motion-accordion {
+  border-color: #2f163630;
+}
+html[data-palette="plum"] .accordion-sheet .skill-options .tags span {
+  border-color: #2f163640;
+}
+
+/* Experience Timeline */
+html[data-palette="plum"] .experience-timeline {
+  --rail-surface: #2f1636;
+}
+html[data-palette="plum"] .experience-timeline::before {
+  background: linear-gradient(#f7c079, #c48ad4 78%, #c48ad435);
+}
+html[data-palette="plum"] .experience-timeline-label {
+  border-color: #f7c079;
+  color: #f7c079;
+}
+html[data-palette="plum"] .experience-employment,
+html[data-palette="plum"] .experience-entry-copy p,
+html[data-palette="plum"] .experience-entry .accordion-panel ul {
+  color: #e3d0e8;
+}
+html[data-palette="plum"] .experience-entry-copy .experience-project-account {
+  color: #f7c079;
+}
+html[data-palette="plum"] .experience-entry-visual {
+  background: #eadce8;
+}
+
+/* Projects, Research, Freelance, Contact */
+html[data-palette="plum"] .showcase-card,
+html[data-palette="plum"] .project-video-dialog {
+  border-color: #dfd3ce;
+  background: #fffcfa;
+}
+html[data-palette="plum"] .showcase-film-play {
+  color: #fff;
+}
+html[data-palette="plum"] .showcase-film-preview:hover .showcase-film-play {
+  background: #e86b56;
+}
+html[data-palette="plum"] .research-section {
+  background: #efe7e3;
+  border-color: #ddd0cb;
+}
+html[data-palette="plum"] .research-kicker {
+  color: #5b2669;
+}
+html[data-palette="plum"] .research-note::before {
+  background: #d9584399;
+}
+html[data-palette="plum"] .case-study-button {
+  background: #2f1636;
+}
+html[data-palette="plum"] .case-study-button:hover {
+  background: #d95843;
+}
+html[data-palette="plum"] .freelance-metrics strong {
+  color: #9e3d42;
+}
+html[data-palette="plum"] .contact {
+  background-image: radial-gradient(ellipse at 90% 100%, #622d73, transparent 60%);
+}
+html[data-palette="plum"] .contact h2 .heading-accent {
+  color: #e6b8f2;
+}
+html[data-palette="plum"] .contact-lower p,
+html[data-palette="plum"] .copy-email,
+html[data-palette="plum"] .availability {
+  color: #d6bfd9;
+}
+html[data-palette="plum"] .contact .back-top:hover {
+  color: #f7c079;
+}
+
+/* --- PLUM & AMBER: DARK MODE --- */
+html[data-palette="plum"][data-theme="dark"] {
+  --ink: #f2eae6;
+  --orange: #f0745b;
+  --blue: #7c449e;
+  --section-blue: #1c0c24;
+  --night: #110a14;
+  --night-2: #180f1d;
+  --night-card: #1f1426;
+  --night-well: #291b33;
+  --night-line: #3d284b;
+  --night-muted: #b5a3b0;
+  --night-faint: #927e8d;
+  --cursor-ink: #f7b39e;
+  --cursor-tint: #f0745b24;
+  --cursor-outline: #f0745ba8;
+  background: var(--night);
+  color: var(--ink);
+}
+html[data-palette="plum"][data-theme="dark"] nav {
+  background: #1d1224e6;
+  border-color: #ffffff14;
+}
+html[data-palette="plum"][data-theme="dark"] .site-header nav a:hover {
+  color: #f79b86;
+}
+html[data-palette="plum"][data-theme="dark"] .on-blue nav {
+  background: #200d29c8;
+}
+html[data-palette="plum"][data-theme="dark"] .motion-controls button {
+  background: #23162ce0;
+  border-color: #ffffff1c;
+  color: #efe6e8;
+}
+html[data-palette="plum"][data-theme="dark"] .motion-controls .theme-toggle[aria-pressed="true"] {
+  background: #23162ce0;
+  color: #f7d8a8;
+}
+html[data-palette="plum"][data-theme="dark"] .hero-frame {
+  background:
+    radial-gradient(circle at 90% 13%, #ffefd9 0 26px, #ffd7b866 28px, #ffb39422 52px, transparent 110px),
+    radial-gradient(circle, #ffffffd9 0.8px, transparent 1.4px) 0 0 / 150px 150px,
+    radial-gradient(circle, #f5c8ff99 0.7px, transparent 1.3px) 40px 70px / 230px 230px,
+    radial-gradient(circle, #ffd9c466 1px, transparent 1.6px) 110px 20px / 310px 310px,
+    radial-gradient(ellipse 45% 38% at 78% 30%, #8a389e4d, transparent 70%),
+    radial-gradient(ellipse 40% 35% at 62% 78%, #d9584330, transparent 70%),
+    radial-gradient(ellipse 35% 40% at 12% 85%, #5c247338, transparent 70%),
+    linear-gradient(180deg, #0d0710 0%, #170c1e 55%, #22122c 100%);
+}
+html[data-palette="plum"][data-theme="dark"] .name-letter,
+html[data-palette="plum"][data-theme="dark"] h1 > span:first-of-type {
+  background-image: linear-gradient(110deg, #f0745b, #f7b379, #d48ef0, #f0745b);
+}
+html[data-palette="plum"][data-theme="dark"] .role-sticker,
+html[data-palette="plum"][data-theme="dark"] .label-sticker {
+  background: #4e245c;
+}
+html[data-palette="plum"][data-theme="dark"] .label-sticker.light {
+  background: #361e42;
+  color: #f2e8eb;
+}
+html[data-palette="plum"][data-theme="dark"] .hero-copy > p,
+html[data-palette="plum"][data-theme="dark"] .hero-copy p {
+  color: #cfc0cb;
+}
+html[data-palette="plum"][data-theme="dark"] .scene-note {
+  background: #1f1426dd;
+  border-color: var(--night-line);
+}
+html[data-palette="plum"][data-theme="dark"] .hero-bottom > a {
+  border-color: #493059;
+}
+html[data-palette="plum"][data-theme="dark"] .ld-night {
+  background:
+    radial-gradient(ellipse 4.5% 4% at 29.6% 29.6%, #fff 0 40%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 51.2% 31.2%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 65.3% 36.4%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 23% 34% at 33% 46%, #fff1dc 0%, #ebd2bd 40%, transparent 100%),
+    radial-gradient(ellipse 32% 32% at 57% 44%, #f0dcf7 0%, #d4b4e3 45%, transparent 100%),
+    radial-gradient(ellipse 22% 30% at 18% 18%, #d9bce8 0%, transparent 100%),
+    radial-gradient(ellipse 64% 66% at 52% 54%, #a87eb5 0%, #825691 45%, #4a2659 78%, #1a0b21 100%);
+}
+html[data-palette="plum"][data-theme="dark"] .ld-night-light {
+  background:
+    radial-gradient(ellipse 5% 4.5% at 29.6% 30%, #fff0c8f0 0%, transparent 70%),
+    radial-gradient(ellipse 19% 28% at 31% 44%, #ffb26a66 0%, transparent 72%),
+    radial-gradient(ellipse 24% 18% at 57% 42%, #c97aff45 0%, transparent 72%),
+    radial-gradient(ellipse 14% 9% at 60% 50%, #ff8cb828 0%, transparent 75%),
+    radial-gradient(ellipse 7% 8% at 51.2% 31.2%, #dda6ff33 0%, transparent 80%),
+    radial-gradient(ellipse 7% 8% at 65.3% 36.4%, #dda6ff33 0%, transparent 80%);
+}
+html[data-palette="plum"][data-theme="dark"] .avatar-journey {
+  background: #1c0c24;
+}
+html[data-palette="plum"][data-theme="dark"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #522261 0%, #1c0c24 56%, #0d0512 100%);
+}
+html[data-palette="plum"][data-theme="dark"] .accordion-sheet {
+  --sheet-blue: #1c0c24;
+  background: var(--night-card);
+  color: var(--ink);
+}
+html[data-palette="plum"][data-theme="dark"] .accordion-sheet .skills-headline {
+  color: var(--ink);
+}
+html[data-palette="plum"][data-theme="dark"] .experience-timeline {
+  --rail-surface: #1c0c24;
+}
+html[data-palette="plum"][data-theme="dark"] .showcase-card,
+html[data-palette="plum"][data-theme="dark"] .project-video-dialog {
+  background: var(--night-card);
+  border-color: var(--night-line);
+}
+html[data-palette="plum"][data-theme="dark"] .showcase-links .showcase-primary,
+html[data-palette="plum"][data-theme="dark"] .showcase-links .showcase-watch,
+html[data-palette="plum"][data-theme="dark"] .case-study-button {
+  background: #6b3487;
+  border-color: #6b3487;
+  color: #fff;
+}
+html[data-palette="plum"][data-theme="dark"] .showcase-links .showcase-watch:hover,
+html[data-palette="plum"][data-theme="dark"] .case-study-button:hover {
+  background: #f0745b;
+  border-color: #f0745b;
+}
+html[data-palette="plum"][data-theme="dark"] .research-section {
+  background: var(--night-2);
+  border-color: var(--night-line);
+}
+html[data-palette="plum"][data-theme="dark"] .research-kicker,
+html[data-palette="plum"][data-theme="dark"] .project-explorer-metrics strong {
+  color: #dfa8f5;
+}
+html[data-palette="plum"][data-theme="dark"] .research-paper .research-kicker {
+  color: #2f1636;
+}
+html[data-palette="plum"][data-theme="dark"] .freelance-metrics strong {
+  color: #f7c079;
+}
+html[data-palette="plum"][data-theme="dark"] .showcase-film-play {
+  color: #1f0a06;
+}
+
+
+/* ======================================================================
+   Floating Palette Switcher (bottom-left pill)
+   ====================================================================== */
+.palette-switcher {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border-radius: 999px;
+  background: #ffffffd9;
+  border: 1px solid #00000018;
+  box-shadow: 0 8px 28px #0000001c;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: #1c1c1c;
+  font-family: "Space Mono", monospace;
+}
+
+html[data-theme="dark"] .palette-switcher {
+  background: #141824e6;
+  border-color: #ffffff1f;
+  box-shadow: 0 10px 30px #00000066;
+  color: #eef0f5;
+}
+
+.palette-switcher-label {
+  font-size: 9px;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  opacity: 0.65;
+  padding: 0 6px 0 8px;
+  user-select: none;
+}
+
+.palette-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-family: "Space Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.palette-chip:hover {
+  background: #0000000d;
+}
+
+html[data-theme="dark"] .palette-chip:hover {
+  background: #ffffff14;
+}
+
+.palette-chip[aria-pressed="true"] {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--orange);
+}
+
+.palette-swatch {
+  display: inline-flex;
+  align-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #ffffff66;
+  flex-shrink: 0;
+  transform: rotate(-35deg);
+}
+
+.palette-swatch i {
+  display: block;
+  width: 50%;
+  height: 100%;
+}
+
+@media (max-width: 680px) {
+  .palette-switcher {
+    left: 12px;
+    bottom: 12px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .palette-switcher-label {
+    display: none;
+  }
+  .palette-chip {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+}
+
+/* ======================================================================
+   ZERO-INSPIRED PALETTE ("zero") + FLOWING MOTION SYSTEM
+   Inspired by learnwithzero.com:
+   Bright: Pale Parchment (#f7f6f2) · Crisp White (#ffffff) · Matte Carbon (#111214) · Emerald Mint (#0f9f6e)
+   Dark:   Matte Carbon (#0a0b0d)   · Elevated Graphite (#15181d) · Luminous Jade (#34d399) · Warm Gold (#f5b864)
+   ====================================================================== */
+
+html[data-palette="zero"] {
+  --cream: #f7f6f2;
+  --orange: #0f9f6e;
+  --blue: #111214;
+  --section-blue: #111214;
+  --ink: #111214;
+  --cursor-ink: #111214;
+  --cursor-tint: #0f9f6e1c;
+  --cursor-outline: #0f9f6e99;
+  color: var(--ink);
+  background: var(--cream);
+}
+
+html[data-palette="zero"] ::selection {
+  background: #0f9f6e;
+  color: #fff;
+}
+
+html[data-palette="zero"] a:focus-visible,
+html[data-palette="zero"] button:focus-visible,
+html[data-palette="zero"] summary:focus-visible {
+  outline-color: #0f9f6e;
+}
+
+/* Header, nav, controls, loader */
+html[data-palette="zero"] nav {
+  background: #ffffffd9;
+  border-color: #11121414;
+  box-shadow: 0 4px 20px #1112140a;
+}
+html[data-palette="zero"] .site-header nav a:hover {
+  color: #0f9f6e;
+}
+html[data-palette="zero"] .on-blue nav {
+  background: #17191dc8;
+  border-color: #ffffff18;
+}
+html[data-palette="zero"] .on-blue .nav-indicator {
+  background: #0f9f6e;
+}
+html[data-palette="zero"] .motion-controls button {
+  background: #ffffffdf;
+  border-color: #1112141a;
+  color: #111214;
+}
+html[data-palette="zero"] .motion-controls button[aria-pressed="true"]:not(.theme-toggle) {
+  background: #0f9f6e;
+  color: #fff;
+}
+html[data-palette="zero"] .theme-toggle {
+  color: #0f9f6e;
+}
+html[data-palette="zero"] .reading-progress {
+  background: linear-gradient(90deg, #0f9f6e, #34d399, #d98a3c, #0f9f6e);
+  background-size: 260% 100%;
+  animation: zero-shimmer 5s linear infinite;
+}
+html[data-palette="zero"] .loader-cube span {
+  background: #111214;
+}
+html[data-palette="zero"] .loader-cube span + span,
+html[data-palette="zero"] .loader-line:after {
+  background: #0f9f6e;
+}
+
+/* Hero */
+html[data-palette="zero"] h1 > span:first-of-type,
+html[data-palette="zero"] .name-letter {
+  background-image: linear-gradient(110deg, #111214, #2b303a, #0f9f6e, #111214);
+}
+html[data-palette="zero"] .name-dot {
+  color: #0f9f6e;
+}
+html[data-palette="zero"] .role-sticker,
+html[data-palette="zero"] .label-sticker {
+  background: #181a1f;
+  color: #f7f6f2;
+  border: 1px solid #ffffff1a;
+}
+html[data-palette="zero"] .label-sticker.light {
+  color: #111214;
+  background: #eceae2;
+  border-color: #11121414;
+}
+html[data-palette="zero"] .hero-copy > p,
+html[data-palette="zero"] .hero-copy p {
+  color: #5c5b55;
+}
+html[data-palette="zero"] .scene-note {
+  background: #ffffffeb;
+  border-color: #e4e1d8;
+  box-shadow: 0 10px 26px #1112140d;
+}
+html[data-palette="zero"] .hero-bottom > a {
+  border-color: #d4d1c7;
+  background: #ffffffaa;
+  backdrop-filter: blur(8px);
+}
+
+/* Meet the Engineer Portal */
+html[data-palette="zero"] .avatar-journey {
+  background: #111214;
+}
+html[data-palette="zero"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #143d32 0%, #111214 55%, #090a0c 100%);
+}
+html[data-palette="zero"] .portal-topline {
+  color: #9be8cc;
+}
+html[data-palette="zero"] .portal-grid {
+  background-image:
+    linear-gradient(#34d39924 1px, transparent 1px),
+    linear-gradient(90deg, #34d39924 1px, transparent 1px);
+}
+html[data-palette="zero"] .portal-stars {
+  background-image: radial-gradient(circle, #a7f3d050 1px, transparent 1.4px);
+}
+html[data-palette="zero"] .portal-base {
+  background: linear-gradient(#10b98188, #0c1412);
+  box-shadow:
+    0 12px 0 #0a0f0e,
+    0 17px 0 #10b98144,
+    0 0 60px #34d39966;
+}
+html[data-palette="zero"] .portal-base i {
+  border-color: #34d399;
+  box-shadow: 0 0 14px #10b981;
+}
+html[data-palette="zero"] .portal-base > span {
+  background: #0d1614;
+  border-color: #2f7d64;
+  color: #86efac;
+}
+html[data-palette="zero"] .portal-callout {
+  border-color: #34d39966;
+  background: #111a1888;
+  color: #ecfdf5;
+}
+html[data-palette="zero"] .portal-callout:after {
+  background: #34d399;
+}
+html[data-palette="zero"] .portal-callout:before {
+  background: #6ee7b7;
+  box-shadow: 0 0 12px #34d399;
+}
+html[data-palette="zero"] .eng-particles i {
+  background: #6ee7b7;
+  box-shadow: 0 0 8px #10b981;
+}
+html[data-palette="zero"] .pe-glow {
+  filter: blur(6px) saturate(1.25) hue-rotate(-32deg);
+}
+
+/* About, Stats, Accordions, Skills Sheet */
+html[data-palette="zero"] .about-editorial-photo {
+  background: #181a1e;
+  border-color: #ffffff22;
+  box-shadow: 0 12px 30px #00000055;
+}
+html[data-palette="zero"] .about-editorial-frame {
+  background: #14161a;
+}
+html[data-palette="zero"] .about-editorial-watch {
+  color: #111214;
+  background: #f7f6f2;
+}
+html[data-palette="zero"] .about-editorial-watch:hover {
+  background: #d1fae5;
+}
+html[data-palette="zero"] .about-editorial-watch small {
+  color: #4b5563;
+}
+html[data-palette="zero"] .about-editorial-bio p + p,
+html[data-palette="zero"] .about-copy > p.secondary-copy,
+html[data-palette="zero"] .stats span,
+html[data-palette="zero"] .detail-content,
+html[data-palette="zero"] .accordion-panel ul {
+  color: #b4b7bf;
+}
+html[data-palette="zero"] .about-editorial-bio em,
+html[data-palette="zero"] .about-copy h2 .heading-accent,
+html[data-palette="zero"] .stats strong {
+  color: #6ee7b7;
+}
+html[data-palette="zero"] .button:hover {
+  background: #34d399;
+  color: #0b1210;
+}
+html[data-palette="zero"] .accordion-sheet {
+  --sheet-blue: #111214;
+  color: #111214;
+}
+html[data-palette="zero"] .accordion-sheet .skills-headline {
+  color: #111214;
+}
+html[data-palette="zero"] .accordion-sheet .skill-options .motion-accordion {
+  border-color: #1112141c;
+}
+html[data-palette="zero"] .accordion-sheet .skill-options .tags span {
+  border-color: #11121426;
+}
+
+/* Experience Timeline */
+html[data-palette="zero"] .experience-timeline {
+  --rail-surface: #111214;
+}
+html[data-palette="zero"] .experience-timeline::before {
+  background: linear-gradient(180deg, #34d399, #f5b864 48%, #525866 86%, #52586622);
+}
+html[data-palette="zero"] .experience-timeline-label {
+  border-color: #34d399;
+  color: #6ee7b7;
+}
+html[data-palette="zero"] .experience-employment,
+html[data-palette="zero"] .experience-entry-copy p,
+html[data-palette="zero"] .experience-entry .accordion-panel ul {
+  color: #c5c8d0;
+}
+html[data-palette="zero"] .experience-entry-copy .experience-project-account {
+  color: #6ee7b7;
+}
+html[data-palette="zero"] .experience-entry-visual {
+  background: #eceae2;
+}
+
+/* Projects, Research, Freelance, Contact */
+html[data-palette="zero"] .showcase-card,
+html[data-palette="zero"] .project-video-dialog {
+  border-color: #e4e1d8;
+  background: #ffffff;
+  box-shadow: 0 2px 14px #11121408;
+}
+html[data-palette="zero"] .showcase-copy .tags span,
+html[data-palette="zero"] .research-copy .tags span {
+  background: #f4f3ee;
+  border-color: #e4e1d8;
+}
+html[data-palette="zero"] .showcase-film-play {
+  color: #fff;
+}
+html[data-palette="zero"] .showcase-film-preview:hover .showcase-film-play {
+  background: #10b981;
+}
+html[data-palette="zero"] .research-section {
+  background: #efede6;
+  border-color: #e0ddd4;
+}
+html[data-palette="zero"] .research-kicker {
+  color: #0f9f6e;
+}
+html[data-palette="zero"] .research-note::before {
+  background: #0f9f6e88;
+}
+html[data-palette="zero"] .research-mini-table b,
+html[data-palette="zero"] .research-salt-diagram em,
+html[data-palette="zero"] .project-explorer-text h3 {
+  color: #0f9f6e;
+}
+html[data-palette="zero"] .case-study-button {
+  background: #111214;
+}
+html[data-palette="zero"] .case-study-button:hover {
+  background: #0f9f6e;
+}
+html[data-palette="zero"] .freelance-metrics strong {
+  color: #0f9f6e;
+}
+html[data-palette="zero"] .contact {
+  background-image:
+    radial-gradient(ellipse at 85% 95%, #0f9f6e38, transparent 55%),
+    radial-gradient(ellipse at 15% 15%, #f5b86418, transparent 50%);
+}
+html[data-palette="zero"] .contact h2 .heading-accent {
+  color: #6ee7b7;
+}
+html[data-palette="zero"] .contact-lower p,
+html[data-palette="zero"] .copy-email,
+html[data-palette="zero"] .availability {
+  color: #b4b8c2;
+}
+html[data-palette="zero"] .contact .back-top:hover {
+  color: #6ee7b7;
+}
+
+/* --- ZERO FLOW: DARK MODE --- */
+html[data-palette="zero"][data-theme="dark"] {
+  --ink: #f2f0ea;
+  --orange: #34d399;
+  --blue: #0f766e;
+  --section-blue: #0f1115;
+  --night: #0a0b0d;
+  --night-2: #101216;
+  --night-card: #15181d;
+  --night-well: #1c2028;
+  --night-line: #262b35;
+  --night-muted: #9ca0ab;
+  --night-faint: #7b808c;
+  --cursor-ink: #6ee7b7;
+  --cursor-tint: #34d39922;
+  --cursor-outline: #34d399a8;
+  background: var(--night);
+  color: var(--ink);
+}
+html[data-palette="zero"][data-theme="dark"] nav {
+  background: #121418e6;
+  border-color: #ffffff14;
+}
+html[data-palette="zero"][data-theme="dark"] .site-header nav a:hover {
+  color: #6ee7b7;
+}
+html[data-palette="zero"][data-theme="dark"] .on-blue nav {
+  background: #101216cc;
+}
+html[data-palette="zero"][data-theme="dark"] .motion-controls button {
+  background: #15181de0;
+  border-color: #ffffff1c;
+  color: #f2f0ea;
+}
+html[data-palette="zero"][data-theme="dark"] .motion-controls .theme-toggle[aria-pressed="true"] {
+  background: #15181de0;
+  color: #6ee7b7;
+}
+html[data-palette="zero"][data-theme="dark"] .hero-frame {
+  background:
+    radial-gradient(circle at 90% 13%, #f7f5ee 0 24px, #d1fae555 27px, #34d3991c 56px, transparent 110px),
+    radial-gradient(circle, #ffffffd0 0.8px, transparent 1.4px) 0 0 / 150px 150px,
+    radial-gradient(circle, #a7f3d088 0.7px, transparent 1.3px) 40px 70px / 230px 230px,
+    radial-gradient(circle, #fde68a55 1px, transparent 1.6px) 110px 20px / 310px 310px,
+    radial-gradient(ellipse 46% 38% at 78% 28%, #0f9f6e33, transparent 70%),
+    radial-gradient(ellipse 42% 34% at 62% 78%, #d98a3c22, transparent 70%),
+    radial-gradient(ellipse 36% 40% at 12% 85%, #1f293740, transparent 70%),
+    linear-gradient(180deg, #08090b 0%, #0d0f13 55%, #11141a 100%);
+}
+html[data-palette="zero"][data-theme="dark"] .name-letter,
+html[data-palette="zero"][data-theme="dark"] h1 > span:first-of-type {
+  background-image: linear-gradient(110deg, #f2f0ea, #6ee7b7, #f5b864, #f2f0ea);
+}
+html[data-palette="zero"][data-theme="dark"] .role-sticker,
+html[data-palette="zero"][data-theme="dark"] .label-sticker {
+  background: #1a1f26;
+  border: 1px solid #34d39944;
+}
+html[data-palette="zero"][data-theme="dark"] .label-sticker.light {
+  background: #1c2028;
+  color: #f2f0ea;
+}
+html[data-palette="zero"][data-theme="dark"] .hero-copy > p,
+html[data-palette="zero"][data-theme="dark"] .hero-copy p {
+  color: #b4b8c2;
+}
+html[data-palette="zero"][data-theme="dark"] .scene-note {
+  background: #15181ddd;
+  border-color: var(--night-line);
+}
+html[data-palette="zero"][data-theme="dark"] .hero-bottom > a {
+  border-color: #2c313d;
+  background: #15181daa;
+}
+html[data-palette="zero"][data-theme="dark"] .ld-night {
+  background:
+    radial-gradient(ellipse 4.5% 4% at 29.6% 29.6%, #fff 0 40%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 51.2% 31.2%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 7.5% 9.5% at 65.3% 36.4%, #fff 0 64%, transparent 100%),
+    radial-gradient(ellipse 23% 34% at 33% 46%, #fff3dc 0%, #e8d6bd 40%, transparent 100%),
+    radial-gradient(ellipse 32% 32% at 57% 44%, #d9f5ec 0%, #a7d9c9 45%, transparent 100%),
+    radial-gradient(ellipse 22% 30% at 18% 18%, #c3cfd9 0%, transparent 100%),
+    radial-gradient(ellipse 64% 66% at 52% 54%, #6a7580 0%, #444d57 45%, #1e2329 78%, #0a0c0f 100%);
+}
+html[data-palette="zero"][data-theme="dark"] .ld-night-light {
+  background:
+    radial-gradient(ellipse 5% 4.5% at 29.6% 30%, #fff1c8f0 0%, transparent 70%),
+    radial-gradient(ellipse 19% 28% at 31% 44%, #f5b86466 0%, transparent 72%),
+    radial-gradient(ellipse 24% 18% at 57% 42%, #34d3993d 0%, transparent 72%),
+    radial-gradient(ellipse 14% 9% at 60% 50%, #6ee7b722 0%, transparent 75%),
+    radial-gradient(ellipse 7% 8% at 51.2% 31.2%, #6ee7b730 0%, transparent 80%),
+    radial-gradient(ellipse 7% 8% at 65.3% 36.4%, #6ee7b730 0%, transparent 80%);
+}
+html[data-palette="zero"][data-theme="dark"] .avatar-journey {
+  background: #0f1115;
+}
+html[data-palette="zero"][data-theme="dark"] .portal-sticky {
+  background: radial-gradient(ellipse at 50% 87%, #123b30 0%, #0f1115 56%, #07080a 100%);
+}
+html[data-palette="zero"][data-theme="dark"] .accordion-sheet {
+  --sheet-blue: #0f1115;
+  background: var(--night-card);
+  color: var(--ink);
+}
+html[data-palette="zero"][data-theme="dark"] .accordion-sheet .skills-headline {
+  color: var(--ink);
+}
+html[data-palette="zero"][data-theme="dark"] .experience-timeline {
+  --rail-surface: #0f1115;
+}
+html[data-palette="zero"][data-theme="dark"] .showcase-card,
+html[data-palette="zero"][data-theme="dark"] .project-video-dialog {
+  background: var(--night-card);
+  border-color: var(--night-line);
+}
+html[data-palette="zero"][data-theme="dark"] .showcase-links .showcase-primary,
+html[data-palette="zero"][data-theme="dark"] .showcase-links .showcase-watch,
+html[data-palette="zero"][data-theme="dark"] .case-study-button {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #fff;
+}
+html[data-palette="zero"][data-theme="dark"] .showcase-links .showcase-watch:hover,
+html[data-palette="zero"][data-theme="dark"] .case-study-button:hover {
+  background: #34d399;
+  border-color: #34d399;
+  color: #09110e;
+}
+html[data-palette="zero"][data-theme="dark"] .research-section {
+  background: var(--night-2);
+  border-color: var(--night-line);
+}
+html[data-palette="zero"][data-theme="dark"] .research-kicker,
+html[data-palette="zero"][data-theme="dark"] .project-explorer-metrics strong,
+html[data-palette="zero"][data-theme="dark"] .freelance-metrics strong {
+  color: #6ee7b7;
+}
+html[data-palette="zero"][data-theme="dark"] .research-paper .research-kicker {
+  color: #0f766e;
+}
+html[data-palette="zero"][data-theme="dark"] .showcase-film-play {
+  color: #06140f;
+}
+
+
+/* ======================================================================
+   FLOWING ANIMATIONS LAYER (inspired by learnwithzero.com)
+   1. Ambient drifting liquid light orbs in Hero
+   2. Seamless dual-row flowing marquee ribbon (stack & impact)
+   3. Flowing gradient shimmer & silky hover lift
+   ====================================================================== */
+
+.zero-flow-aura {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.zero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(78px);
+  opacity: 0.24;
+  will-change: transform;
+}
+
+.zero-orb-a {
+  width: clamp(320px, 42vw, 620px);
+  height: clamp(320px, 42vw, 620px);
+  top: -12%;
+  left: -6%;
+  background: radial-gradient(circle, var(--orange) 0%, transparent 70%);
+  animation: zero-drift-a 18s ease-in-out infinite alternate;
+}
+
+.zero-orb-b {
+  width: clamp(280px, 38vw, 560px);
+  height: clamp(280px, 38vw, 560px);
+  bottom: -16%;
+  right: 18%;
+  background: radial-gradient(circle, var(--blue) 0%, transparent 72%);
+  opacity: 0.16;
+  animation: zero-drift-b 22s ease-in-out infinite alternate;
+}
+
+html[data-theme="dark"] .zero-orb-a {
+  opacity: 0.16;
+}
+html[data-theme="dark"] .zero-orb-b {
+  opacity: 0.2;
+}
+
+@keyframes zero-drift-a {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(7%, 10%, 0) scale(1.1);
+  }
+  100% {
+    transform: translate3d(-4%, 14%, 0) scale(0.95);
+  }
+}
+
+@keyframes zero-drift-b {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-9%, -8%, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(5%, -14%, 0) scale(0.94);
+  }
+}
+
+@keyframes zero-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 260% 50%;
+  }
+}
+
+/* Seamless dual-row infinite flowing ribbon (Zero-style talent/stack flow) */
+.zero-flow-ribbon {
+  position: relative;
+  overflow: hidden;
+  padding: 22px 0 24px;
+  background: var(--section-blue);
+  border-top: 1px solid #ffffff16;
+  border-bottom: 1px solid #ffffff14;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.zero-ribbon-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.zero-ribbon-group {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-right: 11px;
+}
+
+.zero-ribbon-forward {
+  animation: zero-marquee 38s linear infinite;
+}
+
+.zero-ribbon-reverse {
+  animation: zero-marquee-rev 44s linear infinite;
+}
+
+.zero-flow-ribbon:hover .zero-ribbon-track {
+  animation-play-state: paused;
+}
+
+.zero-ribbon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  border: 1px solid #ffffff20;
+  background: #ffffff0a;
+  color: #f3f1ea;
+  font-family: "Space Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.zero-ribbon-pill:hover {
+  transform: translateY(-2px);
+  border-color: var(--orange);
+  background: #ffffff14;
+}
+
+.zero-ribbon-pill.is-metric {
+  border-color: #ffffff14;
+  background: #ffffff05;
+  color: #cbd5e1;
+  font-size: 10px;
+}
+
+.zero-ribbon-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 8px var(--orange);
+  flex-shrink: 0;
+}
+
+@keyframes zero-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes zero-marquee-rev {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Smooth flowing micro-interactions on cards & stats */
+.showcase-card,
+.professional-card,
+.stats > div {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .showcase-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 42px #00000018;
+  }
+  html[data-theme="dark"] .showcase-card:hover {
+    box-shadow: 0 18px 42px #00000055;
+  }
+  .stats > div:hover {
+    transform: translateY(-3px);
+  }
+}
+
+/* Respect reduced motion / pause toggle cleanly */
+.zero-flow-ribbon[data-reduced="true"] .zero-ribbon-track,
+html[data-motion="off"] .zero-ribbon-track,
+html[data-motion="off"] .zero-orb {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zero-ribbon-track,
+  .zero-orb {
+    animation: none !important;
+  }
+}

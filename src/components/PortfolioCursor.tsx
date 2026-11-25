@@ -7,7 +7,7 @@ const controls = "a[href], button, input, [role='button']";
 const media = ".portrait-play, .carousel-thumb, .research-figure a, .project-play-cover, video, .ld-hits polygon";
 const freeControls = media + ", .motion-accordion button, .email-link, .preview-open, .hero-bottom a, .skip-link, .pause-toggle, .research-note, input";
 const fittedShapes = ".skills-content .tags > span, .project-play-stamp, .portrait-play-icon";
-const primary = ".button, .contact-pill, .showcase-primary";
+const primary = ".button, .contact-pill, .delta-contact-pill, .showcase-primary";
 const normal: IpadCursorStyle = {
   width: 14, height: 14, radius: "50%", background: "#eb883caa",
   border: "1.5px solid #57351e", backdropBlur: 0, backdropSaturate: "135%",
@@ -39,7 +39,11 @@ export default function PortfolioCursor() {
         el.setAttribute("data-cursor-style", customCursorStyle({
           background: "#ed883823", border: "1.5px solid #d87427", radius: "999px",
         }));
-      } else if (el.matches(".social-links a, .motion-controls button, .carousel-controls button, .monogram, .project-player-controls > button:first-child")) {
+      } else if (el.matches(".delta-nav-link, .delta-wave-pill")) {
+        el.setAttribute("data-cursor-style", customCursorStyle({
+          background: "#ed883820", border: "1.5px solid #ed8838aa", radius: "999px", durationBase: 190,
+        }));
+      } else if (el.matches(".social-links a, .motion-controls button, .carousel-controls button, .monogram, .delta-logo-btn, .delta-theme-shell button, .project-player-controls > button:first-child")) {
         el.setAttribute("data-cursor-style", customCursorStyle({ radius: "50%", durationBase: 200 }));
       } else if (el.matches("[download], .showcase-links a")) {
         el.setAttribute("data-cursor-style", customCursorStyle({ background: "#9fc5ff2e", border: "1px solid #749ada" }));

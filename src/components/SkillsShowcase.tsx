@@ -4,6 +4,7 @@ import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
 import { RippleWords } from "./HeadingRipples";
 import { Scramble, useMotionPreference } from "./MotionSystem";
+import type { LandmarkAtlas } from "./skills-city/landmarkAtlas";
 import "./SkillsShowcase.css";
 
 const assetUrl = (p: string) => `${import.meta.env.BASE_URL}${p}`;
@@ -65,24 +66,25 @@ function mulberry32(seed: number) {
 
 
 
+// Studio Cycles matte-clay & slate-roof miniature palettes (warm sunlit left, cool dove-gray shadow right)
 const PALETTES_LIGHT = [
-  { top: "#f6f0e4", left: "#e4d9c5", leftBot: "#c7baa2", right: "#cabda6", rightBot: "#a6977e", win: "#3b5678", lit: "#ed8838" },
-  { top: "#f0a366", left: "#ed8838", leftBot: "#c7681f", right: "#d16f24", rightBot: "#9e4d12", win: "#fff5e6", lit: "#fef08a" },
-  { top: "#8fb3d1", left: "#4b7b8b", leftBot: "#2e5463", right: "#386375", rightBot: "#22414f", win: "#e6f3fa", lit: "#f5c478" },
-  { top: "#7c94c9", left: "#3d5594", leftBot: "#1c3370", right: "#29407d", rightBot: "#102b79", win: "#dce6fa", lit: "#f2bd83" },
-  { top: "#f2cf88", left: "#d9a954", leftBot: "#b08230", right: "#ba8b38", rightBot: "#8f651d", win: "#2d3e70", lit: "#fffbeb" },
-  { top: "#88bfa1", left: "#569674", leftBot: "#397053", right: "#3f7d5d", rightBot: "#27573f", win: "#e4f7ed", lit: "#fef08a" },
-  { top: "#e3c5aa", left: "#c49b7a", leftBot: "#9c7454", right: "#a67e5f", rightBot: "#7d5b40", win: "#292820", lit: "#ed8838" },
-  { top: "#d6cebf", left: "#b8ae9c", leftBot: "#948977", right: "#9c9180", rightBot: "#786d5c", win: "#425873", lit: "#f2bd83" },
+  { top: "#8b8e95", left: "#faf8f3", leftBot: "#e3e0d8", right: "#cfd3dc", rightBot: "#b2b7c2", win: "#ffd49c", lit: "#ffa452" },
+  { top: "#7c7f87", left: "#f7f5ee", leftBot: "#dedad0", right: "#c9cdd6", rightBot: "#acb1bc", win: "#ffcf91", lit: "#ff9e4a" },
+  { top: "#868991", left: "#f5f4ef", leftBot: "#dcd9d1", right: "#ccd0d9", rightBot: "#afb4bf", win: "#ffd8a6", lit: "#ffa859" },
+  { top: "#73767e", left: "#f8f6f1", leftBot: "#e0ddd5", right: "#cbd0da", rightBot: "#aeb3bf", win: "#ffd196", lit: "#ffa04d" },
+  { top: "#93959c", left: "#fcfaf5", leftBot: "#e6e3db", right: "#d4d7e0", rightBot: "#b8bcc7", win: "#ffd6a1", lit: "#ffa654" },
+  { top: "#7a7e86", left: "#f2f0ea", leftBot: "#d8d5cc", right: "#c6cbd4", rightBot: "#a9aeb9", win: "#ffce8f", lit: "#ff9b45" },
+  { top: "#888b92", left: "#f6f4ed", leftBot: "#dedbd2", right: "#cdd1da", rightBot: "#b0b5c0", win: "#ffd399", lit: "#ffa350" },
+  { top: "#7f828a", left: "#f4f2ec", leftBot: "#dbd8cf", right: "#c9ced7", rightBot: "#acb1bd", win: "#ffd094", lit: "#ff9f4b" },
 ];
 
 const PALETTES_DARK = [
-  { top: "#38466e", left: "#263254", leftBot: "#141c36", right: "#1b2440", rightBot: "#0e1429", win: "#f0a463", lit: "#ed8838" },
-  { top: "#c77434", left: "#9c5521", leftBot: "#6b3611", right: "#7d4116", rightBot: "#4d260b", win: "#ffe3ba", lit: "#fde68a" },
-  { top: "#426a85", left: "#2b4b63", leftBot: "#193042", right: "#1f394d", rightBot: "#112230", win: "#8dbbe0", lit: "#ed8838" },
-  { top: "#4c62a6", left: "#324580", leftBot: "#1c2854", right: "#243466", rightBot: "#121c3d", win: "#b8c9ff", lit: "#f2bd83" },
-  { top: "#53607d", left: "#39445e", leftBot: "#222a3d", right: "#2b344a", rightBot: "#171d2e", win: "#f5c478", lit: "#ed8838" },
-  { top: "#36695e", left: "#244d44", leftBot: "#15302a", right: "#1a3b34", rightBot: "#0f241f", win: "#9ee3cf", lit: "#f2bd83" },
+  { top: "#4b5163", left: "#343a4c", leftBot: "#222736", right: "#292e3d", rightBot: "#191d29", win: "#ffba73", lit: "#ff9442" },
+  { top: "#43495c", left: "#2f3546", leftBot: "#1e2330", right: "#252a38", rightBot: "#161a26", win: "#ffc280", lit: "#ff9b4a" },
+  { top: "#505669", left: "#383e52", leftBot: "#252a3a", right: "#2c3242", rightBot: "#1c202e", win: "#ffb66b", lit: "#ff8f3b" },
+  { top: "#464c5e", left: "#313748", leftBot: "#202533", right: "#262c3b", rightBot: "#171b27", win: "#ffc685", lit: "#ff9e4f" },
+  { top: "#4d5366", left: "#363c4f", leftBot: "#232838", right: "#2a3040", rightBot: "#1a1e2b", win: "#ffbd78", lit: "#ff9645" },
+  { top: "#404657", left: "#2d3343", leftBot: "#1c212e", right: "#232836", rightBot: "#151824", win: "#ffb870", lit: "#ff9240" },
 ];
 
 const ROAD_X = [-5.8, -2.15, 2.15, 5.8];
@@ -113,6 +115,8 @@ interface Struct {
   palIdx: number;
 }
 
+const FERRIS_POS = { gx: -7.35, gy: 4.86 };
+
 function buildCityStructures(): Struct[] {
   const rand = mulberry32(9721);
   const structures: Struct[] = [
@@ -120,61 +124,134 @@ function buildCityStructures(): Struct[] {
     { kind: "airport", gx: 4.1, gy: -3.25, w: 2.45, d: 1.22, h: 28, palIdx: 2 },
     { kind: "controlTower", gx: 5.2, gy: -2.5, w: 0.44, d: 0.44, h: 98, palIdx: 0 },
     { kind: "spire", gx: -3.9, gy: -3.1, w: 0.88, d: 0.88, h: 142, palIdx: 3 },
-    { kind: "twin", gx: -0.3, gy: -2.9, w: 1.22, d: 0.72, h: 116, palIdx: 1 },
-    { kind: "cantilever", gx: -3.65, gy: -0.05, w: 0.92, d: 0.88, h: 96, palIdx: 5 },
-    { kind: "rotunda", gx: 3.55, gy: -0.05, w: 1.04, d: 1.04, h: 54, palIdx: 0 },
-    { kind: "sawtooth", gx: -7.1, gy: -0.05, w: 1.28, d: 0.96, h: 34, palIdx: 1 },
     { kind: "clocktower", gx: -4.1, gy: 2.65, w: 0.56, d: 0.56, h: 86, palIdx: 4 },
-    { kind: "datacenter", gx: 0.15, gy: 2.68, w: 1.24, d: 0.86, h: 32, palIdx: 3 },
-    { kind: "greenhouse", gx: -3.2, gy: 6.45, w: 1.12, d: 0.78, h: 26, palIdx: 5 },
     { kind: "pond", gx: 3.85, gy: 2.65, w: 1.38, d: 0.94, h: 3, palIdx: 2 },
-    { kind: "spire", gx: 7.2, gy: -0.1, w: 0.84, d: 0.84, h: 122, palIdx: 2 },
-    { kind: "twin", gx: -7.1, gy: 2.75, w: 1.15, d: 0.68, h: 100, palIdx: 3 },
+    // Cosmopolitan civic & transit landmarks
+    { kind: "greenhouse", gx: -3.85, gy: -6.28, w: 1.1, d: 0.84, h: 26, palIdx: 5 },
+    { kind: "rotunda", gx: -7.35, gy: -3.02, w: 1.04, d: 1.04, h: 48, palIdx: 0 },
+    { kind: "metro_station", gx: -0.25, gy: METRO_Y, w: 1.18, d: 0.42, h: 34, palIdx: 2 },
+    { kind: "metro_station", gx: -7.25, gy: METRO_Y, w: 1.18, d: 0.42, h: 34, palIdx: 3 },
+    { kind: "ferris_base", gx: FERRIS_POS.gx, gy: FERRIS_POS.gy, w: 0.96, d: 0.62, h: 12, palIdx: 0 },
+    // 14 compact, evenly distributed skill-logo architectural landmarks
+    { kind: "logo_databricks", gx: -0.35, gy: -2.95, w: 1.14, d: 1.14, h: 106, palIdx: 1 },
+    { kind: "logo_python", gx: -3.75, gy: -0.05, w: 1.16, d: 1.1, h: 94, palIdx: 3 },
+    { kind: "logo_airflow", gx: 3.65, gy: -0.05, w: 1.14, d: 1.14, h: 72, palIdx: 0 },
+    { kind: "logo_fastapi", gx: -7.15, gy: -0.05, w: 1.14, d: 1.04, h: 74, palIdx: 5 },
+    { kind: "logo_delta", gx: 0.15, gy: 2.62, w: 1.2, d: 1.06, h: 82, palIdx: 2 },
+    { kind: "logo_spark", gx: -3.3, gy: 6.45, w: 1.16, d: 1.12, h: 62, palIdx: 1 },
+    { kind: "logo_docker", gx: 0.35, gy: 6.42, w: 1.26, d: 0.96, h: 56, palIdx: 2 },
+    { kind: "logo_azure", gx: 7.35, gy: -0.05, w: 1.18, d: 1.04, h: 112, palIdx: 3 },
+    { kind: "logo_powerbi", gx: -7.2, gy: 2.66, w: 1.18, d: 0.9, h: 96, palIdx: 4 },
+    { kind: "logo_gcp", gx: 7.45, gy: -2.95, w: 1.24, d: 1.0, h: 64, palIdx: 0 },
+    { kind: "logo_redis", gx: 3.85, gy: -6.38, w: 1.16, d: 1.04, h: 68, palIdx: 1 },
+    { kind: "logo_kafka", gx: 7.32, gy: 2.66, w: 1.16, d: 1.04, h: 84, palIdx: 3 },
+    { kind: "logo_gemini", gx: -0.45, gy: -6.48, w: 1.2, d: 1.2, h: 108, palIdx: 3 },
+    { kind: "logo_chatgpt", gx: 1.05, gy: -6.48, w: 1.22, d: 1.22, h: 86, palIdx: 5 },
+    { kind: "logo_claude", gx: -1.08, gy: 6.42, w: 1.22, d: 1.22, h: 88, palIdx: 1 },
+    { kind: "logo_postgres", gx: 3.92, gy: 6.42, w: 1.16, d: 1.04, h: 74, palIdx: 2 },
   ];
 
-  const isReserved = (gx: number, gy: number) => {
-    for (const rx of ROAD_X) if (Math.abs(gx - rx) < 0.44) return true;
-    for (const ry of ROAD_Y) if (Math.abs(gy - ry) < 0.44) return true;
-    if (gy > CANAL_Y0 - 0.42 && gy < CANAL_Y1 + 0.42) return true;
-    if (Math.abs(gy - METRO_Y) < 0.36) return true;
-    if (gx > 2.4 && gx < 7.2 && gy > -4.6 && gy < -3.8) return true;
+  // Footprint-exact placement check: guarantees zero overlap with sidewalks (±0.36), canal water, or neighbors
+  const canPlace = (gx: number, gy: number, hw: number, hd: number, allowRiverbank = false) => {
+    for (const rx of ROAD_X) if (Math.abs(gx - rx) < 0.36 + hw) return false;
+    for (const ry of ROAD_Y) if (Math.abs(gy - ry) < 0.36 + hd) return false;
+    const canalPad = allowRiverbank ? 0.03 : 0.34;
+    if (gy + hd > CANAL_Y0 - canalPad && gy - hd < CANAL_Y1 + canalPad) return false;
+    if (Math.abs(gy - METRO_Y) < 0.24 + hd) return false;
+    if (gx > 2.4 && gx < 7.2 && gy > -4.6 && gy < -3.8) return false;
     for (const s of structures) {
-      if (Math.abs(gx - s.gx) < s.w * 0.54 + 0.28 && Math.abs(gy - s.gy) < s.d * 0.54 + 0.28) return true;
+      const isLogo = s.kind.startsWith("logo_");
+      const pad = isLogo ? 0.14 : 0.08;
+      if (Math.abs(gx - s.gx) < s.w * 0.5 + hw + pad && Math.abs(gy - s.gy) < s.d * 0.5 + hd + pad) return false;
     }
-    return false;
+    return true;
   };
 
+  // PASS 1: Cosmopolitan Waterfront Quays along BOTH north & south canal embankments
+  const bankKinds = ["canal_house", "waterfront_cafe", "boathouse", "canal_house", "river_promenade", "waterfront_cafe"];
+  let bankIdx = 0;
+  for (let gx = -16.2; gx <= 16.2; gx += 0.64) {
+    const banks: Array<{ gy: number; isNorth: boolean }> = [
+      { gy: CANAL_Y0 - 0.24, isNorth: true },
+      { gy: CANAL_Y1 + 0.28, isNorth: false },
+    ];
+    for (const b of banks) {
+      const u = gx - b.gy;
+      const v = gx + b.gy;
+      if (Math.abs(u) > 22.5 || v < -18.5 || v > 19.5) continue;
+      const jx = gx + (rand() - 0.5) * 0.06;
+      const kind = bankKinds[bankIdx % bankKinds.length];
+      bankIdx++;
+      const w = kind === "boathouse" ? 0.52 : kind === "river_promenade" ? 0.54 : 0.44 + rand() * 0.1;
+      const d = 0.36 + rand() * 0.06;
+      if (!canPlace(jx, b.gy, w * 0.5, d * 0.5, true)) continue;
+      structures.push({
+        kind,
+        gx: jx,
+        gy: b.gy,
+        w,
+        d,
+        h: kind === "river_promenade" ? 3 : kind === "boathouse" ? 16 : kind === "waterfront_cafe" ? 18 + rand() * 6 : 24 + rand() * 14,
+        floors: kind === "canal_house" ? 3 : 2,
+        cols: 2,
+        seed: rand(),
+        palIdx: bankIdx + (b.isNorth ? 1 : 3),
+      });
+    }
+  }
+
+  // PASS 2: Dense Primary Metropolitan Block Grid (tighter 0.78 pitch filling up to every avenue & landmark)
   const variants = ["stepped", "gable", "courtyard", "penthouse", "cafe", "slim", "lshape", "terrace", "silo", "tower"];
   let idx = 0;
 
-  for (let gx = -20; gx <= 20; gx += 0.86) {
-    for (let gy = -20; gy <= 20; gy += 0.86) {
+  for (let gx = -20; gx <= 20; gx += 0.78) {
+    for (let gy = -20; gy <= 20; gy += 0.78) {
       const u = gx - gy;
       const v = gx + gy;
       if (Math.abs(u) > 23.5 || v < -19.5 || v > 20.5) continue;
 
-      const jx = gx + (rand() - 0.5) * 0.12;
-      const jy = gy + (rand() - 0.5) * 0.12;
-      if (isReserved(jx, jy)) continue;
+      const jx = gx + (rand() - 0.5) * 0.08;
+      const jy = gy + (rand() - 0.5) * 0.08;
+      const roll = rand();
 
-      if (rand() < 0.085) {
-        structures.push({ kind: "park", gx: jx, gy: jy, w: 0.72, d: 0.72, h: 2, hasFountain: rand() < 0.45, palIdx: 5 });
+      if (roll < 0.065) {
+        const w = 0.64;
+        const d = 0.64;
+        if (canPlace(jx, jy, w * 0.5, d * 0.5)) {
+          structures.push({ kind: "park", gx: jx, gy: jy, w, d, h: 2, hasFountain: rand() < 0.5, palIdx: 5 });
+        }
+        continue;
+      }
+      if (roll < 0.085) {
+        const w = 0.66;
+        const d = 0.5;
+        if (canPlace(jx, jy, w * 0.5, d * 0.5)) {
+          structures.push({ kind: "tennis_court", gx: jx, gy: jy, w, d, h: 2.5, palIdx: 5 });
+        }
         continue;
       }
 
       const kind = variants[(idx * 7 + Math.floor(rand() * 3)) % variants.length];
       idx++;
       const dist = Math.hypot(jx * 0.72, jy * 0.78);
-      const scaleH = Math.max(18, (90 - dist * 2.65) * (0.46 + rand() * 0.88));
-      const small = kind === "gable" || kind === "cafe" || kind === "courtyard";
+      let scaleH = Math.max(18, (90 - dist * 2.65) * (0.46 + rand() * 0.88));
+      // Protect foreground sightlines in front of every skill-logo landmark so nothing hides a logo or brand name
+      const blocksLogo = structures.some(
+        (ls) => ls.kind.startsWith("logo_") && jx > ls.gx - 0.55 && jx < ls.gx + 1.85 && jy > ls.gy - 0.55 && jy < ls.gy + 1.85,
+      );
+      if (blocksLogo) scaleH = Math.min(scaleH, 16 + rand() * 7);
+      const small = blocksLogo || kind === "gable" || kind === "cafe" || kind === "courtyard";
+      const w = 0.44 + rand() * 0.22;
+      const d = 0.42 + rand() * 0.22;
+      if (!canPlace(jx, jy, w * 0.5, d * 0.5)) continue;
 
       structures.push({
         kind,
         gx: jx,
         gy: jy,
-        w: 0.5 + rand() * 0.28,
-        d: 0.48 + rand() * 0.28,
-        h: small ? 18 + rand() * 14 : scaleH,
+        w,
+        d,
+        h: blocksLogo ? 15 + rand() * 7 : small ? 18 + rand() * 14 : scaleH,
         floors: small ? 2 : Math.max(3, Math.floor(scaleH / 8.8)),
         cols: rand() < 0.5 ? 3 : 4,
         hasHvac: rand() < 0.46,
@@ -184,13 +261,107 @@ function buildCityStructures(): Struct[] {
         hasSolar: !small && rand() < 0.34,
         hasBillboard: !small && scaleH > 34 && rand() < 0.16,
         hasRoofGarden: !small && rand() < 0.24,
-        trees: rand() < 0.44 ? 1 : 0,
+        trees: rand() < 0.4 ? 1 : 0,
         seed: rand(),
         palIdx: idx + Math.floor(rand() * 5),
       });
     }
   }
 
+  // PASS 3: Fine Cosmopolitan Pocket Infill & Lush Landscaping (trees, bushes, flower beds, pocket plazas)
+  const infillKinds = [
+    "bush_cluster",
+    "corner_shop",
+    "tree_grove",
+    "market_stalls",
+    "garden_bed",
+    "pocket_plaza",
+    "bush_cluster",
+    "gable",
+    "plaza_fountain",
+    "tree_grove",
+  ];
+  let infIdx = 0;
+  for (let gx = -18.5; gx <= 18.5; gx += 0.48) {
+    for (let gy = -18.5; gy <= 18.5; gy += 0.48) {
+      const u = gx - gy;
+      const v = gx + gy;
+      if (Math.abs(u) > 22.5 || v < -18.5 || v > 19.5) continue;
+      const kind = infillKinds[infIdx % infillKinds.length];
+      const isGreenery = kind === "bush_cluster" || kind === "garden_bed" || kind === "tree_grove";
+      const w = isGreenery ? 0.28 + rand() * 0.08 : 0.34 + rand() * 0.08;
+      const d = isGreenery ? 0.28 + rand() * 0.08 : 0.34 + rand() * 0.08;
+      if (!canPlace(gx, gy, w * 0.5, d * 0.5)) continue;
+      infIdx++;
+      structures.push({
+        kind,
+        gx,
+        gy,
+        w,
+        d,
+        h: isGreenery || kind === "pocket_plaza" || kind === "plaza_fountain" ? 2.5 : kind === "market_stalls" ? 10 : 15 + rand() * 11,
+        floors: 2,
+        cols: 2,
+        seed: rand(),
+        palIdx: infIdx + Math.floor(rand() * 6),
+      });
+    }
+  }
+
+  // PASS 4: Avenue Street Trees & Sidewalk Hedge Planters lining every boulevard
+  for (let p = -15.5; p <= 15.5; p += 1.25) {
+    for (const ry of ROAD_Y) {
+      if (ROAD_X.some((rx) => Math.abs(p - rx) < 0.72)) continue;
+      structures.push({ kind: "street_foliage", gx: p, gy: ry + 0.36, w: 0.16, d: 0.16, h: 2, seed: rand(), palIdx: 5 });
+    }
+    for (const rx of ROAD_X) {
+      if (ROAD_Y.some((ry) => Math.abs(p - ry) < 0.72)) continue;
+      if (p > CANAL_Y0 - 0.5 && p < CANAL_Y1 + 0.5) continue;
+      structures.push({ kind: "street_foliage", gx: rx - 0.36, gy: p, w: 0.16, d: 0.16, h: 2, seed: rand(), palIdx: 5 });
+    }
+  }
+
+  // 6 new distinct architectural logo buildings placed in the expanded right & left city districts.
+  // Clear any overlapping generic blocks within their plazas so they stand out cleanly.
+  const expandedLogos: Struct[] = [
+    { kind: "logo_synapse", gx: 9.2, gy: -5.8, w: 1.08, d: 1.08, h: 68, palIdx: 2 },
+    { kind: "logo_apim", gx: 12.6, gy: -3.2, w: 1.06, d: 0.48, h: 66, palIdx: 2 },
+    { kind: "logo_eventhubs", gx: 11.4, gy: -7.4, w: 1.06, d: 0.48, h: 66, palIdx: 2 },
+    { kind: "logo_unity", gx: -6.2, gy: 7.4, w: 1.12, d: 1.12, h: 68, palIdx: 2 },
+    { kind: "logo_adls", gx: -9.8, gy: 0.4, w: 0.48, d: 1.04, h: 62, palIdx: 2 },
+    { kind: "logo_blob", gx: -7.8, gy: 9.8, w: 0.48, d: 1.04, h: 64, palIdx: 2 },
+  ];
+  for (let i = structures.length - 1; i >= 0; i--) {
+    const st = structures[i];
+    if (st.kind.startsWith("logo_")) continue;
+    if (
+      expandedLogos.some(
+        (nl) =>
+          Math.abs(st.gx - nl.gx) < (st.w + nl.w) * 0.5 + 0.22 &&
+          Math.abs(st.gy - nl.gy) < (st.d + nl.d) * 0.5 + 0.22,
+      )
+    ) {
+      structures.splice(i, 1);
+    }
+  }
+
+  // Infill sites surveyed after the original structures are placed.
+  structures.push(
+    ...expandedLogos,
+    { kind: "logo_devops", gx: -0.3, gy: 12.4, w: 0.96, d: 0.44, h: 64, palIdx: 2 },
+    { kind: "logo_pytest", gx: 1.6, gy: 12.1, w: 0.44, d: 0.96, h: 64, palIdx: 2 },
+    { kind: "logo_vault", gx: 11.95, gy: 1, w: 0.92, d: 0.92, h: 62, palIdx: 2 },
+    { kind: "logo_mysql", gx: 11.7, gy: -1.1, w: 1.04, d: 0.46, h: 62, palIdx: 2 },
+    { kind: "logo_sonar", gx: -10.25, gy: 2.75, w: 0.44, d: 0.96, h: 64, palIdx: 2 },
+    { kind: "logo_functions", gx: -3, gy: 10.2, w: 0.92, d: 0.92, h: 62, palIdx: 2 },
+    { kind: "logo_adf", gx: 2.8, gy: 8.75, w: 0.415, d: 0.99, h: 54, palIdx: 2 },
+    { kind: "logo_copilot", gx: -1.45, gy: -6.5, w: 0.55, d: 1.23, h: 59, palIdx: 5 },
+    { kind: "logo_git", gx: 0.375, gy: 1.075, w: 0.55, d: 0.55, h: 48, palIdx: 1 },
+    { kind: "logo_vscode", gx: 8.55, gy: -1.1, w: 1.11, d: 0.47, h: 60, palIdx: 3 },
+  );
+  for (const building of structures) {
+    if (building.kind.startsWith("logo_")) building.h *= 1.45;
+  }
   structures.sort((a, b) => a.gx + a.gy - (b.gx + b.gy));
   return structures;
 }
@@ -263,8 +434,9 @@ const CRANES = [
 const PEOPLE = Array.from({ length: 72 }, (_, i) => {
   const rand = mulberry32(200 + i * 29);
   const horizontal = i % 2 === 0;
-  const lanesH = [-5.72, -5.08, -2.07, -1.43, 1.43, 2.07, 5.08, 5.72];
-  const lanesV = [-6.12, -5.48, -2.47, -1.83, 1.83, 2.47, 5.48, 6.12];
+  // Strictly centered on the paved sidewalk strips (±0.275 from road centerlines)
+  const lanesH = ROAD_Y.flatMap((ry) => [ry - 0.275, ry + 0.275]);
+  const lanesV = ROAD_X.flatMap((rx) => [rx - 0.275, rx + 0.275]);
   return {
     horizontal,
     lane: horizontal ? lanesH[i % lanesH.length] : lanesV[i % lanesV.length],
@@ -279,14 +451,17 @@ const PEOPLE = Array.from({ length: 72 }, (_, i) => {
 const VEHICLES = Array.from({ length: 36 }, (_, i) => {
   const rand = mulberry32(950 + i * 41);
   const horizontal = i % 2 === 0;
-  const lanesH = [-5.5, -5.3, -1.85, -1.65, 1.65, 1.85, 5.3, 5.5];
-  const lanesV = [-5.9, -5.7, -2.25, -2.05, 2.05, 2.25, 5.7, 5.9];
+  // Strictly centered inside the two asphalt driving lanes (±0.095 from road centerlines)
+  const lanesH = ROAD_Y.flatMap((ry) => [ry - 0.095, ry + 0.095]);
+  const lanesV = ROAD_X.flatMap((rx) => [rx - 0.095, rx + 0.095]);
+  const laneIdx = i % 8;
+  const dir = laneIdx % 2 === 0 ? 1 : -1;
   const isBus = i % 5 === 0;
   return {
     horizontal,
-    lane: horizontal ? lanesH[i % lanesH.length] : lanesV[i % lanesV.length],
+    lane: horizontal ? lanesH[laneIdx] : lanesV[laneIdx],
     pos: -15 + rand() * 30,
-    speed: (isBus ? 0.017 : 0.026 + rand() * 0.022) * (i % 4 < 2 ? 1 : -1),
+    speed: (isBus ? 0.017 : 0.026 + rand() * 0.022) * dir,
     isBus,
     color: isBus ? "#ed8838" : ["#f2bd83", "#2d3e70", "#4b7b8b", "#f4f0e6", "#d96b43"][i % 5],
   };
@@ -529,6 +704,28 @@ function VerticalBeadString({
   );
 }
 
+// High-frequency studio clay micro-grain pattern for tactile Blender-Cycles matte stucco finish
+let clayGrainPattern: CanvasPattern | null = null;
+function getClayGrain(ctx: CanvasRenderingContext2D): CanvasPattern | null {
+  if (clayGrainPattern) return clayGrainPattern;
+  const c = document.createElement("canvas");
+  c.width = 64;
+  c.height = 64;
+  const g = c.getContext("2d");
+  if (!g) return null;
+  const rand = mulberry32(4049);
+  for (let y = 0; y < 64; y += 2) {
+    for (let x = 0; x < 64; x += 2) {
+      const v = rand();
+      const a = 0.018 + rand() * 0.03;
+      g.fillStyle = v > 0.5 ? `rgba(255,255,255,${a.toFixed(3)})` : `rgba(20,28,45,${a.toFixed(3)})`;
+      g.fillRect(x, y, 2, 2);
+    }
+  }
+  clayGrainPattern = ctx.createPattern(c, "repeat");
+  return clayGrainPattern;
+}
+
 function box(
   ctx: CanvasRenderingContext2D,
   iso: IsoFn,
@@ -558,88 +755,126 @@ function box(
     iso(gx + hw, gy + hd, z0),
     iso(gx - hw, gy + hd, z0),
   ];
+  const hSpan = z1 - z0;
+  const grain = hSpan > 5 ? getClayGrain(ctx) : null;
 
+  // Left sunlit matte-clay wall with diagonal 3-point studio gradient (bright top-left -> bounced bottom-right)
   ctx.beginPath();
-  ctx.moveTo(...top[3]);
-  ctx.lineTo(...top[2]);
-  ctx.lineTo(...bot[2]);
-  ctx.lineTo(...bot[3]);
-  ctx.closePath();
-  if (lBot && z1 - z0 > 10) {
-    const gL = ctx.createLinearGradient(top[2][0], top[2][1], bot[2][0], bot[2][1]);
+  ctx.moveTo(...top[3]); ctx.lineTo(...top[2]); ctx.lineTo(...bot[2]); ctx.lineTo(...bot[3]); ctx.closePath();
+  if (lBot && hSpan > 8) {
+    const gL = ctx.createLinearGradient(top[3][0], top[3][1], bot[2][0], bot[2][1]);
     gL.addColorStop(0, lCol);
+    gL.addColorStop(0.62, lCol);
     gL.addColorStop(1, lBot);
     ctx.fillStyle = gL;
   } else {
     ctx.fillStyle = lCol;
   }
   ctx.fill();
-  ctx.strokeStyle = sCol;
-  ctx.lineWidth = 0.5;
-  ctx.stroke();
+  if (grain) { ctx.fillStyle = grain; ctx.fill(); }
+  ctx.strokeStyle = sCol; ctx.lineWidth = 0.35; ctx.stroke();
 
+  // Right shaded matte-clay wall with cool ambient studio falloff
   ctx.beginPath();
-  ctx.moveTo(...top[1]);
-  ctx.lineTo(...top[2]);
-  ctx.lineTo(...bot[2]);
-  ctx.lineTo(...bot[1]);
-  ctx.closePath();
-  if (rBot && z1 - z0 > 10) {
-    const gR = ctx.createLinearGradient(top[2][0], top[2][1], bot[2][0], bot[2][1]);
+  ctx.moveTo(...top[1]); ctx.lineTo(...top[2]); ctx.lineTo(...bot[2]); ctx.lineTo(...bot[1]); ctx.closePath();
+  if (rBot && hSpan > 8) {
+    const gR = ctx.createLinearGradient(top[2][0], top[2][1], bot[1][0], bot[1][1]);
     gR.addColorStop(0, rCol);
+    gR.addColorStop(0.55, rCol);
     gR.addColorStop(1, rBot);
     ctx.fillStyle = gR;
   } else {
     ctx.fillStyle = rCol;
   }
   ctx.fill();
+  if (grain) { ctx.fillStyle = grain; ctx.fill(); }
   ctx.stroke();
 
-  if (z1 - z0 > 14 && z0 === 0) {
-    const aoL = iso(gx - hw, gy + hd, 4);
-    const aoM = iso(gx + hw, gy + hd, 4);
-    const aoR = iso(gx + hw, gy - hd, 4);
-    ctx.beginPath();
-    ctx.moveTo(...aoL);
-    ctx.lineTo(...aoM);
-    ctx.lineTo(...bot[2]);
-    ctx.lineTo(...bot[3]);
-    ctx.closePath();
-    ctx.fillStyle = "rgba(15, 23, 42, 0.14)";
-    ctx.fill();
+  // Architectural concrete plinth molding & deep diffused contact ambient occlusion at base
+  if (hSpan > 12 && z0 <= 4) {
+    const plinthH = Math.min(2.6, hSpan * 0.08);
+    const pL = iso(gx - hw, gy + hd, z0 + plinthH);
+    const pM = iso(gx + hw, gy + hd, z0 + plinthH);
+    const pR = iso(gx + hw, gy - hd, z0 + plinthH);
+    ctx.beginPath(); ctx.moveTo(...pL); ctx.lineTo(...pM); ctx.lineTo(...bot[2]); ctx.lineTo(...bot[3]); ctx.closePath();
+    ctx.fillStyle = "rgba(30, 38, 52, 0.16)"; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(...pM); ctx.lineTo(...pR); ctx.lineTo(...bot[1]); ctx.lineTo(...bot[2]); ctx.closePath();
+    ctx.fillStyle = "rgba(20, 28, 42, 0.24)"; ctx.fill();
 
-    ctx.beginPath();
-    ctx.moveTo(...aoM);
-    ctx.lineTo(...aoR);
-    ctx.lineTo(...bot[1]);
-    ctx.lineTo(...bot[2]);
-    ctx.closePath();
-    ctx.fillStyle = "rgba(15, 23, 42, 0.2)";
-    ctx.fill();
+    const aoH = Math.min(8.5, hSpan * 0.22);
+    const aoL = iso(gx - hw, gy + hd, z0 + aoH);
+    const aoM = iso(gx + hw, gy + hd, z0 + aoH);
+    const aoR = iso(gx + hw, gy - hd, z0 + aoH);
+    const gAoL = ctx.createLinearGradient(aoM[0], aoM[1], bot[2][0], bot[2][1]);
+    gAoL.addColorStop(0, "rgba(15, 23, 42, 0)");
+    gAoL.addColorStop(1, "rgba(15, 23, 42, 0.22)");
+    ctx.beginPath(); ctx.moveTo(...aoL); ctx.lineTo(...aoM); ctx.lineTo(...bot[2]); ctx.lineTo(...bot[3]); ctx.closePath();
+    ctx.fillStyle = gAoL; ctx.fill();
+
+    const gAoR = ctx.createLinearGradient(aoM[0], aoM[1], bot[2][0], bot[2][1]);
+    gAoR.addColorStop(0, "rgba(15, 23, 42, 0)");
+    gAoR.addColorStop(1, "rgba(15, 23, 42, 0.32)");
+    ctx.beginPath(); ctx.moveTo(...aoM); ctx.lineTo(...aoR); ctx.lineTo(...bot[1]); ctx.lineTo(...bot[2]); ctx.closePath();
+    ctx.fillStyle = gAoR; ctx.fill();
   }
 
-  ctx.beginPath();
-  ctx.moveTo(...top[0]);
-  ctx.lineTo(...top[1]);
-  ctx.lineTo(...top[2]);
-  ctx.lineTo(...top[3]);
-  ctx.closePath();
-  ctx.fillStyle = tCol;
-  ctx.fill();
-  ctx.strokeStyle = sCol;
-  ctx.lineWidth = 0.72;
-  ctx.stroke();
+  // Soft diffused under-eave shadow cast by roof lip onto upper walls
+  if (hSpan > 10) {
+    const eaveH = Math.min(4.8, hSpan * 0.15);
+    const eL = iso(gx - hw, gy + hd, z1 - eaveH);
+    const eM = iso(gx + hw, gy + hd, z1 - eaveH);
+    const eR = iso(gx + hw, gy - hd, z1 - eaveH);
+    const gEave = ctx.createLinearGradient(top[2][0], top[2][1], eM[0], eM[1]);
+    gEave.addColorStop(0, "rgba(15, 23, 42, 0.2)");
+    gEave.addColorStop(1, "rgba(15, 23, 42, 0)");
+    ctx.beginPath(); ctx.moveTo(...top[3]); ctx.lineTo(...top[2]); ctx.lineTo(...eM); ctx.lineTo(...eL); ctx.closePath();
+    ctx.fillStyle = gEave; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(...top[2]); ctx.lineTo(...top[1]); ctx.lineTo(...eR); ctx.lineTo(...eM); ctx.closePath();
+    ctx.fillStyle = gEave; ctx.fill();
+  }
 
-  if (withParapet && hw > 0.16 && hd > 0.16) {
-    const pad = 0.05;
+  // Smooth matte roof with soft studio light falloff + micro-grain
+  ctx.beginPath();
+  ctx.moveTo(...top[0]); ctx.lineTo(...top[1]); ctx.lineTo(...top[2]); ctx.lineTo(...top[3]); ctx.closePath();
+  ctx.fillStyle = tCol; ctx.fill();
+  if (hSpan > 8) {
+    const gRoof = ctx.createLinearGradient(top[0][0], top[0][1], top[2][0], top[2][1]);
+    gRoof.addColorStop(0, "rgba(255, 255, 255, 0.22)");
+    gRoof.addColorStop(0.55, "rgba(255, 255, 255, 0.04)");
+    gRoof.addColorStop(1, "rgba(15, 23, 42, 0.12)");
+    ctx.fillStyle = gRoof; ctx.fill();
+  }
+  if (grain) { ctx.fillStyle = grain; ctx.fill(); }
+  ctx.strokeStyle = sCol; ctx.lineWidth = 0.55; ctx.stroke();
+
+  // Crisp chamfered clay specular highlight along sunlit crest and front edge
+  if (hSpan > 12) {
     ctx.beginPath();
-    ctx.moveTo(...iso(gx - hw + pad, gy - hd + pad, z1));
-    ctx.lineTo(...iso(gx + hw - pad, gy - hd + pad, z1));
-    ctx.lineTo(...iso(gx + hw - pad, gy + hd - pad, z1));
-    ctx.lineTo(...iso(gx - hw + pad, gy + hd - pad, z1));
-    ctx.closePath();
-    ctx.fillStyle = "rgba(15, 23, 42, 0.08)";
-    ctx.fill();
+    ctx.moveTo(...top[3]); ctx.lineTo(...top[2]); ctx.lineTo(...top[1]);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.52)"; ctx.lineWidth = 0.9; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(...top[2]); ctx.lineTo(...bot[2]);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.34)"; ctx.lineWidth = 0.75; ctx.stroke();
+  }
+
+  // Recessed parapet deck with 3D-embossed standing-seam grooves (shadow + highlight pair)
+  if (withParapet && hw > 0.15 && hd > 0.15) {
+    const pad = 0.048;
+    const p0 = iso(gx - hw + pad, gy - hd + pad, z1);
+    const p1 = iso(gx + hw - pad, gy - hd + pad, z1);
+    const p2 = iso(gx + hw - pad, gy + hd - pad, z1);
+    const p3 = iso(gx - hw + pad, gy + hd - pad, z1);
+    ctx.beginPath(); ctx.moveTo(...p0); ctx.lineTo(...p1); ctx.lineTo(...p2); ctx.lineTo(...p3); ctx.closePath();
+    ctx.fillStyle = "rgba(15, 23, 42, 0.14)"; ctx.fill();
+    for (let s = 1; s <= 4; s++) {
+      const t = s / 5;
+      const sA = iso(gx - hw + pad + t * (hw - pad) * 2, gy - hd + pad, z1);
+      const sB = iso(gx - hw + pad + t * (hw - pad) * 2, gy + hd - pad, z1);
+      ctx.beginPath(); ctx.moveTo(sA[0], sA[1]); ctx.lineTo(sB[0], sB[1]);
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.22)"; ctx.lineWidth = 0.7; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sA[0] + 0.8, sA[1] + 0.4); ctx.lineTo(sB[0] + 0.8, sB[1] + 0.4);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.22)"; ctx.lineWidth = 0.55; ctx.stroke();
+    }
   }
 }
 
@@ -660,53 +895,74 @@ function windows(
   seed = 0.5,
 ) {
   const dz = (z1 - z0) / (rows + 1);
+  const isWarmGlow = col.startsWith("#ff") || Boolean(litCol && litCol.startsWith("#ff"));
+  const frameCol = "#43464f";
+  const drawGlowingPane = (p0: [number, number], p1: [number, number], p2: [number, number], p3: [number, number], baseCol: string) => {
+    if (isWarmGlow) {
+      // Tiny soft under-sill shadow cast onto the matte-clay stucco wall
+      ctx.beginPath();
+      ctx.moveTo(p3[0], p3[1] + 1.1); ctx.lineTo(p2[0], p2[1] + 1.1);
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.22)"; ctx.lineWidth = 1.2; ctx.stroke();
+      const gW = ctx.createLinearGradient(p0[0], p0[1], p3[0], p3[1]);
+      gW.addColorStop(0, "#f59f56");
+      gW.addColorStop(0.55, baseCol);
+      gW.addColorStop(1, "#fff2d6");
+      ctx.fillStyle = gW;
+    } else {
+      ctx.fillStyle = baseCol;
+    }
+    ctx.beginPath(); ctx.moveTo(...p0); ctx.lineTo(...p1); ctx.lineTo(...p2); ctx.lineTo(...p3); ctx.closePath();
+    ctx.fill();
+    if (isWarmGlow) {
+      ctx.strokeStyle = frameCol; ctx.lineWidth = 1.05; ctx.stroke();
+    }
+  };
+
   for (let r = 1; r <= rows; r++) {
     const z = z0 + r * dz;
     if (ribbon) {
-      ctx.fillStyle = col;
-      ctx.beginPath();
-      ctx.moveTo(...iso(gx - hw * 0.88, gy + hd, z + 1.5));
-      ctx.lineTo(...iso(gx + hw * 0.88, gy + hd, z + 1.5));
-      ctx.lineTo(...iso(gx + hw * 0.88, gy + hd, z - 1.5));
-      ctx.lineTo(...iso(gx - hw * 0.88, gy + hd, z - 1.5));
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(...iso(gx + hw, gy - hd * 0.88, z + 1.5));
-      ctx.lineTo(...iso(gx + hw, gy + hd * 0.88, z + 1.5));
-      ctx.lineTo(...iso(gx + hw, gy + hd * 0.88, z - 1.5));
-      ctx.lineTo(...iso(gx + hw, gy - hd * 0.88, z - 1.5));
-      ctx.closePath();
-      ctx.fill();
+      drawGlowingPane(
+        iso(gx - hw * 0.88, gy + hd, z + 1.6),
+        iso(gx + hw * 0.88, gy + hd, z + 1.6),
+        iso(gx + hw * 0.88, gy + hd, z - 1.6),
+        iso(gx - hw * 0.88, gy + hd, z - 1.6),
+        col,
+      );
+      drawGlowingPane(
+        iso(gx + hw, gy - hd * 0.88, z + 1.6),
+        iso(gx + hw, gy + hd * 0.88, z + 1.6),
+        iso(gx + hw, gy + hd * 0.88, z - 1.6),
+        iso(gx + hw, gy - hd * 0.88, z - 1.6),
+        col,
+      );
       continue;
     }
 
     for (let c = 0; c < cols; c++) {
       const hash = ((r * 13 + c * 7 + Math.floor(seed * 100)) % 11) / 11;
-      ctx.fillStyle = litCol && hash > 0.76 ? litCol : col;
-      const a = -hw + ((c + 0.24) / cols) * hw * 2;
-      const b = -hw + ((c + 0.74) / cols) * hw * 2;
-      ctx.beginPath();
-      ctx.moveTo(...iso(gx + a, gy + hd, z + 1.7));
-      ctx.lineTo(...iso(gx + b, gy + hd, z + 1.7));
-      ctx.lineTo(...iso(gx + b, gy + hd, z - 1.7));
-      ctx.lineTo(...iso(gx + a, gy + hd, z - 1.7));
-      ctx.closePath();
-      ctx.fill();
+      const fillC = litCol && hash > 0.58 ? litCol : col;
+      const a = -hw + ((c + 0.2) / cols) * hw * 2;
+      const b = -hw + ((c + 0.8) / cols) * hw * 2;
+      drawGlowingPane(
+        iso(gx + a, gy + hd, z + 1.85),
+        iso(gx + b, gy + hd, z + 1.85),
+        iso(gx + b, gy + hd, z - 1.85),
+        iso(gx + a, gy + hd, z - 1.85),
+        fillC,
+      );
     }
     for (let c = 0; c < cols; c++) {
       const hash = ((r * 17 + c * 5 + Math.floor(seed * 100)) % 13) / 13;
-      ctx.fillStyle = litCol && hash > 0.8 ? litCol : col;
-      const a = -hd + ((c + 0.24) / cols) * hd * 2;
-      const b = -hd + ((c + 0.74) / cols) * hd * 2;
-      ctx.beginPath();
-      ctx.moveTo(...iso(gx + hw, gy + a, z + 1.7));
-      ctx.lineTo(...iso(gx + hw, gy + b, z + 1.7));
-      ctx.lineTo(...iso(gx + hw, gy + b, z - 1.7));
-      ctx.lineTo(...iso(gx + hw, gy + a, z - 1.7));
-      ctx.closePath();
-      ctx.fill();
+      const fillC = litCol && hash > 0.62 ? litCol : col;
+      const a = -hd + ((c + 0.2) / cols) * hd * 2;
+      const b = -hd + ((c + 0.8) / cols) * hd * 2;
+      drawGlowingPane(
+        iso(gx + hw, gy + a, z + 1.85),
+        iso(gx + hw, gy + b, z + 1.85),
+        iso(gx + hw, gy + b, z - 1.85),
+        iso(gx + hw, gy + a, z - 1.85),
+        fillC,
+      );
     }
   }
 }
@@ -752,7 +1008,197 @@ function drawTree(ctx: CanvasRenderingContext2D, iso: IsoFn, x: number, y: numbe
   ctx.fill();
 }
 
-function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: number, s: Struct, isColor: boolean, isDark: boolean) {
+interface LogoBrandMeta {
+  file: string;
+  label: string;
+  textCol: string;
+  shadowCol: string;
+  accentCol: string;
+  roofLogoZFrac: number;
+  crownZFrac: number;
+  showRoofLogo: boolean;
+}
+
+const LOGO_BRAND_META: Record<string, LogoBrandMeta> = {
+  logo_synapse: { file: "azure-synapse-analytics.svg", label: "Synapse", textCol: "#effcff", shadowCol: "#104d7a", accentCol: "#38bdf8", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_apim: { file: "azure-api-management.svg", label: "APIM", textCol: "#effcff", shadowCol: "#1c5c7a", accentCol: "#8c62d4", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_eventhubs: { file: "azure-event-hubs.svg", label: "Event Hubs", textCol: "#f4fff0", shadowCol: "#2f6315", accentCol: "#76bc2d", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_unity: { file: "unity-catalog.svg", label: "Unity Catalog", textCol: "#ffffff", shadowCol: "#6e1a4a", accentCol: "#ec388c", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_adls: { file: "adls-gen2.svg", label: "ADLS Gen2", textCol: "#effcff", shadowCol: "#165952", accentCol: "#37c2b1", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_blob: { file: "azure-blob-storage.svg", label: "Blob Storage", textCol: "#effcff", shadowCol: "#1a547a", accentCol: "#f48c20", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_devops: { file: "azure-devops.svg", label: "Azure DevOps", textCol: "#effcff", shadowCol: "#24678a", accentCol: "#268fd8", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_pytest: { file: "pytest.svg", label: "pytest", textCol: "#effcff", shadowCol: "#24678a", accentCol: "#26abd4", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_vault: { file: "azure-key-vault.svg", label: "Azure Key Vault", textCol: "#effcff", shadowCol: "#24678a", accentCol: "#f4bb38", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_mysql: { file: "mysql.svg", label: "MySQL", textCol: "#effcff", shadowCol: "#24678a", accentCol: "#26b5d2", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_sonar: { file: "sonarqube.svg", label: "SonarQube", textCol: "#effcff", shadowCol: "#24678a", accentCol: "#448dcc", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_functions: { file: "google-cloud-functions.svg", label: "Cloud Functions", textCol: "#effcff", shadowCol: "#24678a", accentCol: "#4285f4", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_adf: { file: "azure-data-factory-adf.svg", label: "ADF", textCol: "#effcff", shadowCol: "#24678a", accentCol: "rgba(22,166,211,.78)", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_copilot: { file: "github-copilot.svg", label: "Copilot", textCol: "#f8f3ff", shadowCol: "#563a7e", accentCol: "rgba(148,100,206,.78)", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_git: { file: "git.svg", label: "Git", textCol: "#fff3e7", shadowCol: "#804633", accentCol: "rgba(220,84,54,.78)", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_vscode: { file: "vs-code.svg", label: "VS Code", textCol: "#effaff", shadowCol: "#22577a", accentCol: "rgba(43,157,221,.78)", roofLogoZFrac: 1, crownZFrac: 1, showRoofLogo: false },
+  logo_databricks: { file: "azure-databricks.svg", label: "DATABRICKS", textCol: "#ffffff", shadowCol: "rgba(140,20,10,0.9)", accentCol: "rgba(255, 54, 33, 0.7)", roofLogoZFrac: 0.99, crownZFrac: 1.02, showRoofLogo: false },
+  logo_azure: { file: "azure-portal.svg", label: "AZURE", textCol: "#ffffff", shadowCol: "rgba(5,42,96,0.92)", accentCol: "rgba(0, 120, 212, 0.75)", roofLogoZFrac: 0.96, crownZFrac: 1.03, showRoofLogo: false },
+  logo_python: { file: "python.svg", label: "PYTHON", textCol: "#ffffff", shadowCol: "rgba(18,46,84,0.92)", accentCol: "rgba(43, 125, 233, 0.75)", roofLogoZFrac: 1.0, crownZFrac: 1.03, showRoofLogo: false },
+  logo_powerbi: { file: "power-bi.svg", label: "POWER BI", textCol: "#1f1705", shadowCol: "rgba(255,240,160,0.85)", accentCol: "rgba(242, 200, 17, 0.85)", roofLogoZFrac: 1.04, crownZFrac: 1.06, showRoofLogo: false },
+  logo_delta: { file: "delta-lake.svg", label: "DELTA", textCol: "#ffffff", shadowCol: "rgba(6,58,82,0.92)", accentCol: "rgba(0, 173, 212, 0.8)", roofLogoZFrac: 0.92, crownZFrac: 1.02, showRoofLogo: false },
+  logo_docker: { file: "docker.svg", label: "DOCKER", textCol: "#ffffff", shadowCol: "rgba(10,56,108,0.92)", accentCol: "rgba(36, 150, 237, 0.75)", roofLogoZFrac: 0.98, crownZFrac: 1.05, showRoofLogo: false },
+  logo_airflow: { file: "apache-airflow.svg", label: "AIRFLOW", textCol: "#0f172a", shadowCol: "rgba(255,255,255,0.9)", accentCol: "rgba(0, 199, 212, 0.8)", roofLogoZFrac: 1.01, crownZFrac: 1.06, showRoofLogo: false },
+  logo_spark: { file: "apache-spark.svg", label: "SPARK", textCol: "#ffffff", shadowCol: "rgba(120,38,8,0.92)", accentCol: "rgba(226, 90, 28, 0.8)", roofLogoZFrac: 0.8, crownZFrac: 0.92, showRoofLogo: false },
+  logo_gcp: { file: "google-cloud-platform-gcp.svg", label: "GCP", textCol: "#1e293b", shadowCol: "rgba(255,255,255,0.92)", accentCol: "rgba(66, 133, 244, 0.75)", roofLogoZFrac: 0.86, crownZFrac: 1.02, showRoofLogo: true },
+  logo_redis: { file: "redis-cache.svg", label: "REDIS", textCol: "#ffffff", shadowCol: "rgba(110,16,12,0.92)", accentCol: "rgba(220, 56, 45, 0.8)", roofLogoZFrac: 0.99, crownZFrac: 1.04, showRoofLogo: false },
+  logo_kafka: { file: "apache-kafka.svg", label: "KAFKA", textCol: "#ffffff", shadowCol: "rgba(10,14,24,0.95)", accentCol: "rgba(103, 243, 255, 0.75)", roofLogoZFrac: 1.0, crownZFrac: 1.05, showRoofLogo: false },
+  logo_gemini: { file: "google-gemini.svg", label: "GEMINI", textCol: "#ffffff", shadowCol: "rgba(48,22,110,0.92)", accentCol: "rgba(129, 140, 248, 0.85)", roofLogoZFrac: 1.02, crownZFrac: 1.08, showRoofLogo: false },
+  logo_claude: { file: "claude.svg", label: "CLAUDE", textCol: "#ffffff", shadowCol: "rgba(110,38,18,0.92)", accentCol: "rgba(217, 119, 87, 0.8)", roofLogoZFrac: 1.0, crownZFrac: 1.05, showRoofLogo: false },
+  logo_chatgpt: { file: "chatgpt.svg", label: "ChatGPT", textCol: "#064e3b", shadowCol: "rgba(255,255,255,0.92)", accentCol: "rgba(16, 163, 127, 0.8)", roofLogoZFrac: 1.0, crownZFrac: 1.05, showRoofLogo: true },
+  logo_fastapi: { file: "fastapi.svg", label: "FastAPI", textCol: "#ffffff", shadowCol: "rgba(4,72,62,0.92)", accentCol: "rgba(0, 150, 136, 0.8)", roofLogoZFrac: 1.01, crownZFrac: 1.06, showRoofLogo: false },
+  logo_postgres: { file: "postgresql.svg", label: "POSTGRES", textCol: "#ffffff", shadowCol: "rgba(16,44,74,0.92)", accentCol: "rgba(51, 103, 145, 0.8)", roofLogoZFrac: 1.0, crownZFrac: 1.05, showRoofLogo: true },
+};
+
+const LOGO_IMG_CACHE: Record<string, HTMLImageElement> = {};
+let logoLoadVersion = 0;
+let logoPreloadStarted = false;
+function ensureLogoImagesLoaded() {
+  if (logoPreloadStarted || typeof Image === "undefined") return;
+  logoPreloadStarted = true;
+  Object.values(LOGO_BRAND_META).forEach(({ file }) => {
+    if (LOGO_IMG_CACHE[file]) return;
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => {
+      logoLoadVersion++;
+    };
+    img.src = assetUrl(`assets/skills/${file}`);
+    LOGO_IMG_CACHE[file] = img;
+  });
+}
+
+// General-purpose 3D isometric polygon extruder: turns ANY 2D brand logo silhouette into a studio-lit 3D building
+function extrudeIsoPoly(
+  ctx: CanvasRenderingContext2D,
+  iso: IsoFn,
+  cx: number,
+  cy: number,
+  pts: Array<[number, number]>,
+  z0: number,
+  z1: number,
+  litCol: string,
+  midCol: string,
+  shadeCol: string,
+  topCol: string,
+  strokeCol: string,
+  floorBands = 0,
+) {
+  const n = pts.length;
+  const bot = pts.map(([x, y]) => iso(cx + x, cy + y, z0));
+  const top = pts.map(([x, y]) => iso(cx + x, cy + y, z1));
+  const grain = z1 - z0 > 6 ? getClayGrain(ctx) : null;
+
+  const faces: Array<{ i: number; j: number; depth: number; sunDot: number }> = [];
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n;
+    const mx = (pts[i][0] + pts[j][0]) * 0.5;
+    const my = (pts[i][1] + pts[j][1]) * 0.5;
+    const dx = pts[j][0] - pts[i][0];
+    const dy = pts[j][1] - pts[i][1];
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = dy / len;
+    const ny = -dx / len;
+    const sunDot = nx * -0.55 + ny * 0.83;
+    faces.push({ i, j, depth: mx + my, sunDot });
+  }
+  faces.sort((a, b) => a.depth - b.depth);
+
+  for (const f of faces) {
+    ctx.beginPath();
+    ctx.moveTo(...top[f.i]);
+    ctx.lineTo(...top[f.j]);
+    ctx.lineTo(...bot[f.j]);
+    ctx.lineTo(...bot[f.i]);
+    ctx.closePath();
+    ctx.fillStyle = f.sunDot > 0.2 ? litCol : f.sunDot > -0.35 ? midCol : shadeCol;
+    ctx.fill();
+    if (grain) { ctx.fillStyle = grain; ctx.fill(); }
+    ctx.strokeStyle = strokeCol;
+    ctx.lineWidth = 0.45;
+    ctx.stroke();
+
+    if (floorBands > 0 && z1 - z0 > 18) {
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.24)";
+      ctx.lineWidth = 0.7;
+      for (let b = 1; b <= floorBands; b++) {
+        const zf = z0 + (b / (floorBands + 1)) * (z1 - z0);
+        const pA = iso(cx + pts[f.i][0], cy + pts[f.i][1], zf);
+        const pB = iso(cx + pts[f.j][0], cy + pts[f.j][1], zf);
+        ctx.beginPath(); ctx.moveTo(...pA); ctx.lineTo(...pB); ctx.stroke();
+      }
+    }
+  }
+
+  ctx.beginPath();
+  top.forEach(([tx, ty], i) => (i === 0 ? ctx.moveTo(tx, ty) : ctx.lineTo(tx, ty)));
+  ctx.closePath();
+  ctx.fillStyle = topCol;
+  ctx.fill();
+  if (grain) { ctx.fillStyle = grain; ctx.fill(); }
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+  ctx.lineWidth = 0.95;
+  ctx.stroke();
+}
+
+// Borderless integrated rooftop/crown architectural lettering (Netflix/Stripe/Uber/OpenAI style — NO sign board!)
+function drawIntegratedCrownText(
+  ctx: CanvasRenderingContext2D,
+  iso: IsoFn,
+  tile: number,
+  gx: number,
+  gy: number,
+  z: number,
+  meta: LogoBrandMeta,
+  isColor: boolean,
+  isDark: boolean,
+) {
+  const [px, py] = iso(gx, gy, z);
+  ctx.save();
+  ctx.transform(1, 0.48, 0, 1, px, py);
+  ctx.font = `900 ${Math.max(8.2, tile * 0.175).toFixed(1)}px Inter, system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  if (isColor) {
+    ctx.fillStyle = meta.shadowCol;
+    ctx.fillText(meta.label, 0.9, 1.3);
+    ctx.fillText(meta.label, -0.5, 0.9);
+    ctx.fillStyle = meta.textCol;
+    ctx.fillText(meta.label, 0, 0);
+  } else {
+    ctx.fillStyle = isDark ? "rgba(203, 213, 225, 0.55)" : "rgba(71, 85, 105, 0.52)";
+    ctx.fillText(meta.label, 0, 0);
+  }
+  ctx.restore();
+}
+
+// Flush isometric rooftop SVG emblem inlaid directly onto the building's roof surface (no floating badge)
+function drawFlushRoofLogo(
+  ctx: CanvasRenderingContext2D,
+  iso: IsoFn,
+  tile: number,
+  gx: number,
+  gy: number,
+  z: number,
+  meta: LogoBrandMeta,
+  isColor: boolean,
+) {
+  const img = LOGO_IMG_CACHE[meta.file];
+  if (!img || !img.complete || img.naturalWidth === 0) return;
+  const [rx, ry] = iso(gx, gy, z);
+  const sz = Math.max(22, tile * 0.5);
+  ctx.save();
+  ctx.transform(0.88, 0.44, -0.88, 0.44, rx, ry);
+  if (!isColor) ctx.filter = "grayscale(1) opacity(0.38)";
+  ctx.drawImage(img, -sz * 0.5, -sz * 0.5, sz, sz);
+  ctx.restore();
+}
+
+function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: number, s: Struct, isColor: boolean, isDark: boolean, landmarks?: LandmarkAtlas, heading?: { left: number; right: number; bottom: number }) {
   const hw = s.w * 0.5;
   const hd = s.d * 0.5;
   const pals = isDark ? PALETTES_DARK : PALETTES_LIGHT;
@@ -774,7 +1220,7 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
   const litC = isColor ? pal.lit : null;
 
   if (s.kind === "park") {
-    box(ctx, iso, s.gx, s.gy, hw, hd, 0, 2.2, isColor ? "#387c54" : lC, isColor ? "#2c6443" : rC, isColor ? (isDark ? "#2a6948" : "#72ba88") : tC, sC);
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, 2.2, isColor ? "#2d6352" : lC, isColor ? "#234f41" : rC, isColor ? (isDark ? "#214f43" : "#3c7a67") : tC, sC);
     if (s.hasFountain) {
       const fp = iso(s.gx, s.gy, 2.5);
       ctx.beginPath();
@@ -792,7 +1238,7 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
   }
 
   if (s.kind === "pond") {
-    box(ctx, iso, s.gx, s.gy, hw + 0.14, hd + 0.14, 0, 2, isColor ? "#387c54" : lC, isColor ? "#2c6443" : rC, isColor ? (isDark ? "#2a6948" : "#74c68e") : tC, sC);
+    box(ctx, iso, s.gx, s.gy, hw + 0.14, hd + 0.14, 0, 2, isColor ? "#2d6352" : lC, isColor ? "#234f41" : rC, isColor ? (isDark ? "#214f43" : "#3c7a67") : tC, sC);
     const p = iso(s.gx, s.gy, 2.2);
     ctx.beginPath();
     ctx.ellipse(p[0], p[1], tile * 0.74, tile * 0.37, 0, 0, Math.PI * 2);
@@ -1035,6 +1481,574 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
     return;
   }
 
+  // Clean architectural concrete plinth with subtle brand accent line
+  const drawLandmarkPlaza = (accentCol: string) => {
+    const pTop = isColor ? (isDark ? "#24304a" : "#efede7") : tC;
+    const pL = isColor ? (isDark ? "#182136" : "#d8d5cd") : lC;
+    const pR = isColor ? (isDark ? "#111728" : "#bcb9b0") : rC;
+    box(ctx, iso, s.gx, s.gy, hw * 1.08, hd * 1.08, 0, 2.8, pL, pR, pTop, sC);
+    if (isColor) {
+      ctx.beginPath();
+      ctx.moveTo(...iso(s.gx - hw * 1.02, s.gy - hd * 1.02, 3.0));
+      ctx.lineTo(...iso(s.gx + hw * 1.02, s.gy - hd * 1.02, 3.0));
+      ctx.lineTo(...iso(s.gx + hw * 1.02, s.gy + hd * 1.02, 3.0));
+      ctx.lineTo(...iso(s.gx - hw * 1.02, s.gy + hd * 1.02, 3.0));
+      ctx.closePath();
+      ctx.strokeStyle = accentCol; ctx.lineWidth = 1.25; ctx.stroke();
+    }
+  };
+
+  if (s.kind.startsWith("logo_")) {
+    const meta = LOGO_BRAND_META[s.kind];
+    drawLandmarkPlaza(meta.accentCol);
+    const model = landmarks?.sprite(s.kind, tile, isColor, isDark);
+    if (model) {
+      const [x,y] = iso(s.gx,s.gy,2.8);
+      const nearHeading = heading && x+tile*.70>heading.left && x-tile*.70<heading.right && y-s.h<heading.bottom+20;
+      ctx.save();
+      ctx.translate(x,y);
+      if (nearHeading) ctx.scale(.94,.80);
+      model(ctx,0,0);
+      ctx.restore();
+      return;
+    }
+    // Infill lots also have a low-cost, tiered office fallback
+    // while their 3D meshes load or when WebGL is unavailable.
+    if (["logo_synapse", "logo_apim", "logo_eventhubs", "logo_unity", "logo_adls", "logo_blob", "logo_devops", "logo_pytest", "logo_vault", "logo_mysql", "logo_sonar", "logo_functions", "logo_adf", "logo_copilot", "logo_git", "logo_vscode"].includes(s.kind)) {
+      const panes = isColor ? (isDark ? "#82a8b8" : "#a6c5cc") : lC;
+      for (let floor = 0; floor < 4; floor++) {
+        const z = 2.8 + floor * s.h * .15;
+        const inset = .90 - floor * .035;
+        box(ctx, iso, s.gx, s.gy, hw * inset, hd * inset, z, z + s.h * .126, panes, rC, tC, sC);
+        box(ctx, iso, s.gx, s.gy, hw * (inset+.06), hd * (inset+.06), z+s.h*.126, z+s.h*.15, lC, rC, tC, sC);
+      }
+      drawFlushRoofLogo(ctx, iso, tile * Math.min(s.w, s.d), s.gx, s.gy, 3 + s.h*.60, meta, isColor);
+      return;
+    }
+    const drawLogoArchitecture = () => {
+      if (s.kind === "logo_databricks") {
+        // True 3-tier stacked hollow Databricks isometric diamond rings
+        const dLit = isColor ? "#ff4d36" : lC;
+        const dMid = isColor ? "#e02e19" : rC;
+        const dShd = isColor ? "#a61b0b" : rB;
+        const dTop = isColor ? "#ff7b69" : tC;
+        const tierH = s.h * 0.23;
+        const gapH = s.h * 0.12;
+        [0, 1, 2].forEach((tier) => {
+          const z0 = 2.8 + tier * (tierH + gapH);
+          const sc = 1 - tier * 0.02;
+          if (tier < 2) {
+            box(ctx, iso, s.gx, s.gy, hw * sc * 0.56, hd * sc * 0.56, z0 + tierH - 1, z0 + tierH + gapH + 1, isColor ? "#161b26" : rC, isColor ? "#0d111a" : rB, "#1e2536", sC);
+          }
+          const dia: Array<[number, number]> = [
+            [0, -hd * sc * 1.12],
+            [hw * sc * 1.12, 0],
+            [0, hd * sc * 1.12],
+            [-hw * sc * 1.12, 0],
+          ];
+          extrudeIsoPoly(ctx, iso, s.gx, s.gy, dia, z0, z0 + tierH, dLit, dMid, dShd, dTop, "rgba(255,255,255,0.65)", 1);
+        });
+        const topZ = 2.8 + 2 * (tierH + gapH) + tierH;
+        const inPts = [
+          iso(s.gx, s.gy - hd * 0.58, topZ),
+          iso(s.gx + hw * 0.58, s.gy, topZ),
+          iso(s.gx, s.gy + hd * 0.58, topZ),
+          iso(s.gx - hw * 0.58, s.gy, topZ),
+        ];
+        ctx.beginPath(); inPts.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y))); ctx.closePath();
+        ctx.fillStyle = isColor ? "#141821" : rB; ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.82)"; ctx.lineWidth = 1.1; ctx.stroke();
+        return;
+      }
+
+      if (s.kind === "logo_azure") {
+        // True Microsoft Azure slanted A twin-ribbon architectural tower
+        const z0 = 2.8;
+        const zP = s.h;
+        const skyL = isColor ? "#38bdf8" : lC;
+        const skyR = isColor ? "#0284c7" : rC;
+        const bluL = isColor ? "#0078d4" : lC;
+        const bluR = isColor ? "#004e96" : rC;
+        const l0 = iso(s.gx - hw * 0.96, s.gy + hd * 0.45, z0);
+        const l1 = iso(s.gx - hw * 0.34, s.gy + hd * 0.45, z0);
+        const l2 = iso(s.gx + hw * 0.08, s.gy + hd * 0.45, zP * 0.96);
+        const l3 = iso(s.gx - hw * 0.22, s.gy + hd * 0.45, zP * 0.96);
+        const l2b = iso(s.gx + hw * 0.08, s.gy - hd * 0.42, zP * 0.96);
+        const l1b = iso(s.gx - hw * 0.34, s.gy - hd * 0.42, z0);
+        ctx.beginPath(); ctx.moveTo(...l0); ctx.lineTo(...l1); ctx.lineTo(...l2); ctx.lineTo(...l3); ctx.closePath();
+        ctx.fillStyle = skyL; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.8)"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(...l1); ctx.lineTo(...l1b); ctx.lineTo(...l2b); ctx.lineTo(...l2); ctx.closePath();
+        ctx.fillStyle = skyR; ctx.fill(); ctx.stroke();
+        const r0 = iso(s.gx + hw * 0.12, s.gy + hd * 0.48, z0);
+        const r1 = iso(s.gx + hw * 0.96, s.gy + hd * 0.48, z0);
+        const r1b = iso(s.gx + hw * 0.96, s.gy - hd * 0.42, z0);
+        const r2 = iso(s.gx + hw * 0.28, s.gy + hd * 0.48, zP);
+        const r3 = iso(s.gx - hw * 0.08, s.gy + hd * 0.48, zP);
+        const r2b = iso(s.gx + hw * 0.28, s.gy - hd * 0.42, zP);
+        ctx.beginPath(); ctx.moveTo(...r0); ctx.lineTo(...r1); ctx.lineTo(...r2); ctx.lineTo(...r3); ctx.closePath();
+        ctx.fillStyle = bluL; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.85)"; ctx.lineWidth = 1.1; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(...r1); ctx.lineTo(...r1b); ctx.lineTo(...r2b); ctx.lineTo(...r2); ctx.closePath();
+        ctx.fillStyle = bluR; ctx.fill(); ctx.stroke();
+        box(ctx, iso, s.gx + hw * 0.14, s.gy + hd * 0.06, hw * 0.58, hd * 0.34, z0 + 12, z0 + 25, skyL, bluR, "#7dd3fc", "rgba(255,255,255,0.8)");
+        return;
+      }
+
+      if (s.kind === "logo_python") {
+        // True interlocked dual-snake Python logo extruded cleanly into 3D twin curved wings
+        const z0 = 2.8;
+        const bluePoly: Array<[number, number]> = [
+          [-hw * 0.36, -hd * 0.92], [hw * 0.48, -hd * 0.92], [hw * 0.54, -hd * 0.08],
+          [-hw * 0.24, -hd * 0.08], [-hw * 0.24, hd * 0.34], [-hw * 0.92, hd * 0.34],
+          [-hw * 0.92, -hd * 0.42], [-hw * 0.36, -hd * 0.42],
+        ];
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, bluePoly, z0, s.h, isColor ? "#3b82f6" : lC, isColor ? "#2563eb" : rC, isColor ? "#1d4ed8" : rB, isColor ? "#60a5fa" : tC, "rgba(255,255,255,0.68)", 4);
+        const goldPoly: Array<[number, number]> = [
+          [hw * 0.36, hd * 0.92], [-hw * 0.48, hd * 0.92], [-hw * 0.54, hd * 0.08],
+          [hw * 0.24, hd * 0.08], [hw * 0.24, -hd * 0.34], [hw * 0.92, -hd * 0.34],
+          [hw * 0.92, hd * 0.42], [hw * 0.36, hd * 0.42],
+        ];
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, goldPoly, z0, s.h * 0.86, isColor ? "#ffd43b" : lC, isColor ? "#eab308" : rC, isColor ? "#ca8a04" : rB, isColor ? "#fef08a" : tC, "rgba(255,255,255,0.72)", 3);
+        [iso(s.gx - hw * 0.1, s.gy - hd * 0.62, s.h + 1), iso(s.gx + hw * 0.1, s.gy + hd * 0.62, s.h * 0.86 + 1)].forEach(([ex, ey]) => {
+          ctx.beginPath(); ctx.ellipse(ex, ey, 4.6, 2.6, 0, 0, Math.PI * 2); ctx.fillStyle = "#ffffff"; ctx.fill();
+          ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 1.2; ctx.stroke();
+        });
+        return;
+      }
+
+      if (s.kind === "logo_claude") {
+        // True 3D extruded 12-ray Anthropic Claude warm terracotta starburst building
+        const pts: Array<[number, number]> = [];
+        for (let i = 0; i < 24; i++) {
+          const a = (i * Math.PI) / 12 + 0.12;
+          const r = i % 2 === 0 ? (i % 4 === 0 ? 1.08 : 0.88) : 0.32;
+          pts.push([Math.cos(a) * hw * r, Math.sin(a) * hd * r]);
+        }
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, pts, 2.8, s.h, isColor ? "#e87d58" : lC, isColor ? "#d46540" : rC, isColor ? "#a64222" : rB, isColor ? "#ffab8c" : tC, "rgba(255,255,255,0.62)", 3);
+        const core = iso(s.gx, s.gy, s.h + 0.8);
+        ctx.beginPath(); ctx.ellipse(core[0], core[1], 6, 3.4, 0, 0, Math.PI * 2);
+        ctx.fillStyle = isColor ? "#fff7ed" : tC; ctx.fill();
+        return;
+      }
+
+      if (s.kind === "logo_chatgpt") {
+        // True OpenAI / ChatGPT 6-petal interlocking white & emerald blossom tower
+        const pts: Array<[number, number]> = [];
+        for (let i = 0; i < 36; i++) {
+          const a = (i * Math.PI * 2) / 36;
+          const lobe = 0.78 + 0.28 * Math.pow(Math.abs(Math.cos(a * 3)), 0.7);
+          pts.push([Math.cos(a) * hw * lobe, Math.sin(a) * hd * lobe]);
+        }
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, pts, 2.8, s.h, isColor ? "#ffffff" : lC, isColor ? "#dff7ef" : rC, isColor ? "#10a37f" : rB, isColor ? "#f8fffc" : tC, "rgba(16, 163, 127, 0.55)", 4);
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (i * Math.PI) / 3 + Math.PI / 6;
+          const pt = iso(s.gx + Math.cos(a) * hw * 0.36, s.gy + Math.sin(a) * hd * 0.36, s.h + 0.8);
+          if (i === 0) ctx.moveTo(pt[0], pt[1]); else ctx.lineTo(pt[0], pt[1]);
+        }
+        ctx.closePath();
+        ctx.fillStyle = isColor ? "#0d9473" : rB; ctx.fill();
+        ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.4; ctx.stroke();
+        return;
+      }
+
+      if (s.kind === "logo_gemini") {
+        // True concave 4-point hyperbola Google Gemini sparkle star building
+        const pts: Array<[number, number]> = [];
+        for (let i = 0; i < 32; i++) {
+          const a = (i * Math.PI * 2) / 32;
+          const c = Math.cos(a);
+          const sn = Math.sin(a);
+          const r = 1.12 / Math.pow(Math.pow(Math.abs(c), 0.72) + Math.pow(Math.abs(sn), 0.72), 1 / 0.72);
+          pts.push([c * hw * Math.min(1.16, r), sn * hd * Math.min(1.16, r)]);
+        }
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, pts, 2.8, s.h, isColor ? "#6366f1" : lC, isColor ? "#4f46e5" : rC, isColor ? "#312e81" : rB, isColor ? "#a5b4fc" : tC, "rgba(255,255,255,0.75)", 4);
+        const apex = iso(s.gx, s.gy, s.h + 12);
+        for (let i = 0; i < 4; i++) {
+          const a = (i * Math.PI) / 2;
+          const tip = iso(s.gx + Math.cos(a) * hw * 1.12, s.gy + Math.sin(a) * hd * 1.12, s.h);
+          ctx.beginPath(); ctx.moveTo(...tip); ctx.lineTo(...apex);
+          ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 1.2; ctx.stroke();
+        }
+        return;
+      }
+
+      if (s.kind === "logo_powerbi") {
+        // True Power BI 3 ascending chamfered golden bar skyscrapers
+        const bars = [
+          { dx: -hw * 0.62, bh: s.h * 0.48, top: "#fde047", lit: "#eab308", mid: "#ca8a04", shd: "#854d0e" },
+          { dx: 0, bh: s.h * 0.76, top: "#fef08a", lit: "#facc15", mid: "#d99b00", shd: "#925f07" },
+          { dx: hw * 0.62, bh: s.h * 1.05, top: "#fff7ad", lit: "#ffcf1a", mid: "#e09f00", shd: "#9e6c00" },
+        ];
+        bars.forEach((b) => {
+          box(ctx, iso, s.gx + b.dx, s.gy, hw * 0.28, hd * 0.72, 2.8, b.bh, isColor ? b.lit : lC, isColor ? b.mid : rC, isColor ? b.top : tC, "rgba(255,255,255,0.82)", true, isColor ? b.shd : lB, isColor ? b.shd : rB);
+          windows(ctx, iso, s.gx + b.dx, s.gy, hw * 0.28, hd * 0.72, 7, b.bh - 6, Math.max(3, Math.floor(b.bh / 12)), 2, isColor ? "#292008" : wC, true);
+        });
+        return;
+      }
+
+      if (s.kind === "logo_docker") {
+        // True curved Docker whale hull extruded in 3D + 8 shipping-container office modules
+        const deckZ = 2.8 + s.h * 0.46;
+        const hull: Array<[number, number]> = [
+          [-hw * 0.96, 0], [-hw * 0.78, -hd * 0.66], [hw * 0.56, -hd * 0.64],
+          [hw * 0.98, -hd * 0.14], [hw * 0.74, hd * 0.14], [hw * 0.48, hd * 0.68],
+          [-hw * 0.64, hd * 0.72],
+        ];
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, hull, 2.8, deckZ, isColor ? "#2496ed" : lC, isColor ? "#197bc7" : rC, isColor ? "#0e5694" : rB, isColor ? "#7cc4ff" : tC, "rgba(255,255,255,0.75)", 2);
+        box(ctx, iso, s.gx + hw * 0.9, s.gy - hd * 0.1, hw * 0.22, hd * 0.3, deckZ - 2, deckZ + 16, isColor ? "#2496ed" : lC, isColor ? "#197bc7" : rC, isColor ? "#7cc4ff" : tC, "rgba(255,255,255,0.8)");
+        const cPal = isColor ? [["#38bdf8", "#0284c7", "#bae6fd"], ["#f26c4f", "#c7482c", "#ffc4b5"], ["#34a867", "#1e7845", "#a8ebbf"], ["#f5c431", "#c4940e", "#ffeb99"]] : [[lC, rC, tC]];
+        const cH = s.h * 0.2;
+        [-0.5, -0.18, 0.14, 0.46].forEach((dx, ci) => {
+          const c = cPal[ci % cPal.length];
+          box(ctx, iso, s.gx + hw * dx, s.gy, hw * 0.14, hd * 0.3, deckZ, deckZ + cH, c[0], c[1], c[2], "rgba(255,255,255,0.75)");
+        });
+        [-0.34, -0.02, 0.3].forEach((dx, ci) => {
+          const c = cPal[(ci + 2) % cPal.length];
+          box(ctx, iso, s.gx + hw * dx, s.gy, hw * 0.14, hd * 0.3, deckZ + cH, deckZ + cH * 2, c[0], c[1], c[2], "rgba(255,255,255,0.75)");
+        });
+        box(ctx, iso, s.gx - hw * 0.02, s.gy, hw * 0.14, hd * 0.3, deckZ + cH * 2, deckZ + cH * 3, cPal[0][0], cPal[0][1], cPal[0][2], "rgba(255,255,255,0.8)");
+        return;
+      }
+
+      if (s.kind === "logo_delta") {
+        // True Delta Lake hollow equilateral cyan-acrylic triangle monument
+        const z0 = 2.8;
+        const baseL = iso(s.gx - hw * 0.92, s.gy + hd * 0.72, z0);
+        const baseF = iso(s.gx + hw * 0.92, s.gy + hd * 0.72, z0);
+        const baseR = iso(s.gx + hw * 0.92, s.gy - hd * 0.72, z0);
+        const apex = iso(s.gx, s.gy, s.h);
+        const gL = ctx.createLinearGradient(apex[0], apex[1], baseF[0], baseF[1]);
+        gL.addColorStop(0, isColor ? "#a5f3fc" : tC); gL.addColorStop(0.45, isColor ? "#22d3ee" : lC); gL.addColorStop(1, isColor ? "#0284c7" : rC);
+        ctx.beginPath(); ctx.moveTo(...baseL); ctx.lineTo(...baseF); ctx.lineTo(...apex); ctx.closePath();
+        ctx.fillStyle = gL; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 1.25; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(...baseF); ctx.lineTo(...baseR); ctx.lineTo(...apex); ctx.closePath();
+        ctx.fillStyle = isColor ? "#0369a1" : rB; ctx.fill(); ctx.stroke();
+        const inL = iso(s.gx - hw * 0.44, s.gy + hd * 0.72, z0 + 8);
+        const inF = iso(s.gx + hw * 0.44, s.gy + hd * 0.72, z0 + 8);
+        const inApex = iso(s.gx, s.gy + hd * 0.36, s.h * 0.58);
+        ctx.beginPath(); ctx.moveTo(...inL); ctx.lineTo(...inF); ctx.lineTo(...inApex); ctx.closePath();
+        ctx.fillStyle = isColor ? "#0c2238" : rB; ctx.fill();
+        ctx.strokeStyle = isColor ? "#67f3ff" : sC; ctx.lineWidth = 1.5; ctx.stroke();
+        return;
+      }
+
+      if (s.kind === "logo_spark") {
+        // True 3D extruded 5-point Apache Spark orange star building
+        const pts: Array<[number, number]> = [];
+        for (let i = 0; i < 10; i++) {
+          const r = i % 2 === 0 ? 1.12 : 0.44;
+          const a = (i * Math.PI) / 5 - Math.PI / 2;
+          pts.push([Math.cos(a) * hw * r, Math.sin(a) * hd * r]);
+        }
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, pts, 2.8, s.h * 0.78, isColor ? "#f97316" : lC, isColor ? "#ea580c" : rC, isColor ? "#9a3412" : rB, isColor ? "#fdba74" : tC, "rgba(255,255,255,0.75)", 2);
+        return;
+      }
+
+      if (s.kind === "logo_airflow") {
+        // True 4-blade extruded Apache Airflow pinwheel building
+        const bladeCols = isColor
+          ? [["#00d4e0", "#0099a3", "#006d75", "#67f3ff"], ["#38bdf8", "#0284c7", "#075985", "#bae6fd"], ["#34d399", "#059669", "#065f46", "#a7f3d0"], ["#fb7185", "#e11d48", "#9f1239", "#fecdd3"]]
+          : [[lC, rC, rB, tC]];
+        const wings: Array<Array<[number, number]>> = [
+          [[0, 0], [hw * 1.08, hd * 0.08], [hw * 0.48, hd * 0.86]],
+          [[0, 0], [-hw * 0.08, hd * 1.08], [-hw * 0.86, hd * 0.48]],
+          [[0, 0], [-hw * 1.08, -hd * 0.08], [-hw * 0.48, -hd * 0.86]],
+          [[0, 0], [hw * 0.08, -hd * 1.08], [hw * 0.86, -hd * 0.48]],
+        ];
+        wings.forEach((wpts, i) => {
+          const c = bladeCols[i % bladeCols.length];
+          extrudeIsoPoly(ctx, iso, s.gx, s.gy, wpts, 2.8, s.h, c[0], c[1], c[2], c[3], "rgba(255,255,255,0.8)", 2);
+        });
+        return;
+      }
+
+      if (s.kind === "logo_gcp") {
+        // True extruded 3-lobe puffy Google Cloud silhouette building
+        const cloud: Array<[number, number]> = [
+          [-hw * 0.94, hd * 0.48], [-hw * 0.94, -hd * 0.14], [-hw * 0.56, -hd * 0.58],
+          [-hw * 0.05, -hd * 0.9], [hw * 0.56, -hd * 0.56], [hw * 0.94, -hd * 0.08],
+          [hw * 0.94, hd * 0.48],
+        ];
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, cloud, 2.8, s.h * 0.84, isColor ? "#ffffff" : lC, isColor ? "#e2e8f0" : rC, isColor ? "#cbd5e1" : rB, isColor ? "#ffffff" : tC, "rgba(66,133,244,0.45)", 2);
+        return;
+      }
+
+      if (s.kind === "logo_redis") {
+        // True 3-tier stacked crimson Redis slabs with recessed geometric white skylights
+        const tierH = s.h * 0.25;
+        const gap = s.h * 0.09;
+        [0, 1, 2].forEach((i) => {
+          const z0 = 2.8 + i * (tierH + gap);
+          if (i < 2) box(ctx, iso, s.gx, s.gy, hw * 0.76, hd * 0.68, z0 + tierH - 1, z0 + tierH + gap + 1, "#1e293b", "#0f172a", "#334155", sC);
+          box(ctx, iso, s.gx, s.gy, hw * 0.96, hd * 0.86, z0, z0 + tierH, isColor ? "#e03e38" : lC, isColor ? "#b82520" : rC, isColor ? "#ff7670" : tC, "rgba(255,255,255,0.8)", false, isColor ? "#8f1814" : lB, isColor ? "#6b100d" : rB);
+        });
+        const topZ = 2.8 + 2 * (tierH + gap) + tierH + 1;
+        ctx.fillStyle = "#ffffff";
+        const pC = iso(s.gx - hw * 0.34, s.gy - hd * 0.2, topZ);
+        const pS = iso(s.gx + hw * 0.32, s.gy + hd * 0.2, topZ);
+        const pT = iso(s.gx - hw * 0.3, s.gy + hd * 0.26, topZ);
+        ctx.beginPath(); ctx.ellipse(pC[0], pC[1], 3.8, 2.3, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(pS[0] - 3.2, pS[1] - 2.6, 6.4, 5.2);
+        ctx.beginPath(); ctx.moveTo(pT[0], pT[1] - 3.8); ctx.lineTo(pT[0] + 4.2, pT[1] + 2.8); ctx.lineTo(pT[0] - 4.2, pT[1] + 2.8); ctx.closePath(); ctx.fill();
+        return;
+      }
+
+      if (s.kind === "logo_kafka") {
+        // True Apache Kafka matte-black connected-node cylindrical graph building
+        const drawNode = (ox: number, oy: number, rad: number, zh: number) => {
+          const b = iso(s.gx + ox, s.gy + oy, 2.8);
+          const t = iso(s.gx + ox, s.gy + oy, zh);
+          const rx = tile * rad;
+          const ry = tile * rad * 0.52;
+          const cg = ctx.createLinearGradient(t[0] - rx, t[1], t[0] + rx, t[1]);
+          cg.addColorStop(0, isColor ? "#334155" : lC); cg.addColorStop(1, isColor ? "#0b0f19" : rC);
+          ctx.beginPath(); ctx.moveTo(t[0] - rx, t[1]); ctx.lineTo(b[0] - rx, b[1]);
+          ctx.ellipse(b[0], b[1], rx, ry, 0, Math.PI, 0, true); ctx.lineTo(t[0] + rx, t[1]); ctx.closePath();
+          ctx.fillStyle = cg; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 0.8; ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(t[0], t[1], rx, ry, 0, 0, Math.PI * 2);
+          ctx.fillStyle = isColor ? "#f1f5f9" : tC; ctx.fill(); ctx.strokeStyle = "#0f172a"; ctx.lineWidth = 1.4; ctx.stroke();
+          ctx.beginPath(); ctx.ellipse(t[0], t[1], rx * 0.45, ry * 0.45, 0, 0, Math.PI * 2);
+          ctx.fillStyle = isColor ? "#141821" : rB; ctx.fill();
+        };
+        const sat = [
+          { ox: -hw * 0.46, oy: -hd * 0.46, h: s.h * 0.74 },
+          { ox: hw * 0.54, oy: -hd * 0.44, h: s.h * 0.86 },
+          { ox: hw * 0.54, oy: hd * 0.48, h: s.h * 0.66 },
+        ];
+        drawNode(sat[0].ox, sat[0].oy, 0.2, sat[0].h);
+        drawNode(sat[1].ox, sat[1].oy, 0.2, sat[1].h);
+        const cMid = iso(s.gx - hw * 0.14, s.gy + hd * 0.04, s.h * 0.6);
+        sat.forEach((n) => {
+          const np = iso(s.gx + n.ox, s.gy + n.oy, n.h * 0.8);
+          ctx.beginPath(); ctx.moveTo(...cMid); ctx.lineTo(...np);
+          ctx.strokeStyle = isColor ? "#94a3b8" : sC; ctx.lineWidth = 3.2; ctx.stroke();
+        });
+        drawNode(-hw * 0.14, hd * 0.04, 0.3, s.h);
+        drawNode(sat[2].ox, sat[2].oy, 0.2, sat[2].h);
+        return;
+      }
+
+      if (s.kind === "logo_fastapi") {
+        // True FastAPI emerald-teal circular drum with full-roof carved white lightning bolt
+        const base = iso(s.gx, s.gy, 2.8);
+        const top = iso(s.gx, s.gy, s.h);
+        const rx = tile * hw * 0.92;
+        const ry = tile * hd * 0.49;
+        const grad = ctx.createLinearGradient(top[0] - rx, top[1], top[0] + rx, top[1]);
+        grad.addColorStop(0, isColor ? "#2dd4bf" : lC); grad.addColorStop(0.5, isColor ? "#0d9488" : lC); grad.addColorStop(1, isColor ? "#065f46" : rC);
+        ctx.beginPath(); ctx.moveTo(top[0] - rx, top[1]); ctx.lineTo(base[0] - rx, base[1]);
+        ctx.ellipse(base[0], base[1], rx, ry, 0, Math.PI, 0, true); ctx.lineTo(top[0] + rx, top[1]); ctx.closePath();
+        ctx.fillStyle = grad; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.65)"; ctx.lineWidth = 0.85; ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(top[0], top[1], rx, ry, 0, 0, Math.PI * 2);
+        ctx.fillStyle = isColor ? "#14b8a6" : tC; ctx.fill(); ctx.strokeStyle = "rgba(255,255,255,0.9)"; ctx.lineWidth = 1.25; ctx.stroke();
+        const bolt = [
+          iso(s.gx + hw * 0.22, s.gy - hd * 0.58, s.h + 1.2), iso(s.gx - hw * 0.48, s.gy + hd * 0.08, s.h + 1.2),
+          iso(s.gx + hw * 0.04, s.gy + hd * 0.08, s.h + 1.2), iso(s.gx - hw * 0.2, s.gy + hd * 0.6, s.h + 1.2),
+          iso(s.gx + hw * 0.48, s.gy - hd * 0.06, s.h + 1.2), iso(s.gx - hw * 0.04, s.gy - hd * 0.06, s.h + 1.2),
+        ];
+        ctx.beginPath(); bolt.forEach(([bx, by], i) => (i === 0 ? ctx.moveTo(bx, by) : ctx.lineTo(bx, by))); ctx.closePath();
+        ctx.fillStyle = "#ffffff"; ctx.fill();
+        return;
+      }
+
+      if (s.kind === "logo_postgres") {
+        // True sculpted royal-blue PostgreSQL Slonik elephant-head architectural pavilion
+        const headPoly: Array<[number, number]> = [
+          [-hw * 0.88, -hd * 0.36], [-hw * 0.42, -hd * 0.82], [hw * 0.42, -hd * 0.82],
+          [hw * 0.88, -hd * 0.36], [hw * 0.78, hd * 0.32], [hw * 0.24, hd * 0.38],
+          [hw * 0.18, hd * 0.94], [-hw * 0.18, hd * 0.94], [-hw * 0.24, hd * 0.38],
+          [-hw * 0.78, hd * 0.32],
+        ];
+        extrudeIsoPoly(ctx, iso, s.gx, s.gy, headPoly, 2.8, s.h, isColor ? "#3b73a8" : lC, isColor ? "#2b5882" : rC, isColor ? "#193854" : rB, isColor ? "#7cb5e8" : tC, "rgba(255,255,255,0.75)", 3);
+        return;
+      }
+    };
+
+    drawLogoArchitecture();
+    if (meta) {
+      if (meta.showRoofLogo) {
+        drawFlushRoofLogo(ctx, iso, tile, s.gx, s.gy, s.h * meta.roofLogoZFrac + 1.2, meta, isColor);
+      }
+      drawIntegratedCrownText(ctx, iso, tile, s.gx, s.gy + hd * 0.22, s.h * meta.crownZFrac + 4, meta, isColor, isDark);
+    }
+    return;
+  }
+
+  if (s.kind === "metro_station") {
+    // Sleek elevated glass-and-steel metro station canopy spanning the viaduct
+    const zDeck = 22.5;
+    box(ctx, iso, s.gx, s.gy, hw, hd, zDeck, zDeck + 3.2, isColor ? "#334155" : lC, isColor ? "#1e293b" : rC, isColor ? "#f4f0e6" : tC, sC);
+    const aL = iso(s.gx - hw, s.gy, zDeck + 3.2);
+    const aR = iso(s.gx + hw, s.gy, zDeck + 3.2);
+    const aM = iso(s.gx, s.gy, zDeck + 17);
+    ctx.beginPath();
+    ctx.moveTo(aL[0], aL[1]);
+    ctx.quadraticCurveTo(aM[0], aM[1] - 10, aR[0], aR[1]);
+    ctx.lineTo(aR[0], aR[1] + 7);
+    ctx.lineTo(aL[0], aL[1] + 7);
+    ctx.closePath();
+    ctx.fillStyle = isColor ? (isDark ? "rgba(56, 189, 248, 0.36)" : "rgba(186, 230, 253, 0.62)") : "rgba(244, 240, 230, 0.55)";
+    ctx.fill();
+    ctx.strokeStyle = isColor ? "#ed8838" : sC;
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    return;
+  }
+
+  if (s.kind === "ferris_base") {
+    // Waterfront observation wheel stone plaza & A-frame steel support legs
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, 3.2, isColor ? "#dfd7c8" : lC, isColor ? "#c4baa7" : rC, isColor ? "#f7f3ea" : tC, sC);
+    const hub = iso(s.gx, s.gy, 34);
+    [[-hw * 0.52, -hd * 0.3], [hw * 0.52, -hd * 0.3], [-hw * 0.52, hd * 0.3], [hw * 0.52, hd * 0.3]].forEach(([dx, dy]) => {
+      const foot = iso(s.gx + dx, s.gy + dy, 3.2);
+      ctx.beginPath(); ctx.moveTo(...foot); ctx.lineTo(...hub);
+      ctx.strokeStyle = isColor ? (isDark ? "#cbd5e1" : "#475569") : "#94a3b8";
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+    });
+    return;
+  }
+
+  if (s.kind === "canal_house") {
+    // Narrow European-style stepped-gable canal townhouse
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, s.h * 0.78, lC, rC, tC, sC, false, lB, rB);
+    windows(ctx, iso, s.gx, s.gy, hw, hd, 3, s.h * 0.75, Math.max(2, s.floors || 3), 2, wC, false, litC, s.seed || 0.5);
+    box(ctx, iso, s.gx, s.gy, hw * 0.76, hd * 0.88, s.h * 0.78, s.h * 0.92, lC, rC, tC, sC);
+    box(ctx, iso, s.gx, s.gy, hw * 0.46, hd * 0.76, s.h * 0.92, s.h + 2, lC, rC, isColor ? "#ed8838" : tC, sC);
+    return;
+  }
+
+  if (s.kind === "waterfront_cafe") {
+    // Riverside bistro with timber deck, striped awning & patio umbrellas
+    box(ctx, iso, s.gx, s.gy, hw * 1.06, hd * 1.04, 0, 2.4, isColor ? "#9c7454" : lC, isColor ? "#7d5b40" : rC, isColor ? "#d4b494" : tC, sC);
+    box(ctx, iso, s.gx, s.gy - hd * 0.14, hw * 0.78, hd * 0.64, 2.4, s.h, lC, rC, tC, sC, true, lB, rB);
+    windows(ctx, iso, s.gx, s.gy - hd * 0.14, hw * 0.78, hd * 0.64, 5, s.h - 3, 2, 2, wC, false, litC, s.seed || 0.5);
+    // Striped cafe awning
+    box(ctx, iso, s.gx, s.gy + hd * 0.52, hw * 0.72, hd * 0.24, 9, 11.2, isColor ? "#ed8838" : lC, isColor ? "#c7681f" : rC, isColor ? "#f6f0e4" : tC, sC);
+    [-0.42, 0.42].forEach((dx) => {
+      const u = iso(s.gx + hw * dx, s.gy + hd * 0.78, 8.2);
+      ctx.beginPath(); ctx.arc(u[0], u[1], 3.8, 0, Math.PI * 2);
+      ctx.fillStyle = isColor ? (dx < 0 ? "#ed8838" : "#4b7b8b") : tC; ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.65)"; ctx.lineWidth = 0.7; ctx.stroke();
+    });
+    return;
+  }
+
+  if (s.kind === "boathouse") {
+    // Timber-and-glass rowing club boathouse with wooden pier toward canal
+    const pierDir = s.gy < CANAL_Y0 ? 1 : -1;
+    box(ctx, iso, s.gx, s.gy + pierDir * hd * 0.92, hw * 0.52, hd * 0.46, 0, 1.8, isColor ? "#8c6343" : lC, isColor ? "#6b482e" : rC, isColor ? "#c9a482" : tC, sC);
+    box(ctx, iso, s.gx, s.gy, hw * 0.92, hd * 0.84, 0, s.h * 0.7, isColor ? "#4b7b8b" : lC, isColor ? "#325866" : rC, tC, sC, false, lB, rB);
+    windows(ctx, iso, s.gx, s.gy, hw * 0.92, hd * 0.84, 3, s.h * 0.66, 1, 3, wC, true);
+    const peak = iso(s.gx, s.gy, s.h + 5);
+    ctx.beginPath();
+    ctx.moveTo(...iso(s.gx - hw * 0.96, s.gy + hd * 0.88, s.h * 0.7));
+    ctx.lineTo(...iso(s.gx + hw * 0.96, s.gy + hd * 0.88, s.h * 0.7));
+    ctx.lineTo(...peak); ctx.closePath();
+    ctx.fillStyle = isColor ? "#ed8838" : lC; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(...iso(s.gx + hw * 0.96, s.gy + hd * 0.88, s.h * 0.7));
+    ctx.lineTo(...iso(s.gx + hw * 0.96, s.gy - hd * 0.88, s.h * 0.7));
+    ctx.lineTo(...peak); ctx.closePath();
+    ctx.fillStyle = isColor ? "#c7681f" : rC; ctx.fill();
+    return;
+  }
+
+  if (s.kind === "street_foliage") {
+    const seed = s.seed || 0.5;
+    if (seed < 0.48) {
+      drawTree(ctx, iso, s.gx, s.gy, isColor, isDark, 0.72 + seed * 0.35, seed > 0.32);
+    } else {
+      const bp = iso(s.gx, s.gy, 1.2);
+      ctx.beginPath(); ctx.ellipse(bp[0] + 1.5, bp[1] + 1, 4.6, 2.2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = isDark ? "rgba(0,0,0,0.22)" : "rgba(28,38,54,0.12)"; ctx.fill();
+      ctx.beginPath(); ctx.arc(bp[0] - 2.1, bp[1] - 1.2, 2.7, 0, Math.PI * 2);
+      ctx.arc(bp[0] + 2.0, bp[1] - 1.0, 2.5, 0, Math.PI * 2);
+      ctx.arc(bp[0], bp[1] - 2.5, 3.0, 0, Math.PI * 2);
+      ctx.fillStyle = isColor ? (isDark ? "#26684d" : "#3b8f62") : isDark ? "#33405c" : "#cbd5e1"; ctx.fill();
+      ctx.beginPath(); ctx.arc(bp[0] - 0.6, bp[1] - 3.3, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = isColor ? (seed > 0.8 ? "#f2a359" : "#74c69d") : "#e2e8f0"; ctx.fill();
+    }
+    return;
+  }
+
+  if (s.kind === "bush_cluster" || s.kind === "garden_bed" || s.kind === "tree_grove") {
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, 1.8, isColor ? "#326e51" : lC, isColor ? "#24543c" : rC, isColor ? (isDark ? "#20523f" : "#5ca879") : tC, sC);
+    const seed = s.seed || 0.5;
+    if (s.kind === "tree_grove") {
+      drawTree(ctx, iso, s.gx - hw * 0.42, s.gy - hd * 0.28, isColor, isDark, 0.86, false);
+      drawTree(ctx, iso, s.gx + hw * 0.38, s.gy + hd * 0.25, isColor, isDark, 0.74, true);
+    } else if (s.kind === "garden_bed") {
+      drawTree(ctx, iso, s.gx, s.gy - hd * 0.12, isColor, isDark, 0.72, seed > 0.5);
+      [[-0.45, 0.35], [0.42, -0.32], [0.35, 0.38]].forEach(([dx, dy], bi) => {
+        const fp = iso(s.gx + hw * dx, s.gy + hd * dy, 2.6);
+        ctx.beginPath(); ctx.arc(fp[0], fp[1], 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = isColor ? (bi === 0 ? "#ed8838" : bi === 1 ? "#f4c552" : "#74c69d") : tC;
+        ctx.fill();
+      });
+    } else {
+      [[-0.36, -0.24, 3.1], [0.32, -0.16, 2.8], [0.02, 0.3, 3.3]].forEach(([dx, dy, rad]) => {
+        const bp = iso(s.gx + hw * dx, s.gy + hd * dy, 2.2);
+        ctx.beginPath(); ctx.arc(bp[0], bp[1], rad, 0, Math.PI * 2);
+        ctx.fillStyle = isColor ? (isDark ? "#25664b" : "#36875c") : isDark ? "#33405c" : "#cbd5e1"; ctx.fill();
+        ctx.beginPath(); ctx.arc(bp[0] - 0.8, bp[1] - 1.1, rad * 0.52, 0, Math.PI * 2);
+        ctx.fillStyle = isColor ? (isDark ? "#439671" : "#74c69d") : "#e2e8f0"; ctx.fill();
+      });
+    }
+    return;
+  }
+
+  if (s.kind === "river_promenade" || s.kind === "pocket_plaza" || s.kind === "plaza_fountain") {
+    // Landscaped cosmopolitan pocket square with trees, stone paving, and fountain/benches
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, 2.2, isColor ? "#d4cbb9" : lC, isColor ? "#bdb39f" : rC, isColor ? (isDark ? "#24324f" : "#f4efe3") : tC, sC);
+    if (s.kind === "plaza_fountain") {
+      const fp = iso(s.gx, s.gy, 2.8);
+      ctx.beginPath(); ctx.ellipse(fp[0], fp[1], tile * 0.16, tile * 0.08, 0, 0, Math.PI * 2);
+      ctx.fillStyle = isColor ? "#4b8ea8" : lC; ctx.fill();
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.1; ctx.stroke();
+    } else {
+      box(ctx, iso, s.gx, s.gy, hw * 0.62, hd * 0.52, 2.2, 3.0, isColor ? "#387c54" : lC, isColor ? "#2c6443" : rC, isColor ? (isDark ? "#2a6948" : "#74c68e") : tC, sC);
+    }
+    drawTree(ctx, iso, s.gx - hw * 0.48, s.gy - hd * 0.35, isColor, isDark, 0.78, false);
+    drawTree(ctx, iso, s.gx + hw * 0.45, s.gy + hd * 0.35, isColor, isDark, 0.72, true);
+    return;
+  }
+
+  if (s.kind === "corner_shop") {
+    // Compact 2-story cosmopolitan corner bakery/bookshop with bright awning
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, s.h, lC, rC, tC, sC, true, lB, rB);
+    windows(ctx, iso, s.gx, s.gy, hw, hd, 4, s.h - 2, 2, 2, wC, false, litC, s.seed || 0.5);
+    box(ctx, iso, s.gx, s.gy + hd * 0.92, hw * 0.88, hd * 0.24, 6.2, 8.2, isColor ? "#ed8838" : lC, isColor ? "#c7681f" : rC, isColor ? "#fff5e6" : tC, sC);
+    return;
+  }
+
+  if (s.kind === "market_stalls") {
+    // Cluster of 4 colorful cosmopolitan open-air street market kiosks
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, 1.8, isColor ? "#d4cbb9" : lC, isColor ? "#bdb39f" : rC, isColor ? "#f2ece0" : tC, sC);
+    const stallCols = isColor ? ["#ed8838", "#4b7b8b", "#569674", "#d9a954"] : [lC, rC, tC, lC];
+    [[-0.44, -0.4], [0.44, -0.4], [-0.44, 0.42], [0.44, 0.42]].forEach(([dx, dy], si) => {
+      box(ctx, iso, s.gx + hw * dx, s.gy + hd * dy, hw * 0.34, hd * 0.3, 1.8, 7.6, stallCols[si], rC, stallCols[si], "rgba(255,255,255,0.65)");
+    });
+    return;
+  }
+
+  if (s.kind === "tennis_court") {
+    // Cosmopolitan neighborhood tennis court with white court markings & perimeter trees
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, 2.2, isColor ? "#2d6a4f" : lC, isColor ? "#1f4d39" : rC, isColor ? (isDark ? "#215c4a" : "#3b8c6e") : tC, sC);
+    ctx.beginPath();
+    ctx.moveTo(...iso(s.gx - hw * 0.72, s.gy - hd * 0.66, 2.5));
+    ctx.lineTo(...iso(s.gx + hw * 0.72, s.gy - hd * 0.66, 2.5));
+    ctx.lineTo(...iso(s.gx + hw * 0.72, s.gy + hd * 0.66, 2.5));
+    ctx.lineTo(...iso(s.gx - hw * 0.72, s.gy + hd * 0.66, 2.5));
+    ctx.closePath();
+    ctx.strokeStyle = "rgba(255,255,255,0.8)"; ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(...iso(s.gx, s.gy - hd * 0.68, 3.8));
+    ctx.lineTo(...iso(s.gx, s.gy + hd * 0.68, 3.8));
+    ctx.stroke();
+    return;
+  }
+
   if (s.kind === "greenhouse") {
     box(ctx, iso, s.gx, s.gy, hw, hd, 0, 7, lC, rC, tC, sC);
     drawTree(ctx, iso, s.gx - 0.22, s.gy, isColor, isDark, 0.82, false);
@@ -1090,29 +2104,38 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
   }
 
   if (s.kind === "gable" || s.kind === "cafe") {
-    box(ctx, iso, s.gx, s.gy, hw, hd, 0, s.h * 0.68, isColor ? (isDark ? "#2a3352" : "#f4f0e6") : lC, isColor ? (isDark ? "#1c233b" : "#ded6c5") : rC, tC, sC);
+    // Warm matte-clay stucco walls + dark-framed glowing amber windows + overhanging standing-seam slate roof
+    box(ctx, iso, s.gx, s.gy, hw, hd, 0, s.h * 0.68, lC, rC, tC, sC, false, lB, rB);
     windows(ctx, iso, s.gx, s.gy, hw, hd, 3, s.h * 0.65, 2, 2, wC, false, litC, s.seed || 0.5);
-    const peak = iso(s.gx, s.gy, s.h + 8.5);
-    ctx.beginPath();
-    ctx.moveTo(...iso(s.gx - hw, s.gy + hd, s.h * 0.68));
-    ctx.lineTo(...iso(s.gx + hw, s.gy + hd, s.h * 0.68));
-    ctx.lineTo(...peak);
-    ctx.closePath();
-    ctx.fillStyle = lC;
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(...iso(s.gx + hw, s.gy + hd, s.h * 0.68));
-    ctx.lineTo(...iso(s.gx + hw, s.gy - hd, s.h * 0.68));
-    ctx.lineTo(...peak);
-    ctx.closePath();
-    ctx.fillStyle = rC;
-    ctx.fill();
+    const ov = 1.07;
+    const peak = iso(s.gx, s.gy, s.h + 9);
+    const eL = iso(s.gx - hw * ov, s.gy + hd * ov, s.h * 0.66);
+    const eM = iso(s.gx + hw * ov, s.gy + hd * ov, s.h * 0.66);
+    const eR = iso(s.gx + hw * ov, s.gy - hd * ov, s.h * 0.66);
+    const gL = ctx.createLinearGradient(peak[0], peak[1], eM[0], eM[1]);
+    gL.addColorStop(0, isColor ? (isDark ? "#5e657a" : "#9b9da3") : lC);
+    gL.addColorStop(1, isColor ? (isDark ? "#464c5e" : "#7f8188") : lB);
+    ctx.beginPath(); ctx.moveTo(...eL); ctx.lineTo(...eM); ctx.lineTo(...peak); ctx.closePath();
+    ctx.fillStyle = gL; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(...eM); ctx.lineTo(...eR); ctx.lineTo(...peak); ctx.closePath();
+    ctx.fillStyle = isColor ? (isDark ? "#393f4f" : "#6c6f76") : rC; ctx.fill();
+    // 3D-embossed standing-seam roof ridges (shadow + highlight pair)
+    for (let k = 1; k <= 4; k++) {
+      const t = k / 5;
+      const rx = eL[0] + (eM[0] - eL[0]) * t;
+      const ry = eL[1] + (eM[1] - eL[1]) * t;
+      ctx.beginPath(); ctx.moveTo(peak[0], peak[1]); ctx.lineTo(rx, ry);
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.26)"; ctx.lineWidth = 0.7; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(peak[0] + 0.8, peak[1] + 0.3); ctx.lineTo(rx + 0.8, ry + 0.3);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.24)"; ctx.lineWidth = 0.55; ctx.stroke();
+    }
+    // Sunlit ridge cap bevel
+    ctx.beginPath(); ctx.moveTo(...eL); ctx.lineTo(...eM); ctx.lineTo(...eR);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.38)"; ctx.lineWidth = 0.8; ctx.stroke();
     if (s.kind === "cafe") {
       const umb = iso(s.gx + hw + 0.13, s.gy + hd - 0.12, 7.5);
-      ctx.beginPath();
-      ctx.arc(umb[0], umb[1], 4.8, 0, Math.PI * 2);
-      ctx.fillStyle = isColor ? "#ed8838" : tC;
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(umb[0], umb[1], 4.8, 0, Math.PI * 2);
+      ctx.fillStyle = isColor ? "#ed8838" : tC; ctx.fill();
     }
     return;
   }
@@ -1243,6 +2266,11 @@ export default function SkillsShowcase() {
     const arcStage = arcStageRef.current;
     if (!section || !monoCanvas || !colorCanvas || !waveCanvas || !arcStage) return;
 
+    const pan = monoCanvas.closest<HTMLDivElement>(".skills-city-pan");
+    const centerMap = () => { if (pan) pan.scrollLeft = (pan.scrollWidth - pan.clientWidth) / 2; };
+    const mapSize = new ResizeObserver(centerMap);
+    if (pan) mapSize.observe(pan);
+    centerMap();
     arcStage.textContent = "";
     const arcNodes: Array<{ el: HTMLDivElement; row: (typeof ARC_ROWS)[number]; rIdx: number; basePhase: number }> = [];
     ARC_ROWS.forEach((row, rIdx) => {
@@ -1269,12 +2297,38 @@ export default function SkillsShowcase() {
       });
     });
 
-    const staticMono = document.createElement("canvas");
-    const staticColor = document.createElement("canvas");
+    // 16-Band Depth-Sliced Occlusion Cache (ground + 16 transparent vertical building slices)
+    const DEPTH_BANDS = 16;
+    const depthToBand = (d: number) => Math.max(0, Math.min(DEPTH_BANDS - 1, Math.floor((d + 20) / 2.5)));
+    const groundMono = document.createElement("canvas");
+    const groundColor = document.createElement("canvas");
+    const slicesMono = Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas"));
+    const slicesColor = Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas"));
+    ensureLogoImagesLoaded();
     let cW = 0;
     let cH = 0;
     let cDpr = 0;
     let cDark = false;
+    let cLogoVer = -1;
+    let landmarks: LandmarkAtlas | undefined;
+    const landmarkRequest = new AbortController();
+    const preloadLandmarks = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      preloadLandmarks.disconnect();
+      const { signal } = landmarkRequest;
+      import("./skills-city/landmarkAtlas").then(async ({ createLandmarkAtlas }) => {
+        if (signal.aborted) return;
+        const atlas = await createLandmarkAtlas(STRUCTURES.filter(s => s.kind.startsWith("logo_")), signal);
+        if (signal.aborted) atlas.dispose();
+        else {
+          landmarks = atlas;
+          cLogoVer = -1;
+        }
+      }).catch(error => {
+        if (!signal.aborted) console.warn("Using the canvas landmark models", error);
+      });
+    }, { rootMargin: "500px" });
+    preloadLandmarks.observe(section);
 
     const getIso = (W: number, H: number) => {
       const tile = Math.max(40, Math.min(W, H) * 0.062);
@@ -1284,39 +2338,74 @@ export default function SkillsShowcase() {
       return { tile, cx, cy, iso };
     };
 
-    const buildCache = (canvas: HTMLCanvasElement, W: number, H: number, dpr: number, isColor: boolean, isDark: boolean) => {
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
-      const ctx = canvas.getContext("2d")!;
+    const buildCityCache = (
+      groundCanvas: HTMLCanvasElement,
+      sliceCanvases: HTMLCanvasElement[],
+      W: number,
+      H: number,
+      dpr: number,
+      isColor: boolean,
+      isDark: boolean,
+    ) => {
+      groundCanvas.width = W * dpr;
+      groundCanvas.height = H * dpr;
+      const ctx = groundCanvas.getContext("2d")!;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      ctx.fillStyle = isDark ? (isColor ? "#12172b" : "#0e1120") : isColor ? "#ece4d4" : "#f4f0e6";
+      ctx.fillStyle = isDark ? (isColor ? "#12172b" : "#0e1120") : isColor ? "#ebe2d2" : "#f4f0e6";
       ctx.fillRect(0, 0, W, H);
 
       const { tile, iso } = getIso(W, H);
 
-      ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.09)" : isColor ? "rgba(148, 134, 114, 0.16)" : "rgba(140, 132, 118, 0.14)";
+      // Subtle architectural urban grid
+      ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.08)" : isColor ? "rgba(148, 134, 114, 0.14)" : "rgba(140, 132, 118, 0.12)";
       ctx.lineWidth = 1;
       for (let i = -22; i <= 22; i++) {
-        ctx.beginPath();
-        ctx.moveTo(...iso(i, -22));
-        ctx.lineTo(...iso(i, 22));
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(...iso(-22, i));
-        ctx.lineTo(...iso(22, i));
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(...iso(i, -22)); ctx.lineTo(...iso(i, 22)); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(...iso(-22, i)); ctx.lineTo(...iso(22, i)); ctx.stroke();
       }
 
+      // Wide paved waterfront stone promenades along both canal embankments
+      ctx.beginPath();
+      ctx.moveTo(...iso(-24, CANAL_Y0 - 0.44, 0));
+      ctx.lineTo(...iso(24, CANAL_Y0 - 0.44, 0));
+      ctx.lineTo(...iso(24, CANAL_Y1 + 0.48, 0));
+      ctx.lineTo(...iso(-24, CANAL_Y1 + 0.48, 0));
+      ctx.closePath();
+      ctx.fillStyle = isDark ? "#1f2842" : isColor ? "#dfd7c8" : "#ebe6dc";
+      ctx.fill();
+
+      // Stone quay coping walls right at water edge
+      ctx.beginPath();
+      ctx.moveTo(...iso(-24, CANAL_Y0 - 0.08, 0));
+      ctx.lineTo(...iso(24, CANAL_Y0 - 0.08, 0));
+      ctx.lineTo(...iso(24, CANAL_Y1 + 0.08, 0));
+      ctx.lineTo(...iso(-24, CANAL_Y1 + 0.08, 0));
+      ctx.closePath();
+      ctx.fillStyle = isDark ? "#2c3857" : isColor ? "#c4baa7" : "#dad4c7";
+      ctx.fill();
+
+      const cA = iso(0, CANAL_Y0, 0);
+      const cB = iso(0, CANAL_Y1, 0);
+      const waterGrad = ctx.createLinearGradient(cA[0], cA[1], cB[0], cB[1]);
+      if (isColor) {
+        waterGrad.addColorStop(0, isDark ? "#143752" : "#3b7f9c");
+        waterGrad.addColorStop(0.5, isDark ? "#1e5273" : "#5ca3bd");
+        waterGrad.addColorStop(1, isDark ? "#113047" : "#35748f");
+      } else {
+        waterGrad.addColorStop(0, isDark ? "#161e36" : "#dad4c7");
+        waterGrad.addColorStop(1, isDark ? "#1c2642" : "#e5e0d5");
+      }
       ctx.beginPath();
       ctx.moveTo(...iso(-24, CANAL_Y0, 0));
       ctx.lineTo(...iso(24, CANAL_Y0, 0));
       ctx.lineTo(...iso(24, CANAL_Y1, 0));
       ctx.lineTo(...iso(-24, CANAL_Y1, 0));
       ctx.closePath();
-      ctx.fillStyle = isColor ? (isDark ? "#1c4966" : "#4b8ea8") : isDark ? "#182038" : "#ded9cc";
+      ctx.fillStyle = waterGrad;
       ctx.fill();
 
+      // Central stadium plaza apron
       ctx.beginPath();
       ctx.moveTo(...iso(-1.45, -1.25, 0));
       ctx.lineTo(...iso(1.45, -1.25, 0));
@@ -1326,102 +2415,287 @@ export default function SkillsShowcase() {
       ctx.fillStyle = isDark ? "#1c233b" : "#f7f3ea";
       ctx.fill();
 
+      // Paved sidewalks + dark asphalt avenues + crisp lane markings
       const drawAvenue = (x1: number, y1: number, x2: number, y2: number) => {
-        ctx.beginPath();
-        ctx.moveTo(...iso(x1, y1));
-        ctx.lineTo(...iso(x2, y2));
-        ctx.strokeStyle = isDark ? "#232c47" : "#f8f5ee";
-        ctx.lineWidth = tile * 0.54;
+        ctx.beginPath(); ctx.moveTo(...iso(x1, y1)); ctx.lineTo(...iso(x2, y2));
+        ctx.strokeStyle = isDark ? "#26314f" : "#f9f6ef";
+        ctx.lineWidth = tile * 0.56;
         ctx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(...iso(x1, y1));
-        ctx.lineTo(...iso(x2, y2));
-        ctx.strokeStyle = isDark ? "#121626" : isColor ? "#464d5c" : "#dbd6ca";
+        ctx.beginPath(); ctx.moveTo(...iso(x1, y1)); ctx.lineTo(...iso(x2, y2));
+        ctx.strokeStyle = isDark ? "#121626" : isColor ? "#3f4654" : "#dad5c8";
         ctx.lineWidth = tile * 0.34;
         ctx.stroke();
 
         ctx.setLineDash([6, 8]);
-        ctx.beginPath();
-        ctx.moveTo(...iso(x1, y1));
-        ctx.lineTo(...iso(x2, y2));
-        ctx.strokeStyle = isColor ? "rgba(237, 136, 56, 0.72)" : isDark ? "rgba(148,163,184,0.35)" : "rgba(255,255,255,0.78)";
+        ctx.beginPath(); ctx.moveTo(...iso(x1, y1)); ctx.lineTo(...iso(x2, y2));
+        ctx.strokeStyle = isColor ? "rgba(237, 136, 56, 0.78)" : isDark ? "rgba(148,163,184,0.35)" : "rgba(255,255,255,0.82)";
         ctx.lineWidth = 1.3;
         ctx.stroke();
         ctx.setLineDash([]);
       };
-      for (const rx of ROAD_X) drawAvenue(rx, -22, rx, 22);
+      // Vertical avenues skip the canal water span (bridges render above boats!)
+      for (const rx of ROAD_X) {
+        drawAvenue(rx, -22, rx, CANAL_Y0 - 0.04);
+        drawAvenue(rx, CANAL_Y1 + 0.04, rx, 22);
+      }
       for (const ry of ROAD_Y) drawAvenue(-22, ry, 22, ry);
 
+      // Crisp zebra crosswalks at every avenue intersection
+      ctx.strokeStyle = isColor ? "rgba(255, 252, 245, 0.78)" : isDark ? "rgba(148,163,184,0.35)" : "rgba(255,255,255,0.82)";
+      ctx.lineWidth = 1.6;
+      for (const rx of ROAD_X) {
+        for (const ry of ROAD_Y) {
+          for (let s = -0.14; s <= 0.14; s += 0.07) {
+            ctx.beginPath();
+            ctx.moveTo(...iso(rx + s, ry - 0.34)); ctx.lineTo(...iso(rx + s, ry - 0.22));
+            ctx.moveTo(...iso(rx + s, ry + 0.22)); ctx.lineTo(...iso(rx + s, ry + 0.34));
+            ctx.moveTo(...iso(rx - 0.34, ry + s)); ctx.lineTo(...iso(rx - 0.22, ry + s));
+            ctx.moveTo(...iso(rx + 0.22, ry + s)); ctx.lineTo(...iso(rx + 0.34, ry + s));
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Soft studio two-layer (penumbra + umbra) contact shadows seating every building cleanly on the ground
       for (const s of STRUCTURES) {
         if (s.h < 4) continue;
         const hw = s.w * 0.5;
         const hd = s.d * 0.5;
-        const sx = s.h * 0.0088;
-        const sy = s.h * 0.0042;
-        ctx.beginPath();
-        ctx.moveTo(...iso(s.gx - hw, s.gy + hd, 0));
-        ctx.lineTo(...iso(s.gx + hw, s.gy + hd, 0));
-        ctx.lineTo(...iso(s.gx + hw, s.gy - hd, 0));
-        ctx.lineTo(...iso(s.gx + hw + sx, s.gy - hd + sy, 0));
-        ctx.lineTo(...iso(s.gx + hw + sx, s.gy + hd + sy, 0));
-        ctx.lineTo(...iso(s.gx - hw + sx, s.gy + hd + sy, 0));
-        ctx.closePath();
-        ctx.fillStyle = isDark ? "rgba(0, 0, 0, 0.32)" : isColor ? "rgba(28, 38, 54, 0.16)" : "rgba(71, 65, 55, 0.09)";
-        ctx.fill();
+        [1.35, 0.78].forEach((mult, pass) => {
+          const sx = s.h * 0.0078 * mult;
+          const sy = s.h * 0.0038 * mult;
+          ctx.beginPath();
+          ctx.moveTo(...iso(s.gx - hw, s.gy + hd, 0));
+          ctx.lineTo(...iso(s.gx + hw, s.gy + hd, 0));
+          ctx.lineTo(...iso(s.gx + hw, s.gy - hd, 0));
+          ctx.lineTo(...iso(s.gx + hw + sx, s.gy - hd + sy, 0));
+          ctx.lineTo(...iso(s.gx + hw + sx, s.gy + hd + sy, 0));
+          ctx.lineTo(...iso(s.gx - hw + sx, s.gy + hd + sy, 0));
+          ctx.closePath();
+          ctx.fillStyle = isDark
+            ? pass === 0 ? "rgba(0, 0, 0, 0.18)" : "rgba(0, 0, 0, 0.28)"
+            : isColor
+              ? pass === 0 ? "rgba(20, 30, 48, 0.08)" : "rgba(20, 30, 48, 0.14)"
+              : pass === 0 ? "rgba(60, 56, 48, 0.045)" : "rgba(60, 56, 48, 0.075)";
+          ctx.fill();
+        });
       }
 
+      // Bake static buildings, metro pillars, and street lamps into 16 depth-sorted transparent slices
+      const sliceCtxs = sliceCanvases.map((sc) => {
+        sc.width = W * dpr;
+        sc.height = H * dpr;
+        const sctx = sc.getContext("2d")!;
+        sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        sctx.clearRect(0, 0, W, H);
+        return sctx;
+      });
+
       const mz = 24;
-      for (let x = -18; x <= 18; x += 2.2) {
-        box(ctx, iso, x, METRO_Y, 0.09, 0.09, 0, mz, isDark ? "#28324d" : "#d8d3c8", isDark ? "#1c243b" : "#c4bdb0", isDark ? "#38466e" : "#f4f0e6", "rgba(255,255,255,0.25)");
+      const pillars: Array<{ depth: number; type: "p"; gx: number }> = [];
+      for (let x = -18; x <= 18; x += 2.2) pillars.push({ depth: x + METRO_Y, type: "p", gx: x });
+
+      const list = [
+        ...STRUCTURES.map((s) => ({ depth: s.gx + s.gy, type: "s" as const, data: s })),
+        ...LAMPS.map((l) => ({ depth: l.gx + l.gy, type: "l" as const, data: l })),
+        ...pillars,
+      ];
+      list.sort((a, b) => a.depth - b.depth);
+      const textBounds = Array.from(cityHeaderRef.current?.children ?? []).map(el => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return range.getBoundingClientRect();
+      });
+      const viewport = monoCanvas.getBoundingClientRect();
+      const heading = {
+        left: Math.min(...textBounds.map(r => r.left)) - viewport.left,
+        right: Math.max(...textBounds.map(r => r.right)) - viewport.left,
+        bottom: Math.max(...textBounds.map(r => r.bottom)) - viewport.top,
+      };
+      for (const item of list) {
+        const bCtx = sliceCtxs[depthToBand(item.depth)];
+        if (item.type === "s") {
+          drawStaticStructure(bCtx, iso, tile, item.data, isColor, isDark, landmarks, heading);
+        } else if (item.type === "p") {
+          box(bCtx, iso, item.gx, METRO_Y, 0.09, 0.09, 0, mz, isDark ? "#28324d" : "#d8d3c8", isDark ? "#1c243b" : "#c4bdb0", isDark ? "#38466e" : "#f4f0e6", "rgba(255,255,255,0.25)");
+        } else {
+          const b = iso(item.data.gx, item.data.gy, 0);
+          const t = iso(item.data.gx, item.data.gy, 10.5);
+          bCtx.beginPath(); bCtx.moveTo(...b); bCtx.lineTo(...t);
+          bCtx.strokeStyle = isDark ? "#475569" : "#94a3b8";
+          bCtx.lineWidth = 1;
+          bCtx.stroke();
+          bCtx.beginPath(); bCtx.arc(t[0], t[1], 1.6, 0, Math.PI * 2);
+          bCtx.fillStyle = isColor ? "#f2bd83" : "#e2e8f0";
+          bCtx.fill();
+        }
       }
+    };
+
+    const drawCanalBridges = (ctx: CanvasRenderingContext2D, iso: IsoFn, tile: number, isColor: boolean, isDark: boolean) => {
+      const bz = 3.6;
+      const deckL = isColor ? (isDark ? "#263254" : "#d6cfc0") : isDark ? "#1f2842" : "#e2ddd1";
+      const deckR = isColor ? (isDark ? "#1b2440" : "#b8b0a0") : isDark ? "#161d33" : "#cfc9bc";
+      const deckT = isDark ? "#151b2e" : isColor ? "#464e5e" : "#ded9cd";
+      for (const rx of ROAD_X) {
+        // Stone bridge deck spanning canal so boats glide cleanly underneath
+        box(ctx, iso, rx, (CANAL_Y0 + CANAL_Y1) * 0.5, 0.34, (CANAL_Y1 - CANAL_Y0) * 0.5 + 0.08, 0, bz, deckL, deckR, deckT, "rgba(255,255,255,0.35)");
+        // Sidewalk parapets & steel rails
+        [-0.3, 0.3].forEach((dx) => {
+          ctx.beginPath();
+          ctx.moveTo(...iso(rx + dx, CANAL_Y0 - 0.06, bz + 2.2));
+          ctx.lineTo(...iso(rx + dx, CANAL_Y1 + 0.06, bz + 2.2));
+          ctx.strokeStyle = isColor ? (isDark ? "#94a3b8" : "#f8f5ee") : "#cbd5e1";
+          ctx.lineWidth = 1.6;
+          ctx.stroke();
+        });
+        // Bridge centerline dash
+        ctx.setLineDash([4, 5]);
+        ctx.beginPath();
+        ctx.moveTo(...iso(rx, CANAL_Y0, bz + 0.4));
+        ctx.lineTo(...iso(rx, CANAL_Y1, bz + 0.4));
+        ctx.strokeStyle = isColor ? "rgba(237, 136, 56, 0.85)" : "rgba(255,255,255,0.75)";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      void tile;
+    };
+
+    const drawDepthSortedScene = (
+      ctx: CanvasRenderingContext2D,
+      groundCanvas: HTMLCanvasElement,
+      sliceCanvases: HTMLCanvasElement[],
+      W: number,
+      H: number,
+      isColor: boolean,
+      isDark: boolean,
+      time: number,
+    ) => {
+      const { tile, iso } = getIso(W, H);
+
+      // 1. Ground, roads, crosswalks, canal & building shadows
+      ctx.drawImage(groundCanvas, 0, 0, W, H);
+
+      // 2. Canal boats glide directly on water underneath the 4 bridges
+      for (const b of BOATS) {
+        const bx = (((b.pos + time * 0.001 * b.speed * 14) % 28) + 28) % 28 - 14;
+        const p = iso(bx, b.y, 1);
+        const wake = iso(bx - Math.sign(b.speed) * 0.6, b.y, 0.5);
+        ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(...wake);
+        ctx.strokeStyle = "rgba(244,240,230,0.52)"; ctx.lineWidth = 2; ctx.stroke();
+        box(ctx, iso, bx, b.y, b.isBarge ? 0.24 : 0.17, 0.08, 0.5, 4.4, isColor ? b.hull : "#cbd5e1", isColor ? b.trim : "#94a3b8", "#f4f0e6", "rgba(0,0,0,0.16)");
+      }
+
+      // 3. Four stone-and-steel canal bridges above boats
+      drawCanalBridges(ctx, iso, tile, isColor, isDark);
+
+      // 4. Bucket moving vehicles & pedestrians into the 16 isometric depth bands
+      type DynamicEntity =
+        | { kind: "v"; depth: number; x: number; y: number; z0: number; v: (typeof VEHICLES)[number] }
+        | { kind: "p"; depth: number; x: number; y: number; z0: number; ch: (typeof PEOPLE)[number] };
+      const buckets: DynamicEntity[][] = Array.from({ length: DEPTH_BANDS }, () => []);
+
+      for (const v of VEHICLES) {
+        const pos = (((v.pos + time * 0.001 * v.speed * 18) % 30) + 30) % 30 - 15;
+        const vx = v.horizontal ? pos : v.lane;
+        const vy = v.horizontal ? v.lane : pos;
+        const onBridge = !v.horizontal && vy > CANAL_Y0 - 0.12 && vy < CANAL_Y1 + 0.12;
+        const depth = vx + vy;
+        buckets[depthToBand(depth)].push({ kind: "v", depth, x: vx, y: vy, z0: onBridge ? 3.8 : 0.6, v });
+      }
+
+      for (const ch of PEOPLE) {
+        const pos = (((ch.pos + time * 0.001 * ch.speed * 12) % 28) + 28) % 28 - 14;
+        const px = ch.horizontal ? pos : ch.lane;
+        const py = ch.horizontal ? ch.lane : pos;
+        const onBridge = !ch.horizontal && py > CANAL_Y0 - 0.12 && py < CANAL_Y1 + 0.12;
+        const depth = px + py;
+        buckets[depthToBand(depth)].push({ kind: "p", depth, x: px, y: py, z0: onBridge ? 3.6 : 0, ch });
+      }
+
+      const ferrisBand = depthToBand(FERRIS_POS.gx + FERRIS_POS.gy);
+
+      // 5. Composite back-to-front: entities in band b -> static building slice b (true 3D occlusion!)
+      for (let b = 0; b < DEPTH_BANDS; b++) {
+        const entities = buckets[b];
+        if (entities.length > 1) entities.sort((a, c) => a.depth - c.depth);
+        for (const e of entities) {
+          if (e.kind === "v") {
+            const hw = e.v.horizontal ? (e.v.isBus ? 0.15 : 0.095) : 0.062;
+            const hd = e.v.horizontal ? 0.062 : e.v.isBus ? 0.15 : 0.095;
+            const sh = iso(e.x + 0.02, e.y + 0.02, e.z0);
+            ctx.beginPath();
+            ctx.ellipse(sh[0], sh[1], e.v.isBus ? 7 : 4.6, e.v.isBus ? 3.4 : 2.3, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(15, 23, 42, 0.24)";
+            ctx.fill();
+            box(ctx, iso, e.x, e.y, hw, hd, e.z0, e.z0 + (e.v.isBus ? 5.8 : 3.5), isColor ? e.v.color : "#cbd5e1", isColor ? e.v.color : "#94a3b8", isColor ? "#f4f0e6" : "#e2e8f0", "rgba(0,0,0,0.22)");
+          } else {
+            const bob = Math.abs(Math.sin(time * 0.0095 + e.ch.phase)) * 1.8;
+            const foot = iso(e.x, e.y, e.z0);
+            const body = iso(e.x, e.y, e.z0 + 4.4 + bob);
+            const head = iso(e.x, e.y, e.z0 + 7.4 + bob);
+            ctx.beginPath();
+            ctx.ellipse(foot[0] + 1, foot[1] + 0.5, 2.2, 1.1, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(15, 23, 42, 0.22)";
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(foot[0], foot[1]);
+            ctx.lineTo(body[0], body[1]);
+            ctx.strokeStyle = isColor ? e.ch.coat : isDark ? "#64748b" : "#94a3b8";
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = "round";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(head[0], head[1], 1.7, 0, Math.PI * 2);
+            ctx.fillStyle = isColor ? (e.ch.hat ? "#102b79" : "#f2bd83") : "#cbd5e1";
+            ctx.fill();
+          }
+        }
+        ctx.drawImage(sliceCanvases[b], 0, 0, W, H);
+
+        // Animated rotating waterfront Ferris wheel in its exact depth band
+        if (b === ferrisBand) {
+          const hub = iso(FERRIS_POS.gx, FERRIS_POS.gy, 34);
+          const rX = tile * 0.5;
+          const rY = tile * 0.54;
+          const spin = time * 0.00035;
+          ctx.beginPath();
+          ctx.ellipse(hub[0], hub[1], rX, rY, -0.18, 0, Math.PI * 2);
+          ctx.strokeStyle = isColor ? (isDark ? "#e2e8f0" : "#f8f5ee") : "#cbd5e1";
+          ctx.lineWidth = 2.1;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.ellipse(hub[0], hub[1], rX * 0.72, rY * 0.72, -0.18, 0, Math.PI * 2);
+          ctx.strokeStyle = isColor ? "rgba(237, 136, 56, 0.72)" : "rgba(148,163,184,0.55)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          const podCols = ["#ed8838", "#38bdf8", "#f5c418", "#409d6b"];
+          for (let k = 0; k < 12; k++) {
+            const a = spin + (k * Math.PI * 2) / 12;
+            const px = hub[0] + Math.cos(a) * rX;
+            const py = hub[1] + Math.sin(a) * rY;
+            ctx.beginPath(); ctx.moveTo(hub[0], hub[1]); ctx.lineTo(px, py);
+            ctx.strokeStyle = isColor ? "rgba(255,255,255,0.42)" : "rgba(148,163,184,0.35)";
+            ctx.lineWidth = 0.85; ctx.stroke();
+            ctx.beginPath(); ctx.arc(px, py + 2.4, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = isColor ? podCols[k % podCols.length] : "#e2e8f0";
+            ctx.fill();
+          }
+          ctx.beginPath(); ctx.arc(hub[0], hub[1], 3.2, 0, Math.PI * 2);
+          ctx.fillStyle = isColor ? "#ed8838" : "#94a3b8"; ctx.fill();
+        }
+      }
+
+      // 6. Elevated metro viaduct deck, moving metro trains, cranes, and ascending airplane
+      const mz = 24;
       ctx.beginPath();
       ctx.moveTo(...iso(-20, METRO_Y, mz));
       ctx.lineTo(...iso(20, METRO_Y, mz));
       ctx.strokeStyle = isDark ? "#334155" : "#b8b1a3";
       ctx.lineWidth = 9;
       ctx.stroke();
-
-      const list = [
-        ...STRUCTURES.map((s) => ({ depth: s.gx + s.gy, type: "s" as const, data: s })),
-        ...LAMPS.map((l) => ({ depth: l.gx + l.gy, type: "l" as const, data: l })),
-      ];
-      list.sort((a, b) => a.depth - b.depth);
-      for (const item of list) {
-        if (item.type === "s") {
-          drawStaticStructure(ctx, iso, tile, item.data, isColor, isDark);
-        } else {
-          const b = iso(item.data.gx, item.data.gy, 0);
-          const t = iso(item.data.gx, item.data.gy, 10.5);
-          ctx.beginPath();
-          ctx.moveTo(...b);
-          ctx.lineTo(...t);
-          ctx.strokeStyle = isDark ? "#475569" : "#94a3b8";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.arc(t[0], t[1], 1.6, 0, Math.PI * 2);
-          ctx.fillStyle = isColor ? "#f2bd83" : "#e2e8f0";
-          ctx.fill();
-        }
-      }
-    };
-
-    const drawLiving = (ctx: CanvasRenderingContext2D, W: number, H: number, isColor: boolean, isDark: boolean, time: number) => {
-      const { iso } = getIso(W, H);
-
-      for (const b of BOATS) {
-        const bx = (((b.pos + time * 0.001 * b.speed * 14) % 28) + 28) % 28 - 14;
-        const p = iso(bx, b.y, 1);
-        const wake = iso(bx - Math.sign(b.speed) * 0.55, b.y, 0.5);
-        ctx.beginPath();
-        ctx.moveTo(...p);
-        ctx.lineTo(...wake);
-        ctx.strokeStyle = "rgba(244,240,230,0.48)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        box(ctx, iso, bx, b.y, b.isBarge ? 0.24 : 0.17, 0.08, 0.5, 4.4, isColor ? b.hull : "#cbd5e1", isColor ? b.trim : "#94a3b8", "#f4f0e6", "rgba(0,0,0,0.16)");
-      }
 
       [
         { dir: 1, offset: 0, accent: "#ed8838" },
@@ -1433,52 +2707,16 @@ export default function SkillsShowcase() {
         }
       });
 
-      for (const v of VEHICLES) {
-        const p = (((v.pos + time * 0.001 * v.speed * 18) % 30) + 30) % 30 - 15;
-        const vx = v.horizontal ? p : v.lane;
-        const vy = v.horizontal ? v.lane : p;
-        const hw = v.horizontal ? (v.isBus ? 0.16 : 0.1) : 0.07;
-        const hd = v.horizontal ? 0.07 : v.isBus ? 0.16 : 0.1;
-        box(ctx, iso, vx, vy, hw, hd, 0.8, v.isBus ? 6.8 : 4.3, isColor ? v.color : "#cbd5e1", isColor ? v.color : "#94a3b8", isColor ? "#f4f0e6" : "#e2e8f0", "rgba(0,0,0,0.2)");
-      }
-
-      for (const ch of PEOPLE) {
-        const p = (((ch.pos + time * 0.001 * ch.speed * 12) % 28) + 28) % 28 - 14;
-        const px = ch.horizontal ? p : ch.lane;
-        const py = ch.horizontal ? ch.lane : p;
-        const bob = Math.abs(Math.sin(time * 0.0095 + ch.phase)) * 2.0;
-        const foot = iso(px, py, 0);
-        const body = iso(px, py, 4.8 + bob);
-        const head = iso(px, py, 8.0 + bob);
-        ctx.beginPath();
-        ctx.moveTo(foot[0], foot[1]);
-        ctx.lineTo(body[0], body[1]);
-        ctx.strokeStyle = isColor ? ch.coat : isDark ? "#64748b" : "#94a3b8";
-        ctx.lineWidth = 2.7;
-        ctx.lineCap = "round";
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(head[0], head[1], 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = isColor ? (ch.hat ? "#102b79" : "#f2bd83") : "#cbd5e1";
-        ctx.fill();
-      }
-
       for (const cr of CRANES) {
         const base = iso(cr.gx, cr.gy, cr.z);
         const top = iso(cr.gx, cr.gy, cr.z + 28);
-        ctx.beginPath();
-        ctx.moveTo(...base);
-        ctx.lineTo(...top);
-        ctx.strokeStyle = isColor ? "#ed8838" : "#94a3b8";
-        ctx.lineWidth = 2.1;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(...base); ctx.lineTo(...top);
+        ctx.strokeStyle = isColor ? "#ed8838" : "#94a3b8"; ctx.lineWidth = 2.1; ctx.stroke();
         const ang = cr.phase + time * cr.speed;
         ctx.beginPath();
         ctx.moveTo(top[0] - Math.cos(ang) * 10, top[1] - Math.sin(ang) * 5);
         ctx.lineTo(top[0] + Math.cos(ang) * 28, top[1] + Math.sin(ang) * 14);
-        ctx.strokeStyle = isColor ? "#f2bd83" : "#cbd5e1";
-        ctx.lineWidth = 1.9;
-        ctx.stroke();
+        ctx.strokeStyle = isColor ? "#f2bd83" : "#cbd5e1"; ctx.lineWidth = 1.9; ctx.stroke();
       }
 
       const u = (time * 0.00016) % 1;
@@ -1671,7 +2909,7 @@ export default function SkillsShowcase() {
       const irisP = clamp((smoothP - 0.03) / 0.36);
 
       if (fadeOutCity < 0.98) {
-        const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+        const dpr = Math.min(pan && pan.scrollWidth > pan.clientWidth ? 1 : 1.5, window.devicePixelRatio || 1);
         const W = monoCanvas.clientWidth;
         const H = monoCanvas.clientHeight;
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -1683,26 +2921,25 @@ export default function SkillsShowcase() {
             colorCanvas.width = W * dpr;
             colorCanvas.height = H * dpr;
           }
-          if (cW !== W || cH !== H || cDpr !== dpr || cDark !== isDark) {
+          if (cW !== W || cH !== H || cDpr !== dpr || cDark !== isDark || cLogoVer !== logoLoadVersion) {
             cW = W;
             cH = H;
             cDpr = dpr;
             cDark = isDark;
-            buildCache(staticMono, W, H, dpr, false, isDark);
-            buildCache(staticColor, W, H, dpr, true, isDark);
+            cLogoVer = logoLoadVersion;
+            buildCityCache(groundMono, slicesMono, W, H, dpr, false, isDark);
+            buildCityCache(groundColor, slicesColor, W, H, dpr, true, isDark);
           }
 
           const mCtx = monoCanvas.getContext("2d")!;
           mCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
           mCtx.globalCompositeOperation = "source-over";
-          mCtx.drawImage(staticMono, 0, 0, W, H);
-          drawLiving(mCtx, W, H, false, isDark, now);
+          drawDepthSortedScene(mCtx, groundMono, slicesMono, W, H, false, isDark, now);
 
           const cCtx = colorCanvas.getContext("2d")!;
           cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
           cCtx.globalCompositeOperation = "source-over";
-          cCtx.drawImage(staticColor, 0, 0, W, H);
-          drawLiving(cCtx, W, H, true, isDark, now);
+          drawDepthSortedScene(cCtx, groundColor, slicesColor, W, H, true, isDark, now);
 
           applyFluidColorWave(W, H, dpr, isDark, now, irisP);
         }
@@ -1717,6 +2954,8 @@ export default function SkillsShowcase() {
         cityLayerRef.current.style.pointerEvents = fadeOutCity > 0.85 ? "none" : "auto";
       }
       if (cityHeaderRef.current) {
+        // Let the city be seen unobstructed during the existing colour reveal.
+        cityHeaderRef.current.style.opacity = String(1 - clamp((smoothP - .06) / .18));
         cityHeaderRef.current.style.transform = `translate3d(0, ${(-fadeOutCity * 38).toFixed(1)}px, 0)`;
       }
 
@@ -1762,6 +3001,10 @@ export default function SkillsShowcase() {
     rafId = requestAnimationFrame(render);
     return () => {
       cancelAnimationFrame(rafId);
+      preloadLandmarks.disconnect();
+      mapSize.disconnect();
+      landmarkRequest.abort();
+      landmarks?.dispose();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onPointer);
     };
@@ -1776,9 +3019,13 @@ export default function SkillsShowcase() {
         {/* STAGE A: FULL-BLEED PORTFOLIO-THEMED METROPOLIS + FLUID WAVE */}
         <div className="skills-city-layer" ref={cityLayerRef}>
           <div className="skills-city-wrap" ref={cityWrapRef}>
-            <canvas className="skills-city-canvas skills-city-mono" ref={monoRef} aria-hidden="true" />
-            <canvas className="skills-city-canvas skills-city-color" ref={colorRef} aria-hidden="true" />
-            <canvas className="skills-city-canvas skills-city-wave" ref={waveRef} aria-hidden="true" />
+            <div className="skills-city-pan">
+              <div className="skills-city-map">
+                <canvas className="skills-city-canvas skills-city-mono" ref={monoRef} aria-hidden="true" />
+                <canvas className="skills-city-canvas skills-city-color" ref={colorRef} aria-hidden="true" />
+                <canvas className="skills-city-canvas skills-city-wave" ref={waveRef} aria-hidden="true" />
+              </div>
+            </div>
             <div className="skills-city-mist" />
           </div>
 
@@ -1790,7 +3037,7 @@ export default function SkillsShowcase() {
               <em>zero</em> <RippleWords text="friction" suffix={<span className="orange">.</span>} />
             </h2>
             <p className="skills-city-sub">
-              Scroll to sweep through the data systems, cloud lakehouse tools, and streaming stack behind my production work.
+              Scroll to sweep through the data systems, cloud lakehouse tools, and streaming stack behind my production work. <span className="skills-pan-hint">Swipe sideways to explore the edges.</span>
             </p>
           </div>
         </div>

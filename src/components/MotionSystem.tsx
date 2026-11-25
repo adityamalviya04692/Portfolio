@@ -10,6 +10,7 @@ import {
 } from "react";
 import {
   AnimatePresence,
+  LayoutGroup,
   MotionConfig,
   animate,
   motion,
@@ -20,10 +21,23 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import ThemeToggle from "./ThemeToggle";
 import ParticleEngineer from "./ParticleEngineer";
 
-const MotionContext = createContext({ reduced: false });
+export type IntroPhase = "loading" | "docking" | "complete";
+
+const MotionContext = createContext<{
+  reduced: boolean;
+  paused: boolean;
+  togglePaused: () => void;
+  introPhase: IntroPhase;
+  dockReady: boolean;
+}>({
+  reduced: false,
+  paused: false,
+  togglePaused: () => {},
+  introPhase: "complete",
+  dockReady: true,
+});
 export const useMotionPreference = () => useContext(MotionContext);
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 
@@ -33,9 +47,42 @@ export function MotionSystem({ children }: { children: ReactNode }) {
     () => localStorage.getItem("portfolio-motion") === "paused",
   );
   const reduced = Boolean(systemReduced || paused);
-  const [ready, setReady] = useState(false);
+  const [introPhase, setIntroPhase] = useState<IntroPhase>(() =>
+    systemReduced || localStorage.getItem("portfolio-motion") === "paused"
+      ? "complete"
+      : "loading",
+  );
+  const [dockReady, setDockReady] = useState(() =>
+    Boolean(systemReduced || localStorage.getItem("portfolio-motion") === "paused"),
+  );
+  const [loadPct, setLoadPct] = useState(0);
+  const flightTargetRef = useRef({ dx: 0, dy: -320, scale: 1 });
+  const introDoneRef = useRef(false);
+  const handoffStartedRef = useRef(false);
+  const flyX = useMotionValue(0);
+  const flyY = useMotionValue(0);
+  const flyScale = useMotionValue(118 / 54);
+  const flyRotateZ = useMotionValue(0);
+  const flyRotateX = useMotionValue(0);
+  const trailX = useMotionValue(0);
+  const trailY = useMotionValue(0);
+  const trailScale = useMotionValue(118 / 54);
+  const trailOpacity = useMotionValue(0);
   const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, { stiffness: 160, damping: 30 });
+  const progress = useSpring(scrollYProgress, { stiffness: 160, damping: 28, mass: 0.6 });
+
+  const togglePaused = () => {
+    setPaused((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("portfolio-motion", next ? "paused" : "on");
+      } catch {
+        /* ignore storage failures */
+      }
+      return next;
+    });
+  };
+
   useEffect(() => {
     delete document.documentElement.dataset.palette;
     document.documentElement.dataset.motion = reduced ? "off" : "on";
@@ -43,74 +90,322 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       delete document.documentElement.dataset.motion;
     };
   }, [reduced]);
+
+  const finishHandoff = () => {
+    if (handoffStartedRef.current) return;
+    handoffStartedRef.current = true;
+    // Reveal the identical navbar logo first, then unmount the flying clone on the next frame (zero gap/blink)
+    setDockReady(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        introDoneRef.current = true;
+        setIntroPhase("complete");
+      });
+    });
+  };
+
+  // Runs ONCE on initial load — single continuous rAF physics loop from idle float -> feather glide -> exact dock
   useEffect(() => {
+    if (introDoneRef.current) return;
+    if (reduced) {
+      introDoneRef.current = true;
+      setLoadPct(100);
+      setDockReady(true);
+      setIntroPhase("complete");
+      return;
+    }
+
     let alive = true;
-    const timeout = window.setTimeout(() => {
-      if (alive) setReady(true);
-    }, 3500);
+    let dockingScheduled = false;
+    let mode: "loading" | "docking" | "done" = "loading";
+    let flightStart = 0;
+    let x0 = 0;
+    let y0 = 0;
+    let rz0 = 0;
+    let dx = 0;
+    let dy = -320;
+    let endScale = 1;
+    let rafId = 0;
+    const startedAt = performance.now();
+    const START_SCALE_VAL = 118 / 54;
+    const MIN_DRAW_MS = 1080;
+    const FLIGHT_DURATION_MS = 1040;
+    const timers: number[] = [];
+
+    flyX.set(0);
+    flyY.set(0);
+    flyScale.set(START_SCALE_VAL);
+    flyRotateZ.set(0);
+    flyRotateX.set(0);
+    trailOpacity.set(0);
+
+    const pctCtrl = animate(0, 100, {
+      duration: 1.0,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => {
+        if (alive) setLoadPct(Math.round(v));
+      },
+    });
+
+    // Smooth S-curve feather path starting from the exact idle float position (zero jump/chop)
+    const featherAt = (u: number) => {
+      const ease = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2.4) / 2;
+      const env = Math.sin(u * Math.PI);
+      const swayAmp = Math.min(44, Math.max(24, Math.abs(dy) * 0.1));
+      const x = x0 + (dx - x0) * ease + Math.sin(u * Math.PI * 2) * swayAmp * env;
+      const y = y0 + (dy - y0) * ease + Math.sin(u * Math.PI) * 14 * (1 - u);
+      const sc = START_SCALE_VAL + (endScale - START_SCALE_VAL) * ease;
+      const rz = rz0 * (1 - u) + Math.cos(u * Math.PI * 2) * 10 * env;
+      const rx = -12 * env;
+      return { x, y, sc, rz, rx };
+    };
+
+    const tick = (now: number) => {
+      if (!alive || mode === "done") return;
+      if (mode === "loading") {
+        const t = (now - startedAt) / 1000;
+        const introPop = Math.min(1, t / 0.38);
+        const popEase = 1 - Math.pow(1 - introPop, 3);
+        flyX.set(Math.sin(t * 2.1) * 3.2);
+        flyY.set(Math.sin(t * 2.6) * -6.5);
+        flyRotateZ.set(Math.sin(t * 2.1) * 2.4);
+        flyScale.set(START_SCALE_VAL * (0.88 + 0.12 * popEase));
+      } else if (mode === "docking") {
+        const raw = Math.min(1, (now - flightStart) / FLIGHT_DURATION_MS);
+        const p = featherAt(raw);
+        flyX.set(p.x);
+        flyY.set(p.y);
+        flyScale.set(p.sc);
+        flyRotateZ.set(p.rz);
+        flyRotateX.set(p.rx);
+
+        const tu = Math.max(0, raw - 0.08);
+        const tp = featherAt(tu);
+        trailX.set(tp.x);
+        trailY.set(tp.y);
+        trailScale.set(tp.sc * 1.12);
+        trailOpacity.set(Math.sin(raw * Math.PI) * 0.36 * (1 - raw * 0.4));
+
+        if (raw >= 1) {
+          mode = "done";
+          flyX.set(dx);
+          flyY.set(dy);
+          flyScale.set(endScale);
+          flyRotateZ.set(0);
+          flyRotateX.set(0);
+          trailOpacity.set(0);
+          finishHandoff();
+          return;
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
+    const beginDocking = () => {
+      if (!alive || dockingScheduled) return;
+      dockingScheduled = true;
+      const elapsed = performance.now() - startedAt;
+      const wait = Math.max(0, MIN_DRAW_MS - elapsed);
+      timers.push(
+        window.setTimeout(() => {
+          if (!alive) return;
+          const dockEl = document.getElementById("delta-logo-dock");
+          const btnEl = dockEl?.querySelector(".delta-logo-btn") ?? dockEl;
+          if (btnEl) {
+            const rect = btnEl.getBoundingClientRect();
+            dx = rect.left + rect.width / 2 - window.innerWidth / 2;
+            dy = rect.top + rect.height / 2 - window.innerHeight / 2;
+            endScale = (rect.width || 54) / 54;
+          }
+          flightTargetRef.current = { dx, dy, scale: endScale };
+          // Capture live coordinates so takeoff is 100% continuous with zero jump
+          x0 = flyX.get();
+          y0 = flyY.get();
+          rz0 = flyRotateZ.get();
+          flightStart = performance.now();
+          mode = "docking";
+          setLoadPct(100);
+          setIntroPhase("docking");
+        }, wait),
+      );
+    };
+
+    const failSafe = window.setTimeout(beginDocking, 2400);
     const image = new Image();
     image.src = asset("workspace-aditya.png");
     image
       .decode()
       .catch(() => {})
       .then(() => document.fonts.ready)
-      .then(() => {
-        if (alive) setReady(true);
-      });
+      .then(beginDocking);
+
     return () => {
       alive = false;
-      clearTimeout(timeout);
+      cancelAnimationFrame(rafId);
+      pctCtrl.stop();
+      clearTimeout(failSafe);
+      timers.forEach((id) => clearTimeout(id));
     };
   }, []);
+
+  const isDocking = introPhase === "docking";
+  const rimCircumference = 2 * Math.PI * 56;
+
   return (
-    <MotionContext.Provider value={{ reduced }}>
+    <MotionContext.Provider value={{ reduced, paused, togglePaused, introPhase, dockReady }}>
       <MotionConfig reducedMotion={reduced ? "always" : "never"}>
-        <AnimatePresence>
-          {!ready && (
-            <motion.div
-              className="page-loader"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0, y: reduced ? 0 : "-100%" }}
-              transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
-              aria-label="Loading portfolio"
-            >
-              <div className="loader-cube">
-                <span>a</span>
-                <span>m</span>
-              </div>
-              <p>LOADING WORKSPACE</p>
-              <div className="loader-line" />
-            </motion.div>
+        <LayoutGroup id="delta-portfolio-stage">
+          {/* Layer 1: Atmospheric loading curtain — fades away cleanly while the logo floats above it */}
+          <AnimatePresence>
+            {introPhase !== "complete" && (
+              <motion.div
+                className={`page-loader delta-classic-loader ${isDocking ? "is-docking" : ""}`}
+                initial={{ opacity: 1 }}
+                animate={{ opacity: isDocking ? 0 : 1 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: 0.62,
+                  delay: isDocking ? 0.14 : 0,
+                  ease: [0.65, 0, 0.35, 1],
+                }}
+                aria-label="Loading portfolio"
+              >
+                <div className="delta-loader-grid" aria-hidden="true" />
+                <motion.div
+                  className="delta-loader-spotlight"
+                  aria-hidden="true"
+                  animate={isDocking ? { scale: 2.1, opacity: 0 } : { scale: 1, opacity: 0.72 }}
+                  transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                />
+                <motion.div
+                  className="delta-orbit-halo"
+                  aria-hidden="true"
+                  initial={{ scale: 0.78, opacity: 0, rotate: -24 }}
+                  animate={
+                    isDocking
+                      ? { scale: 1.85, opacity: 0, rotate: 54 }
+                      : { scale: 1, opacity: 0.55, rotate: 18 }
+                  }
+                  transition={{ type: "spring", stiffness: 78, damping: 18 }}
+                />
+
+                <motion.div
+                  className="delta-classic-loader-meta"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={isDocking ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <p>
+                    LOADING WORKSPACE{" "}
+                    <span className="delta-loader-pct">
+                      {String(loadPct).padStart(3, "0")}%
+                    </span>
+                  </p>
+                  <div className="loader-line">
+                    <motion.span
+                      className="delta-loader-fill"
+                      animate={{ scaleX: loadPct / 100 }}
+                      transition={{ duration: 0.16, ease: "easeOut" }}
+                    />
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Layer 2: Dedicated Flying Logo Medallion — 100% pixel-identical 54px clone of navbar am. with feather-floating flight */}
+          {introPhase !== "complete" && (
+            <div className="delta-flying-stage" aria-hidden="true">
+              {isDocking && (
+                <motion.div
+                  className="delta-flight-trail"
+                  style={{
+                    x: trailX,
+                    y: trailY,
+                    scale: trailScale,
+                    opacity: trailOpacity,
+                  }}
+                />
+              )}
+              <motion.div
+                className={`delta-flying-medallion ${isDocking ? "is-flying" : ""}`}
+                style={{
+                  x: flyX,
+                  y: flyY,
+                  scale: flyScale,
+                  rotateZ: flyRotateZ,
+                  rotateX: flyRotateX,
+                  transformPerspective: 900,
+                }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ opacity: { duration: 0.28, ease: "easeOut" } }}
+              >
+                <div className="delta-drawn-medallion">
+                  {/* Exact same navbar am. typography — blooms in cleanly as the SVG stroke draw completes */}
+                  <motion.span
+                    className="delta-am-mark"
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.34, delay: 0.52, ease: "easeOut" }}
+                  >
+                    a<span className="monogram-accent">m.</span>
+                  </motion.span>
+
+                  {/* SVG progress rim + initial stroke-draw outline — fades out cleanly before docking */}
+                  <svg
+                    viewBox="0 0 120 120"
+                    className="delta-drawn-svg"
+                    aria-hidden="true"
+                  >
+                    <motion.circle
+                      cx="60"
+                      cy="60"
+                      r="56"
+                      className="delta-drawn-rim-arc"
+                      strokeWidth="2.6"
+                      strokeLinecap="round"
+                      fill="none"
+                      transform="rotate(-90 60 60)"
+                      strokeDasharray={rimCircumference}
+                      animate={{
+                        strokeDashoffset: rimCircumference * (1 - loadPct / 100),
+                        opacity: isDocking ? 0 : 1,
+                      }}
+                      transition={{
+                        strokeDashoffset: { duration: 0.25, ease: "easeOut" },
+                        opacity: { duration: 0.28, ease: "easeOut" },
+                      }}
+                    />
+
+                    {/* Tight-kerned stroke preview of "am." that traces first, then dissolves into the real mark */}
+                    <motion.text
+                      x="57"
+                      y="78"
+                      textAnchor="middle"
+                      className="delta-draw-letter delta-draw-a"
+                      initial={{ strokeDashoffset: 320, opacity: 1 }}
+                      animate={{ strokeDashoffset: 0, opacity: 0 }}
+                      transition={{
+                        strokeDashoffset: { duration: 0.62, delay: 0.06, ease: [0.22, 1, 0.36, 1] },
+                        opacity: { duration: 0.24, delay: 0.64, ease: "easeOut" },
+                      }}
+                    >
+                      a<tspan className="delta-draw-m">m.</tspan>
+                    </motion.text>
+                  </svg>
+                </div>
+              </motion.div>
+            </div>
           )}
-        </AnimatePresence>
-        <motion.div
-          className="reading-progress"
-          style={{ scaleX: reduced ? scrollYProgress : progress }}
-        />
-        <div className="motion-controls">
-          <ThemeToggle reduced={reduced} />
-          <button
-            className="pause-toggle"
-            onClick={() => {
-              setPaused(!paused);
-              localStorage.setItem(
-                "portfolio-motion",
-                paused ? "on" : "paused",
-              );
-            }}
-            aria-label={paused ? "Enable animations" : "Pause animations"}
-            aria-pressed={paused}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <g className="pause-bars" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                <path d="M9 6v12" />
-                <path d="M15 6v12" />
-              </g>
-              <path className="pause-play" fill="currentColor" d="M9 5.5 19 12 9 18.5Z" />
-            </svg>
-          </button>
-        </div>
-        {ready && children}
+
+          <motion.div
+            className="reading-progress"
+            style={{ scaleX: reduced ? scrollYProgress : progress }}
+          />
+          {children}
+        </LayoutGroup>
       </MotionConfig>
     </MotionContext.Provider>
   );
@@ -129,10 +424,15 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={reduced ? false : { opacity: 0, y: 22, scale: 0.985 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      initial={reduced ? false : { opacity: 0, y: 30, scale: 0.96, rotateX: 6 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
       viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] }}
+      style={reduced ? undefined : { transformPerspective: 1000 }}
+      transition={
+        reduced
+          ? { duration: 0 }
+          : { type: "spring", stiffness: 118, damping: 20, mass: 0.95, delay }
+      }
     >
       {children}
     </motion.div>
@@ -267,11 +567,16 @@ export function HeroFrame({ children }: { children: ReactNode }) {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const scale = useTransform(scrollYProgress, [0, 0.65], [1, 0.82]),
-    rotate = useTransform(scrollYProgress, [0, 0.65], [0, -3]),
-    y = useTransform(scrollYProgress, [0, 0.65], [0, -100]),
-    opacity = useTransform(scrollYProgress, [0.3, 0.8], [1, 0.15]),
-    radius = useTransform(scrollYProgress, [0, 0.5], [0, 70]);
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 24,
+    mass: 0.55,
+  });
+  const scale = useTransform(smoothProgress, [0, 0.65], [1, 0.82]),
+    rotate = useTransform(smoothProgress, [0, 0.65], [0, -3]),
+    y = useTransform(smoothProgress, [0, 0.65], [0, -100]),
+    opacity = useTransform(smoothProgress, [0.3, 0.8], [1, 0.15]),
+    radius = useTransform(smoothProgress, [0, 0.5], [0, 70]);
   return (
     <div className="hero-scroll" ref={ref}>
       <motion.div

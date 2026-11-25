@@ -19,7 +19,8 @@
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 100px;
+  --section-scroll-padding: 100px;
+  scroll-padding-top: var(--section-scroll-padding);
 }
 body {
   margin: 0;
@@ -1043,7 +1044,7 @@ footer > a:not(.monogram) {
 }
 @media (max-width: 700px) {
   html {
-    scroll-padding-top: 120px;
+    --section-scroll-padding: 120px;
   }
   .site-header {
     padding: 15px 5%;
@@ -4454,19 +4455,119 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
   .research-note { transition: none; }
 }
 
-#freelance {padding-inline:0;overflow:visible}
+#freelance {padding-inline:0;padding-top:0;overflow:visible}
 #freelance > .section-wrap {padding-inline:clamp(18px,4vw,60px)}
 #freelance .freelance-copy {padding-top:0}
 #freelance > .section-wrap {margin-top:-28px}
-.monitor-scene{height:230svh}
+.monitor-scene{height:175svh}
 .monitor-sticky{height:100svh;position:sticky;top:0;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(64px,9vh,90px) max(5vw,calc((100vw - 1200px)/2)) 8px}
 .monitor-heading.section-heading{position:relative;margin:0;z-index:2;pointer-events:none;opacity:var(--copy-opacity,0)}
 .monitor-heading [data-ripple], .monitor-heading .label-sticker{pointer-events:auto}
 .monitor-stage{position:absolute;inset:0;opacity:0}
 .monitor-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .monitor-caption{z-index:2;display:flex;align-items:center;justify-content:flex-end;color:var(--ink)}
-.monitor-caption output{margin:0 10px}
-.monitor-caption button{border:1px solid currentColor;color:inherit;background:transparent;border-radius:50%;width:36px;height:36px}
-.monitor-caption button:hover,.monitor-caption button:focus-visible{background:var(--orange);color:#222}
 .monitor-scene [hidden]{display:none!important}
 .monitor-scene[data-reduced="true"]{height:100svh}
+
+/* Ultra-realistic macOS cursor overlay projected onto the 3D monitor glass */
+.monitor-screen-overlay {
+  position: absolute;
+  left: var(--screen-left, 12.6%);
+  top: var(--screen-top, 11%);
+  width: var(--screen-w, 74.8%);
+  height: var(--screen-h, 55%);
+  z-index: 4;
+  overflow: hidden;
+  border-radius: 3px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+
+.monitor-screen-overlay.is-live {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.monitor-screen-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    112deg,
+    transparent 24%,
+    rgba(255, 255, 255, 0.22) 48%,
+    rgba(232, 245, 236, 0.14) 54%,
+    transparent 76%
+  );
+  opacity: 0;
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+
+.monitor-screen-sheen.is-sweeping {
+  animation: monitor-sheen-sweep 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes monitor-sheen-sweep {
+  0% { opacity: 0; transform: translateX(-110%); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(115%); }
+}
+
+.monitor-click-ripple {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  border: 2px solid rgba(35, 134, 72, 0.85);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.48) 0%, rgba(35, 134, 72, 0.18) 60%, transparent 100%);
+  box-shadow: 0 0 14px rgba(35, 134, 72, 0.35);
+  opacity: 0;
+  transform: scale(0.25);
+  pointer-events: none;
+}
+
+.monitor-click-ripple.is-pulsing {
+  animation: monitor-ripple-pop 0.58s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes monitor-ripple-pop {
+  0% { opacity: 0.95; transform: scale(0.25); }
+  55% { opacity: 0.72; transform: scale(1.28); }
+  100% { opacity: 0; transform: scale(1.85); }
+}
+
+.monitor-cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  margin-left: -4px;
+  margin-top: -2px;
+  pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.36)) drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.25));
+}
+
+.monitor-cursor svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.14s ease, transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: 4px 2px;
+}
+
+.monitor-cursor[data-shape="arrow"] .monitor-cursor-arrow { opacity: 1; }
+.monitor-cursor[data-shape="arrow"] .monitor-cursor-hand { opacity: 0; }
+.monitor-cursor[data-shape="hand"] .monitor-cursor-arrow { opacity: 0; }
+.monitor-cursor[data-shape="hand"] .monitor-cursor-hand { opacity: 1; margin-left: -6px; margin-top: -1px; }
+
+.monitor-cursor[data-clicking="true"] svg {
+  transform: scale(0.84) translate(0.5px, 1.5px);
+}
