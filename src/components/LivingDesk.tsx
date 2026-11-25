@@ -129,8 +129,8 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
   const { reduced } = useMotionPreference();
   const root = useRef<HTMLDivElement>(null);
   const busy = useRef(new Set<string>());
-  const plate = src.replace(/\.png$/, "-plate.webp");
-  const maskUrl = (id: string) => src.replace(/[^/]+\.png$/, `living/${id}.png`);
+  const plate = src.replace(/\.webp$/, "-plate.webp");
+  const maskUrl = (id: string) => src.replace(/[^/]+\.webp$/, `living/${id}.png`);
 
   // Swap in the moving parts only once the plate and every traced mask have loaded;
   // if any fails, the untouched illustration stays on screen instead of a gap.

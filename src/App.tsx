@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -24,7 +24,7 @@ import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
 import AboutEditorial from "./components/AboutEditorial";
 import SkillsPanel from "./components/SkillsPanel";
-import SkillsShowcase from "./components/SkillsShowcase";
+import "./components/SkillsShowcase.css";
 import ProjectGallery from "./components/ProjectGallery";
 import ScrollPinnedStats from "./components/ScrollPinnedStats";
 import { SectionWatermarkCards, VaultSticker } from "./components/VaultSectionBadge";
@@ -121,6 +121,26 @@ function MorivedaTypewriter({ reduced }: { reduced: boolean }) {
         {!reduced && <span className="moriveda-caret" />}
       </span>
     </h3>
+  );
+}
+
+const SkillsShowcase = lazy(() => import("./components/SkillsShowcase"));
+
+function SkillsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [nearby, setNearby] = useState(() => window.location.hash === "#skills");
+  useEffect(() => {
+    if (nearby || !sectionRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setNearby(true);
+    }, { rootMargin: "600px" });
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, [nearby]);
+  return (
+    <section id="skills" className="skills-showcase" ref={sectionRef} data-reduced="false" aria-label="Skills and capabilities">
+      {nearby && <Suspense fallback={null}><SkillsShowcase sectionRef={sectionRef} /></Suspense>}
+    </section>
   );
 }
 
@@ -302,7 +322,7 @@ function Portfolio() {
             >
               <div className="desk-parallax">
                 <LivingDesk
-                  src={asset("assets/workspace-aditya.png")}
+                  src={asset("assets/workspace-aditya.webp")}
                   alt="Personalized avatar of Aditya Malviya at his data engineering workspace"
                 />
               </div>
@@ -327,7 +347,7 @@ function Portfolio() {
           <AboutEditorial onIntro={(trigger) => playProject("intro", trigger)} />
           <ScrollPinnedStats stats={data.stats} />
         </section>
-        {!reduced && <SkillsShowcase />}
+        {!reduced && <SkillsSection />}
         <section id={reduced ? "skills" : "education"} className="education-band blue-section" aria-label={reduced ? "Skills, education and certifications" : "Education and certifications"}>
           <div className="section-wrap">
             <div className="about-details">

@@ -55,20 +55,15 @@ export function MotionSystem({ children }: { children: ReactNode }) {
   const [dockReady, setDockReady] = useState(() =>
     Boolean(systemReduced || localStorage.getItem("portfolio-motion") === "paused"),
   );
-  const [loadPct, setLoadPct] = useState(0);
-  const flightTargetRef = useRef({ dx: 0, dy: -320, scale: 1 });
+  const loadPct = useMotionValue(0);
+  const progressText = useTransform(loadPct, value => String(Math.round(value)).padStart(3, "0") + "%");
+  const progressScale = useTransform(loadPct, [0, 100], [0, 1]);
+  const rimCircumference = 2 * Math.PI * 56;
+  const rimOffset = useTransform(loadPct, [0, 100], [rimCircumference, 0]);
+  const medallionRef = useRef<HTMLDivElement>(null);
+  const trailRef = useRef<HTMLDivElement>(null);
   const introDoneRef = useRef(false);
   const handoffStartedRef = useRef(false);
-  const flyX = useMotionValue(0);
-  const flyY = useMotionValue(0);
-  const flyScale = useMotionValue(118 / 54);
-  const flyRotateZ = useMotionValue(0);
-  const flyRotateX = useMotionValue(0);
-  const trailX = useMotionValue(0);
-  const trailY = useMotionValue(0);
-  const trailScale = useMotionValue(118 / 54);
-  const trailOpacity = useMotionValue(0);
-
   const togglePaused = () => {
     setPaused((prev) => {
       const next = !prev;
@@ -102,12 +97,12 @@ export function MotionSystem({ children }: { children: ReactNode }) {
     });
   };
 
-  // Runs ONCE on initial load — single continuous rAF physics loop from idle float -> feather glide -> exact dock
+  // Hand the logo path to the compositor so page initialization cannot stall its flight.
   useEffect(() => {
     if (introDoneRef.current) return;
     if (reduced) {
       introDoneRef.current = true;
-      setLoadPct(100);
+      loadPct.set(100);
       setDockReady(true);
       setIntroPhase("complete");
       return;
@@ -115,34 +110,25 @@ export function MotionSystem({ children }: { children: ReactNode }) {
 
     let alive = true;
     let dockingScheduled = false;
-    let mode: "loading" | "docking" | "done" = "loading";
-    let flightStart = 0;
+    const medallion = medallionRef.current;
+    const trail = trailRef.current;
+    if (!medallion || !trail) return;
+    const animations: Animation[] = [];
     let x0 = 0;
     let y0 = 0;
     let rz0 = 0;
     let dx = 0;
     let dy = -320;
     let endScale = 1;
-    let rafId = 0;
     const startedAt = performance.now();
     const START_SCALE_VAL = 118 / 54;
     const MIN_DRAW_MS = 1080;
     const FLIGHT_DURATION_MS = 1040;
     const timers: number[] = [];
 
-    flyX.set(0);
-    flyY.set(0);
-    flyScale.set(START_SCALE_VAL);
-    flyRotateZ.set(0);
-    flyRotateX.set(0);
-    trailOpacity.set(0);
-
-    const pctCtrl = animate(0, 100, {
+    const pctCtrl = animate(loadPct, 100, {
       duration: 1.0,
       ease: [0.22, 1, 0.36, 1],
-      onUpdate: (v) => {
-        if (alive) setLoadPct(Math.round(v));
-      },
     });
 
     // Smooth S-curve feather path starting from the exact idle float position (zero jump/chop)
@@ -158,47 +144,20 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       return { x, y, sc, rz, rx };
     };
 
-    const tick = (now: number) => {
-      if (!alive || mode === "done") return;
-      if (mode === "loading") {
-        const t = (now - startedAt) / 1000;
-        const introPop = Math.min(1, t / 0.38);
-        const popEase = 1 - Math.pow(1 - introPop, 3);
-        flyX.set(Math.sin(t * 2.1) * 3.2);
-        flyY.set(Math.sin(t * 2.6) * -6.5);
-        flyRotateZ.set(Math.sin(t * 2.1) * 2.4);
-        flyScale.set(START_SCALE_VAL * (0.88 + 0.12 * popEase));
-      } else if (mode === "docking") {
-        const raw = Math.min(1, (now - flightStart) / FLIGHT_DURATION_MS);
-        const p = featherAt(raw);
-        flyX.set(p.x);
-        flyY.set(p.y);
-        flyScale.set(p.sc);
-        flyRotateZ.set(p.rz);
-        flyRotateX.set(p.rx);
-
-        const tu = Math.max(0, raw - 0.08);
-        const tp = featherAt(tu);
-        trailX.set(tp.x);
-        trailY.set(tp.y);
-        trailScale.set(tp.sc * 1.12);
-        trailOpacity.set(Math.sin(raw * Math.PI) * 0.36 * (1 - raw * 0.4));
-
-        if (raw >= 1) {
-          mode = "done";
-          flyX.set(dx);
-          flyY.set(dy);
-          flyScale.set(endScale);
-          flyRotateZ.set(0);
-          flyRotateX.set(0);
-          trailOpacity.set(0);
-          finishHandoff();
-          return;
-        }
-      }
-      rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
+    const transform = (x: number, y: number, scale: number, rx: number, rz: number) =>
+      `perspective(900px) translate3d(${x}px, ${y}px, 0) scale(${scale}) rotateX(${rx}deg) rotateZ(${rz}deg)`;
+    const idleAt = (t: number) => ({
+      x: Math.sin(t * 2.1) * 3.2,
+      y: Math.sin(t * 2.6) * -6.5,
+      rz: Math.sin(t * 2.1) * 2.4,
+      scale: START_SCALE_VAL * (1 - .12 * Math.pow(1 - Math.min(1, t / .38), 3)),
+    });
+    const idleDuration = 2400;
+    const idle = medallion.animate(Array.from({ length: 73 }, (_, i) => {
+      const p = idleAt(i / 72 * idleDuration / 1000);
+      return { transform: transform(p.x, p.y, p.scale, 0, p.rz) };
+    }), { duration: idleDuration, fill: "both" });
+    animations.push(idle);
 
     const beginDocking = () => {
       if (!alive || dockingScheduled) return;
@@ -216,22 +175,36 @@ export function MotionSystem({ children }: { children: ReactNode }) {
             dy = rect.top + rect.height / 2 - window.innerHeight / 2;
             endScale = (rect.width || 54) / 54;
           }
-          flightTargetRef.current = { dx, dy, scale: endScale };
-          // Capture live coordinates so takeoff is 100% continuous with zero jump
-          x0 = flyX.get();
-          y0 = flyY.get();
-          rz0 = flyRotateZ.get();
-          flightStart = performance.now();
-          mode = "docking";
-          setLoadPct(100);
+          const takeoff = idleAt(Math.min(idleDuration, Number(idle.currentTime)) / 1000);
+          x0 = takeoff.x;
+          y0 = takeoff.y;
+          rz0 = takeoff.rz;
+          const flightFrames: Keyframe[] = [];
+          const trailFrames: Keyframe[] = [];
+          for (let i = 0; i <= 64; i++) {
+            const u = i / 64;
+            const p = featherAt(u);
+            const tail = featherAt(Math.max(0, u - .08));
+            flightFrames.push({ transform: transform(p.x, p.y, p.sc, p.rx, p.rz) });
+            trailFrames.push({
+              transform: `translate3d(${tail.x}px, ${tail.y}px, 0) scale(${tail.sc * 1.12})`,
+              opacity: Math.sin(u * Math.PI) * .36 * (1 - u * .4),
+            });
+          }
+          idle.cancel();
+          const timing = { duration: FLIGHT_DURATION_MS, fill: "both" as const };
+          const flight = medallion.animate(flightFrames, timing);
+          animations.push(flight, trail.animate(trailFrames, timing));
+          flight.onfinish = () => { if (alive) finishHandoff(); };
+          loadPct.set(100);
           setIntroPhase("docking");
         }, wait),
       );
     };
 
-    const failSafe = window.setTimeout(beginDocking, 2400);
+    const failSafe = window.setTimeout(beginDocking, idleDuration);
     const image = new Image();
-    image.src = asset("workspace-aditya.png");
+    image.src = asset("workspace-aditya.webp");
     image
       .decode()
       .catch(() => {})
@@ -240,7 +213,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
 
     return () => {
       alive = false;
-      cancelAnimationFrame(rafId);
+      animations.forEach(animation => animation.cancel());
       pctCtrl.stop();
       clearTimeout(failSafe);
       timers.forEach((id) => clearTimeout(id));
@@ -248,7 +221,6 @@ export function MotionSystem({ children }: { children: ReactNode }) {
   }, []);
 
   const isDocking = introPhase === "docking";
-  const rimCircumference = 2 * Math.PI * 56;
 
   return (
     <MotionContext.Provider value={{ reduced, paused, togglePaused, introPhase, dockReady }}>
@@ -296,15 +268,12 @@ export function MotionSystem({ children }: { children: ReactNode }) {
                 >
                   <p>
                     LOADING WORKSPACE{" "}
-                    <span className="delta-loader-pct">
-                      {String(loadPct).padStart(3, "0")}%
-                    </span>
+                    <motion.span className="delta-loader-pct">{progressText}</motion.span>
                   </p>
                   <div className="loader-line">
                     <motion.span
                       className="delta-loader-fill"
-                      animate={{ scaleX: loadPct / 100 }}
-                      transition={{ duration: 0.16, ease: "easeOut" }}
+                      style={{ scaleX: progressScale }}
                     />
                   </div>
                 </motion.div>
@@ -315,27 +284,10 @@ export function MotionSystem({ children }: { children: ReactNode }) {
           {/* Layer 2: Dedicated Flying Logo Medallion — 100% pixel-identical 54px clone of navbar am. with feather-floating flight */}
           {introPhase !== "complete" && (
             <div className="delta-flying-stage" aria-hidden="true">
-              {isDocking && (
-                <motion.div
-                  className="delta-flight-trail"
-                  style={{
-                    x: trailX,
-                    y: trailY,
-                    scale: trailScale,
-                    opacity: trailOpacity,
-                  }}
-                />
-              )}
+              <div className="delta-flight-trail" ref={trailRef} style={{ opacity: 0 }} />
               <motion.div
+                ref={medallionRef}
                 className={`delta-flying-medallion ${isDocking ? "is-flying" : ""}`}
-                style={{
-                  x: flyX,
-                  y: flyY,
-                  scale: flyScale,
-                  rotateZ: flyRotateZ,
-                  rotateX: flyRotateX,
-                  transformPerspective: 900,
-                }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ opacity: { duration: 0.28, ease: "easeOut" } }}
@@ -367,12 +319,11 @@ export function MotionSystem({ children }: { children: ReactNode }) {
                       fill="none"
                       transform="rotate(-90 60 60)"
                       strokeDasharray={rimCircumference}
+                      style={{ strokeDashoffset: rimOffset }}
                       animate={{
-                        strokeDashoffset: rimCircumference * (1 - loadPct / 100),
                         opacity: isDocking ? 0 : 1,
                       }}
                       transition={{
-                        strokeDashoffset: { duration: 0.25, ease: "easeOut" },
                         opacity: { duration: 0.28, ease: "easeOut" },
                       }}
                     />

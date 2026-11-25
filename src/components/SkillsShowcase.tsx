@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
@@ -7,7 +7,6 @@ import { useMotionPreference } from "./MotionSystem";
 import { VaultSticker } from "./VaultSectionBadge";
 import { drawCityMicroEventsForBand } from "./skills-city/cityEvents";
 import type { LandmarkAtlas } from "./skills-city/landmarkAtlas";
-import "./SkillsShowcase.css";
 
 const assetUrl = (p: string) => `${import.meta.env.BASE_URL}${p}`;
 const iconMap: Record<string, string> = skillIcons;
@@ -2297,9 +2296,8 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
   }
 }
 
-export default function SkillsShowcase() {
+export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<HTMLElement> }) {
   const { reduced } = useMotionPreference();
-  const sectionRef = useRef<HTMLElement>(null);
   const cityLayerRef = useRef<HTMLDivElement>(null);
   const cityWrapRef = useRef<HTMLDivElement>(null);
   const cityHeaderRef = useRef<HTMLDivElement>(null);
@@ -3300,7 +3298,6 @@ export default function SkillsShowcase() {
   const selectedCategory = selectedCatIdx !== null ? data.skills.categories[selectedCatIdx] : null;
 
   return (
-    <section id="skills" className="skills-showcase" ref={sectionRef} data-reduced={reduced} aria-labelledby="skills-heading">
       <div className="skills-showcase-sticky">
         {/* STAGE A: FULL-BLEED PORTFOLIO-THEMED METROPOLIS + FLUID WAVE */}
         <div className="skills-city-layer" ref={cityLayerRef}>
@@ -3491,6 +3488,5 @@ export default function SkillsShowcase() {
           </div>
         </div>
       </div>
-    </section>
   );
 }
