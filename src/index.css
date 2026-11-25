@@ -1295,6 +1295,17 @@ footer > a:not(.monogram) {
   min-height: 900px;
   overflow: clip;
 }
+/* Limit the opening reveal to the hero, keeping the long page out of its composited layer. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .hero-scroll {
+    transform-origin: 50% 0%;
+    transition: transform .76s cubic-bezier(.22, 1, .36, 1) .08s, opacity .76s cubic-bezier(.22, 1, .36, 1) .08s;
+  }
+  .hero-scroll[data-intro-loading] {
+    transform: translateY(20px) scale(1.035);
+    opacity: .12;
+  }
+}
 .hero-frame {
   position: sticky;
   top: 0;

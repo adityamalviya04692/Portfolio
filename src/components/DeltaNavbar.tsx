@@ -815,11 +815,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         {/* Far-left Cell-Division Wave ↔ Pause Pill (decoupled curl + split physics) */}
         <div className="delta-left-slot">
           <motion.div
-            initial={reduced ? false : { opacity: 0, x: -28, scale: 0.82 }}
+            initial={reduced ? false : { opacity: 0, transform: "translateX(-28px) scale(0.82)" }}
             animate={
               isDocked
-                ? { opacity: 1, x: 0, scale: 1 }
-                : { opacity: 0, x: -28, scale: 0.82 }
+                ? { opacity: 1, transform: "translateX(0px) scale(1)" }
+                : { opacity: 0, transform: "translateX(-28px) scale(0.82)" }
             }
             transition={pillSpring}
           >
@@ -848,11 +848,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
           <motion.div
             ref={leftWingRef}
             className="delta-wing delta-wing-left"
-            initial={reduced ? false : { opacity: 0, x: 56, scaleX: 0.58 }}
+            initial={reduced ? false : { opacity: 0, transform: "translateX(56px) scaleX(0.58)" }}
             animate={
               isDocked
-                ? { opacity: 1, x: 0, scaleX: 1 }
-                : { opacity: 0, x: 56, scaleX: 0.58 }
+                ? { opacity: 1, transform: "translateX(0px) scaleX(1)" }
+                : { opacity: 0, transform: "translateX(56px) scaleX(0.58)" }
             }
             transition={wingSpring}
           >
@@ -880,8 +880,8 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                   aria-current={isActive ? "location" : undefined}
                   className={`delta-nav-link ${isActive ? "is-active" : ""}`}
                   onClick={() => triggerBurst(item.id)}
-                  initial={reduced ? false : { opacity: 0, x: 16 }}
-                  animate={isDocked ? { opacity: 1, x: 0 } : { opacity: 0, x: 16 }}
+                  initial={reduced ? false : { opacity: 0, transform: "translateX(16px)" }}
+                  animate={isDocked ? { opacity: 1, transform: "translateX(0px)" } : { opacity: 0, transform: "translateX(16px)" }}
                   transition={
                     reduced
                       ? { duration: 0 }
@@ -968,11 +968,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
           <motion.div
             ref={rightWingRef}
             className="delta-wing delta-wing-right"
-            initial={reduced ? false : { opacity: 0, x: -56, scaleX: 0.58 }}
+            initial={reduced ? false : { opacity: 0, transform: "translateX(-56px) scaleX(0.58)" }}
             animate={
               isDocked
-                ? { opacity: 1, x: 0, scaleX: 1 }
-                : { opacity: 0, x: -56, scaleX: 0.58 }
+                ? { opacity: 1, transform: "translateX(0px) scaleX(1)" }
+                : { opacity: 0, transform: "translateX(-56px) scaleX(0.58)" }
             }
             transition={wingSpring}
           >
@@ -999,8 +999,8 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                   aria-current={isActive ? "location" : undefined}
                   className={`delta-nav-link ${isActive ? "is-active" : ""}`}
                   onClick={() => triggerBurst(item.id)}
-                  initial={reduced ? false : { opacity: 0, x: -16 }}
-                  animate={isDocked ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
+                  initial={reduced ? false : { opacity: 0, transform: "translateX(-16px)" }}
+                  animate={isDocked ? { opacity: 1, transform: "translateX(0px)" } : { opacity: 0, transform: "translateX(-16px)" }}
                   transition={
                     reduced
                       ? { duration: 0 }
@@ -1039,11 +1039,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         {/* Far-right Theme Pill (self-explanatory eclipse hover anticipation) + Get in Touch CTA */}
         <motion.div
           className="delta-right-slot"
-          initial={reduced ? false : { opacity: 0, x: 22, scale: 0.88 }}
+          initial={reduced ? false : { opacity: 0, transform: "translateX(22px) scale(0.88)" }}
           animate={
             isDocked
-              ? { opacity: 1, x: 0, scale: 1 }
-              : { opacity: 0, x: 22, scale: 0.88 }
+              ? { opacity: 1, transform: "translateX(0px) scale(1)" }
+              : { opacity: 0, transform: "translateX(22px) scale(0.88)" }
           }
           transition={pillSpring}
         >

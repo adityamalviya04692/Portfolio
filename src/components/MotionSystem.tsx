@@ -133,13 +133,14 @@ export function MotionSystem({ children }: { children: ReactNode }) {
 
     // Smooth S-curve feather path starting from the exact idle float position (zero jump/chop)
     const featherAt = (u: number) => {
-      const ease = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2.4) / 2;
-      const env = Math.sin(u * Math.PI);
+      // One velocity curve through the midpoint; flatten the sway at takeoff and landing.
+      const ease = u * u * u * (u * (6 * u - 15) + 10);
+      const env = Math.sin(u * Math.PI) ** 2;
       const swayAmp = Math.min(44, Math.max(24, Math.abs(dy) * 0.1));
       const x = x0 + (dx - x0) * ease + Math.sin(u * Math.PI * 2) * swayAmp * env;
-      const y = y0 + (dy - y0) * ease + Math.sin(u * Math.PI) * 14 * (1 - u);
+      const y = y0 + (dy - y0) * ease + env * 14 * (1 - u);
       const sc = START_SCALE_VAL + (endScale - START_SCALE_VAL) * ease;
-      const rz = rz0 * (1 - u) + Math.cos(u * Math.PI * 2) * 10 * env;
+      const rz = rz0 * (1 - ease) + Math.cos(u * Math.PI * 2) * 10 * env;
       const rx = -12 * env;
       return { x, y, sc, rz, rx };
     };
@@ -507,7 +508,7 @@ export function Counter({ value }: { value: string }) {
 
 export function HeroFrame({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null),
-    { reduced } = useMotionPreference();
+    { reduced, introPhase } = useMotionPreference();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -523,7 +524,7 @@ export function HeroFrame({ children }: { children: ReactNode }) {
     opacity = useTransform(smoothProgress, [0.3, 0.8], [1, 0.15]),
     radius = useTransform(smoothProgress, [0, 0.5], [0, 70]);
   return (
-    <div className="hero-scroll" ref={ref}>
+    <div className="hero-scroll" ref={ref} data-intro-loading={!reduced && introPhase === "loading" || undefined}>
       <motion.div
         className="hero-frame"
         style={

@@ -170,7 +170,7 @@ function Portfolio() {
     [copied, setCopied] = useState(false),
     [caseOpen, setCaseOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null),
-    { reduced, introPhase } = useMotionPreference();
+    { reduced } = useMotionPreference();
   useEffect(() => {
     const scene = document.querySelector(".monitor-scene")!;
     const observer = new IntersectionObserver(([entry]) => {
@@ -253,20 +253,7 @@ function Portfolio() {
         email={email}
         onBlue={["about", "education", "experience", "contact"].includes(active)}
       />
-      <motion.main
-        initial={reduced ? false : { opacity: 0.12, scale: 1.035, y: 20 }}
-        animate={
-          introPhase === "loading" && !reduced
-            ? { opacity: 0.12, scale: 1.035, y: 20 }
-            : { opacity: 1, scale: 1, y: 0 }
-        }
-        transition={
-          reduced
-            ? { duration: 0 }
-            : { type: "spring", stiffness: 96, damping: 21, mass: 0.95, delay: 0.08 }
-        }
-        style={{ transformOrigin: "50% 0%" }}
-      >
+      <main>
         <HeroFrame>
           <section className="hero" id="home">
             <div className="zero-flow-aura" aria-hidden="true">
@@ -626,7 +613,7 @@ function Portfolio() {
             BACK TO TOP ↑
           </a>
         </section>
-      </motion.main>
+      </main>
       {videoProject && <ProjectVideoDialog key={videoProject.id} returnFocusTo={videoTrigger.current} project={videoProject} details={activeVideo.explore && videoProject.id !== "intro" ? skillProjects.find((project) => project.id === videoProject.id) : undefined} autoPlay={!activeVideo.explore} eyebrow={videoProject.id === "intro" ? "70-SECOND INTRO" : undefined} kind={videoProject.id === "intro" ? "Narrated profile video" : undefined} index={skillProjects.findIndex((project) => project.id === videoProject.id)} request={activeVideo.request} onClose={() => setActiveVideo((previous) => ({ id: "", request: previous.request, explore: false }))} />}
       <dialog
         ref={dialog}
