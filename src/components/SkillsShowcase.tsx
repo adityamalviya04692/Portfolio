@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { memo, useEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
 import { RippleWords } from "./HeadingRipples";
-import { useMotionPreference } from "./MotionSystem";
+import { useIntroState, useMotionPreference } from "./MotionSystem";
 import { VaultSticker } from "./VaultSectionBadge";
+import { completePrewarmTask, updatePrewarmTask } from "./PrewarmManager";
 import { drawCityMicroEventsForBand } from "./skills-city/cityEvents";
-import type { LandmarkAtlas } from "./skills-city/landmarkAtlas";
+import type { LandmarkAtlas } from "./skills-city/landmarkCache";
 
 const assetUrl = (p: string) => `${import.meta.env.BASE_URL}${p}`;
 const iconMap: Record<string, string> = skillIcons;
@@ -2296,8 +2297,12 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
   }
 }
 
-export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<HTMLElement> }) {
+const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<HTMLElement> }) {
   const { reduced } = useMotionPreference();
+  const { introPhase } = useIntroState();
+  const introPhaseRef = useRef(introPhase);
+  introPhaseRef.current = introPhase;
+  const sectionVisibleRef = useRef(false);
   const cityLayerRef = useRef<HTMLDivElement>(null);
   const cityWrapRef = useRef<HTMLDivElement>(null);
   const cityHeaderRef = useRef<HTMLDivElement>(null);
@@ -2337,6 +2342,7 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
 
   const handleSelectCategory = (idx: number | null) => {
     if (idx === selectedCatIdx) {
+      if (typeof window !== "undefined" && window.innerWidth <= 820) setCatMenuOpen(false);
       return;
     }
     if (idx === null) {
@@ -2351,14 +2357,20 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
       catActiveRef.current = true;
     }
     setSelectedCatIdx(idx);
+    // Auto-close the category sheet on mobile so the selected skills chips are immediately unobstructed
+    if (idx !== null && typeof window !== "undefined" && window.innerWidth <= 820) {
+      setCatMenuOpen(false);
+    }
   };
 
   useEffect(() => {
     if (reduced) return;
     let swapTimer = 0;
     const timer = window.setInterval(() => {
+      if (!sectionVisibleRef.current || document.hidden) return;
       setSlotState("is-leaving");
       swapTimer = window.setTimeout(() => {
+        if (!sectionVisibleRef.current) return;
         setSkillIdx((p) => (p + 1) % SKILL_ROTATION.length);
         setSlotState("is-entering");
         requestAnimationFrame(() => requestAnimationFrame(() => setSlotState("")));
@@ -2413,10 +2425,12 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
     // 48-Band Depth-Sliced Occlusion Cache (ground + 48 fine transparent vertical building slices)
     const DEPTH_BANDS = 48;
     const depthToBand = (d: number) => Math.max(0, Math.min(DEPTH_BANDS - 1, Math.floor(((d + 20) / 40) * DEPTH_BANDS)));
-    const groundMono = document.createElement("canvas");
-    const groundColor = document.createElement("canvas");
-    const slicesMono = Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas"));
-    const slicesColor = Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas"));
+    const createLayers = () => ({
+      ground: document.createElement("canvas"),
+      slices: Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas")),
+    });
+    let cityCache: { mono: ReturnType<typeof createLayers>; color: ReturnType<typeof createLayers> } | undefined;
+    let baking: Generator<void> | undefined;
     const sliceTop = new WeakMap<HTMLCanvasElement, number>();
     ensureLogoImagesLoaded();
     let cW = 0;
@@ -2425,24 +2439,30 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
     let cDark = false;
     let cLogoVer = -1;
     let landmarks: LandmarkAtlas | undefined;
+    let landmarksSettled = false;
     const landmarkRequest = new AbortController();
-    const preloadLandmarks = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      preloadLandmarks.disconnect();
+    // Eagerly load 3D WebGL landmarks right away under the loading curtain so the city bakes once cleanly
+    (() => {
       const { signal } = landmarkRequest;
-      import("./skills-city/landmarkAtlas").then(async ({ createLandmarkAtlas }) => {
+      updatePrewarmTask("city", 0.08);
+      import("./skills-city/landmarkCache").then(async ({ createLandmarkCache }) => {
         if (signal.aborted) return;
-        const atlas = await createLandmarkAtlas(STRUCTURES.filter(s => s.kind.startsWith("logo_")), signal);
-        if (signal.aborted) atlas.dispose();
-        else {
-          landmarks = atlas;
+        landmarks = await createLandmarkCache(STRUCTURES.filter(s => s.kind.startsWith("logo_")), signal, () => {
+          landmarksSettled = true;
           cLogoVer = -1;
+          schedulePrebake();
+        });
+        if (!signal.aborted) {
+          updatePrewarmTask("city", 0.25);
+          const w = monoCanvas.clientWidth || window.innerWidth;
+          const h = monoCanvas.clientHeight || window.innerHeight;
+          landmarks.request(getIso(w, h).tile, document.documentElement.dataset.theme === "dark");
         }
       }).catch(error => {
+        landmarksSettled = true;
         if (!signal.aborted) console.warn("Using the canvas landmark models", error);
       });
-    }, { rootMargin: "500px" });
-    preloadLandmarks.observe(section);
+    })();
 
     const getIso = (W: number, H: number) => {
       const tile = Math.max(40, Math.min(W, H) * 0.062);
@@ -2452,7 +2472,7 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
       return { tile, cx, cy, iso };
     };
 
-    const buildCityCache = (
+    const buildCityCache = function* (
       groundCanvas: HTMLCanvasElement,
       sliceCanvases: HTMLCanvasElement[],
       W: number,
@@ -2460,7 +2480,7 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
       dpr: number,
       isColor: boolean,
       isDark: boolean,
-    ) => {
+    ) {
       groundCanvas.width = W * dpr;
       groundCanvas.height = H * dpr;
       const ctx = groundCanvas.getContext("2d")!;
@@ -2618,7 +2638,9 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
         range.top = Math.min(range.top, center - height - margin);
         range.bottom = Math.max(range.bottom, center + margin);
       }
-      const sliceCtxs = sliceCanvases.map((canvas, band) => {
+      const sliceCtxs: CanvasRenderingContext2D[] = [];
+      for (const [band, canvas] of sliceCanvases.entries()) {
+        yield;
         const top = Math.max(0, Math.floor(bounds[band].top * dpr));
         const bottom = Math.min(groundCanvas.height, Math.ceil(bounds[band].bottom * dpr));
         canvas.width = groundCanvas.width;
@@ -2626,8 +2648,8 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
         sliceTop.set(canvas, top);
         const context = canvas.getContext("2d")!;
         context.setTransform(dpr, 0, 0, dpr, 0, -top);
-        return context;
-      });
+        sliceCtxs.push(context);
+      }
       const textBounds = Array.from(cityHeaderRef.current?.children ?? []).map(el => {
         const range = document.createRange();
         range.selectNodeContents(el);
@@ -2640,6 +2662,7 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
         bottom: Math.max(...textBounds.map(r => r.bottom)) - viewport.top,
       };
       for (const item of list) {
+        yield;
         const bCtx = sliceCtxs[depthToBand(item.depth)];
         if (item.type === "s") {
           drawStaticStructure(bCtx, iso, tile, item.data, isColor, isDark, landmarks, heading);
@@ -2674,6 +2697,14 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
       }
     };
 
+    function* bakeCity(W: number, H: number, dpr: number, dark: boolean) {
+      const mono = createLayers();
+      const color = createLayers();
+      yield* buildCityCache(mono.ground, mono.slices, W, H, dpr, false, dark);
+      yield* buildCityCache(color.ground, color.slices, W, H, dpr, true, dark);
+      cityCache = { mono, color };
+    }
+
     const drawCanalBridges = (ctx: CanvasRenderingContext2D, iso: IsoFn, tile: number, isColor: boolean, isDark: boolean) => {
       const bz = 3.6;
       const deckL = isColor ? (isDark ? "#263254" : "#d6cfc0") : isDark ? "#1f2842" : "#e2ddd1";
@@ -2704,6 +2735,12 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
       void tile;
     };
 
+    type DynamicEntity =
+      | { kind: "v"; depth: number; x: number; y: number; z0: number; v: (typeof VEHICLES)[number] }
+      | { kind: "p"; depth: number; x: number; y: number; z0: number; coat: string; hat: boolean; phase: number; speedMult: number };
+    // Reuse depth-band buckets across frames (zero per-frame array allocations)
+    const sharedBuckets: DynamicEntity[][] = Array.from({ length: DEPTH_BANDS }, () => []);
+
     const drawDepthSortedScene = (
       ctx: CanvasRenderingContext2D,
       groundCanvas: HTMLCanvasElement,
@@ -2732,11 +2769,9 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
       // 3. Four stone-and-steel canal bridges above boats
       drawCanalBridges(ctx, iso, tile, isColor, isDark);
 
-      // 4. Bucket moving vehicles, pedestrians & plaza gatherings into the 16 isometric depth bands
-      type DynamicEntity =
-        | { kind: "v"; depth: number; x: number; y: number; z0: number; v: (typeof VEHICLES)[number] }
-        | { kind: "p"; depth: number; x: number; y: number; z0: number; coat: string; hat: boolean; phase: number; speedMult: number };
-      const buckets: DynamicEntity[][] = Array.from({ length: DEPTH_BANDS }, () => []);
+      // 4. Bucket moving vehicles, pedestrians & plaza gatherings into the 48 isometric depth bands
+      const buckets = sharedBuckets;
+      for (let i = 0; i < DEPTH_BANDS; i++) buckets[i].length = 0;
 
       for (const v of VEHICLES) {
         const pos = (((v.pos + time * 0.001 * v.speed * 18) % 30) + 30) % 30 - 15;
@@ -3158,6 +3193,74 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
     window.addEventListener("pointermove", onPointer, { passive: true });
 
     let rafId = 0;
+    // Upfront background pre-baker: bakes the 48-band mono + color city caches under the loading curtain
+    // so scrolling down into #skills is instant with zero mid-scroll stutter.
+    let prebakeRaf = 0;
+    let bakeStepsDone = 0;
+    const EST_BAKE_STEPS = 2 * (DEPTH_BANDS + STRUCTURES.length + LAMPS.length + 18);
+    const stepBaking = (budgetMs: number) => {
+      const dpr = Math.min(pan && pan.scrollWidth > pan.clientWidth ? 1 : 1.5, window.devicePixelRatio || 1);
+      const W = monoCanvas.clientWidth;
+      const H = monoCanvas.clientHeight;
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (W <= 0 || H <= 0) return false;
+      if (monoCanvas.width !== Math.floor(W * dpr) || monoCanvas.height !== Math.floor(H * dpr)) {
+        monoCanvas.width = W * dpr;
+        monoCanvas.height = H * dpr;
+        colorCanvas.width = W * dpr;
+        colorCanvas.height = H * dpr;
+      }
+      landmarks?.request(getIso(W, H).tile, isDark);
+      if (cW !== W || cH !== H || cDpr !== dpr || cDark !== isDark || cLogoVer !== logoLoadVersion) {
+        cW = W;
+        cH = H;
+        cDpr = dpr;
+        cDark = isDark;
+        cLogoVer = logoLoadVersion;
+        bakeStepsDone = 0;
+        baking = bakeCity(W, H, dpr, isDark);
+      }
+      if (baking) {
+        const deadline = performance.now() + budgetMs;
+        do {
+          bakeStepsDone++;
+          if (baking.next().done) {
+            baking = undefined;
+            if (landmarksSettled) {
+              completePrewarmTask("city");
+            } else {
+              updatePrewarmTask("city", 0.72);
+            }
+          }
+        } while (baking && performance.now() < deadline);
+        if (baking) {
+          const maxCap = landmarksSettled ? 0.96 : 0.7;
+          updatePrewarmTask("city", Math.min(maxCap, 0.25 + (bakeStepsDone / Math.max(1, EST_BAKE_STEPS)) * (maxCap - 0.25)));
+        }
+      }
+      return Boolean(baking);
+    };
+
+    const schedulePrebake = () => {
+      if (prebakeRaf) return;
+      const pump = () => {
+        prebakeRaf = 0;
+        if (document.hidden) return;
+        // Pause baking during the 1s logo flight so the docking animation gets 100% of CPU/GPU
+        if (introPhaseRef.current === "docking") {
+          prebakeRaf = requestAnimationFrame(pump);
+          return;
+        }
+        const budget = introPhaseRef.current === "loading" ? 5 : 3;
+        const stillBaking = stepBaking(budget);
+        if (stillBaking) {
+          prebakeRaf = requestAnimationFrame(pump);
+        }
+      };
+      prebakeRaf = requestAnimationFrame(pump);
+    };
+    schedulePrebake();
+
     const render = (now: number) => {
       const dt = Math.min(48, now - lastFrame);
       lastFrame = now;
@@ -3184,33 +3287,75 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
 
         if (W > 0 && H > 0) {
-          if (monoCanvas.width !== Math.floor(W * dpr) || monoCanvas.height !== Math.floor(H * dpr)) {
-            monoCanvas.width = W * dpr;
-            monoCanvas.height = H * dpr;
-            colorCanvas.width = W * dpr;
-            colorCanvas.height = H * dpr;
+          stepBaking(4);
+          if (cityCache && rect.top < window.innerHeight + 32 && rect.bottom > -32) {
+            const fullyColored = irisP >= 0.995;
+            if (!fullyColored) {
+              const mCtx = monoCanvas.getContext("2d")!;
+              mCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              mCtx.globalCompositeOperation = "source-over";
+              drawDepthSortedScene(mCtx, cityCache.mono.ground, cityCache.mono.slices, W, H, false, isDark, now);
+            }
+
+            const cCtx = colorCanvas.getContext("2d")!;
+            cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            cCtx.globalCompositeOperation = "source-over";
+
+            if (fullyColored) {
+              // 100% revealed: draw full color scene directly without expensive destination-in pass
+              drawDepthSortedScene(cCtx, cityCache.color.ground, cityCache.color.slices, W, H, true, isDark, now);
+              if (waveCanvas.width !== Math.floor(W * dpr) || waveCanvas.height !== Math.floor(H * dpr)) {
+                waveCanvas.width = W * dpr;
+                waveCanvas.height = H * dpr;
+              }
+              const wCtx = waveCanvas.getContext("2d")!;
+              wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              wCtx.clearRect(0, 0, W, H);
+            } else if (irisP >= 0.015) {
+              // Expanding iris reveal: clip BEFORE drawing color scene (eliminates full-canvas destination-in readback)
+              const { iso } = getIso(W, H);
+              const outerR = Math.max(0.5, irisP * 26.5);
+              const outerPts = buildFluidWaveRing(iso, outerR, now);
+              cCtx.clearRect(0, 0, W, H);
+              cCtx.save();
+              cCtx.beginPath();
+              traceSmoothCurve(cCtx, outerPts, false);
+              cCtx.clip();
+              drawDepthSortedScene(cCtx, cityCache.color.ground, cityCache.color.slices, W, H, true, isDark, now);
+              cCtx.restore();
+
+              if (waveCanvas.width !== Math.floor(W * dpr) || waveCanvas.height !== Math.floor(H * dpr)) {
+                waveCanvas.width = W * dpr;
+                waveCanvas.height = H * dpr;
+              }
+              const wCtx = waveCanvas.getContext("2d")!;
+              wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+              wCtx.clearRect(0, 0, W, H);
+              const fadeOut = 1 - Math.max(0, (irisP - 0.84) / 0.16);
+              if (fadeOut > 0.01) {
+                wCtx.save();
+                wCtx.beginPath();
+                traceSmoothCurve(wCtx, outerPts, false);
+                wCtx.lineCap = "round";
+                wCtx.lineJoin = "round";
+                wCtx.strokeStyle = `rgba(237, 136, 56, ${(0.14 * fadeOut).toFixed(3)})`;
+                wCtx.lineWidth = 40;
+                wCtx.stroke();
+                wCtx.strokeStyle = `rgba(237, 136, 56, ${(0.26 * fadeOut).toFixed(3)})`;
+                wCtx.lineWidth = 18;
+                wCtx.stroke();
+                wCtx.strokeStyle = isDark
+                  ? `rgba(142, 180, 245, ${(0.38 * fadeOut).toFixed(3)})`
+                  : `rgba(255, 250, 240, ${(0.54 * fadeOut).toFixed(3)})`;
+                wCtx.lineWidth = 7;
+                wCtx.stroke();
+                wCtx.restore();
+              }
+            } else {
+              drawDepthSortedScene(cCtx, cityCache.color.ground, cityCache.color.slices, W, H, true, isDark, now);
+              applyFluidColorWave(W, H, dpr, isDark, now, irisP);
+            }
           }
-          if (cW !== W || cH !== H || cDpr !== dpr || cDark !== isDark || cLogoVer !== logoLoadVersion) {
-            cW = W;
-            cH = H;
-            cDpr = dpr;
-            cDark = isDark;
-            cLogoVer = logoLoadVersion;
-            buildCityCache(groundMono, slicesMono, W, H, dpr, false, isDark);
-            buildCityCache(groundColor, slicesColor, W, H, dpr, true, isDark);
-          }
-
-          const mCtx = monoCanvas.getContext("2d")!;
-          mCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          mCtx.globalCompositeOperation = "source-over";
-          drawDepthSortedScene(mCtx, groundMono, slicesMono, W, H, false, isDark, now);
-
-          const cCtx = colorCanvas.getContext("2d")!;
-          cCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          cCtx.globalCompositeOperation = "source-over";
-          drawDepthSortedScene(cCtx, groundColor, slicesColor, W, H, true, isDark, now);
-
-          applyFluidColorWave(W, H, dpr, isDark, now, irisP);
         }
       }
 
@@ -3219,8 +3364,11 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
         cityWrapRef.current.style.transform = `translate3d(${(-smoothMX * 14).toFixed(1)}px, ${(-smoothMY * 10).toFixed(1)}px, 0) scale(${scale.toFixed(4)})`;
       }
       if (cityLayerRef.current) {
+        const cityHidden = fadeOutCity > 0.85;
         cityLayerRef.current.style.opacity = String(1 - fadeOutCity);
-        cityLayerRef.current.style.pointerEvents = fadeOutCity > 0.85 ? "none" : "auto";
+        cityLayerRef.current.style.pointerEvents = cityHidden ? "none" : "auto";
+        cityLayerRef.current.style.visibility = cityHidden ? "hidden" : "visible";
+        cityLayerRef.current.classList.toggle("is-hidden", cityHidden);
       }
       if (cityHeaderRef.current) {
         // Let the city be seen unobstructed during the existing colour reveal.
@@ -3275,20 +3423,21 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
         rafId = requestAnimationFrame(render);
       }
     };
+    // Tight 80px margin so #skills consumes 0% CPU while the user is in #about scrolling the numbers
     const cityVisibility = new IntersectionObserver(([entry]) => {
       nearby = entry.isIntersecting;
+      sectionVisibleRef.current = nearby;
       syncFrames();
-    }, { rootMargin: "220px" });
+    }, { rootMargin: "80px" });
     cityVisibility.observe(section);
     document.addEventListener("visibilitychange", syncFrames);
     return () => {
       cityVisibility.disconnect();
       document.removeEventListener("visibilitychange", syncFrames);
       cancelAnimationFrame(rafId);
-      preloadLandmarks.disconnect();
+      cancelAnimationFrame(prebakeRaf);
       mapSize.disconnect();
       landmarkRequest.abort();
-      landmarks?.dispose();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onPointer);
     };
@@ -3420,26 +3569,23 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
                 type="button"
                 className="skills-cat-trigger"
                 aria-expanded={catMenuOpen}
-                onClick={() => {
-                  if (catMenuOpen) {
-                    handleSelectCategory(null);
-                    setCatMenuOpen(false);
-                  } else {
-                    setCatMenuOpen(true);
-                  }
-                }}
+                onClick={() => setCatMenuOpen((open) => !open)}
               >
                 <span className="skills-cat-trigger-label">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.span
-                      key={catMenuOpen ? "back" : "browse"}
+                      key={catMenuOpen ? "close" : selectedCategory ? "switch" : "browse"}
                       initial={reduced ? false : { opacity: 0, y: 8, filter: "blur(3px)" }}
                       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                       exit={reduced ? undefined : { opacity: 0, y: -8, filter: "blur(3px)" }}
                       transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                       style={{ display: "inline-block" }}
                     >
-                      {catMenuOpen ? "← Back to all skills" : "Browse by category"}
+                      {catMenuOpen
+                        ? "Close categories"
+                        : selectedCategory
+                          ? "Switch category"
+                          : "Browse by category"}
                     </motion.span>
                   </AnimatePresence>
                 </span>
@@ -3457,6 +3603,20 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
                     exit={{ opacity: 0, y: -8, scale: 0.96 }}
                     transition={{ type: "spring", stiffness: 420, damping: 28 }}
                   >
+                    {selectedCategory && (
+                      <div className="skills-cat-item-wrap">
+                        <button
+                          type="button"
+                          className="skills-cat-option"
+                          onClick={() => {
+                            handleSelectCategory(null);
+                            setCatMenuOpen(false);
+                          }}
+                        >
+                          <span>← All skills (Orbit)</span>
+                        </button>
+                      </div>
+                    )}
                     {data.skills.categories.map(({ name, items }, idx) => {
                       const isSelected = selectedCatIdx === idx;
                       return (
@@ -3489,4 +3649,6 @@ export default function SkillsShowcase({ sectionRef }: { sectionRef: RefObject<H
         </div>
       </div>
   );
-}
+});
+
+export default SkillsShowcase;

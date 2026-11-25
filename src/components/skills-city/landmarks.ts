@@ -239,7 +239,7 @@ const campuses: Campus[] = [
   },
 ];
 
-export async function loadModels(materials: LandmarkMaterials, signal: AbortSignal) {
+export async function loadProfiles(signal: AbortSignal) {
   const loader = new SVGLoader();
   const profiles = await Promise.all(
     campuses.map(async (campus) => {
@@ -256,13 +256,19 @@ export async function loadModels(materials: LandmarkMaterials, signal: AbortSign
         
         return loader
           .parse(`<svg xmlns="http://www.w3.org/2000/svg">${new XMLSerializer().serializeToString(node)}</svg>`)
-          .paths[0].toShapes();
+          .paths[0].toShapes().map(shape => shape.toJSON());
       });
       return sections;
     }),
   );
   signal.throwIfAborted();
-  return campuses.map((campus, i) => makeModel(campus, profiles[i], materials));
+  return profiles;
+}
+
+export function buildModels(materials: LandmarkMaterials, profiles: Awaited<ReturnType<typeof loadProfiles>>) {
+  return campuses.map((campus, i) => makeModel(campus,
+    profiles[i].map(group => group.map(data => new T.Shape().fromJSON(data))), materials));
+
 }
 
 function makeModel(campus: Campus, groups: T.Shape[][], materials: LandmarkMaterials) {

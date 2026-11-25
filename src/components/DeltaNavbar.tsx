@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useScroll, useSpring, useTransform, useVelocit
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { RippleWord } from "./HeadingRipples";
 import ThemeToggle from "./ThemeToggle";
-import { useMotionPreference } from "./MotionSystem";
+import { useIntroState, useMotionPreference } from "./MotionSystem";
 import "./DeltaNavbar.css";
 
 const LEFT_NAV = [
@@ -368,7 +368,8 @@ interface DeltaNavbarProps {
 }
 
 export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps) {
-  const { reduced, paused, togglePaused, introPhase, dockReady } = useMotionPreference();
+  const { reduced, paused, togglePaused } = useMotionPreference();
+  const { introPhase, dockReady } = useIntroState();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [burstKey, setBurstKey] = useState<{ id: string; count: number }>({ id: "", count: 0 });
@@ -376,6 +377,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
   const [waveBouncing, setWaveBouncing] = useState(false);
   const [logoFlipCount, setLogoFlipCount] = useState(0);
   const bounceTimer = useRef<number | null>(null);
+  const suppressWaveHoverRef = useRef(false);
 
   // Liquid-pipe scroll fill refs (section-precise across left & right wings + tethered center buoy)
   const leftWingRef = useRef<HTMLDivElement>(null);
@@ -401,6 +403,8 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
   };
 
   const handleWaveToggle = () => {
+    suppressWaveHoverRef.current = true;
+    setWaveHovered(false);
     triggerBurst("wave");
     setWaveBouncing(false);
     requestAnimationFrame(() => {
@@ -436,32 +440,51 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
       });
     };
 
-    // Maps current scrollY precisely to each section's exact visual span in the left & right wings
-    const getSectionAlignedFill = (): { left: number; right: number; overall: number } => {
-      const y = window.scrollY;
-      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      const offset = window.innerHeight * 0.28;
+    // Cache section tops, maxScroll, and wing link spans off the scroll hot path (zero forced reflow on scroll)
+    const ids = ["about", "experience", "projects", "research", "freelance", "contact"];
+    let cachedMaxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    let cachedTops: number[] | null = null;
+    let cachedLeftSpans: Array<[number, number]> = [[0, 1 / 3], [1 / 3, 2 / 3], [2 / 3, 1]];
+    let cachedRightSpans: Array<[number, number]> = [[0, 1 / 3], [1 / 3, 2 / 3], [2 / 3, 1]];
 
-      const ids = ["about", "experience", "projects", "research", "freelance", "contact"];
+    const measureLayout = () => {
+      const y = window.scrollY;
+      cachedMaxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const offset = window.innerHeight * 0.28;
       const rawTops = ids.map((id) => {
         const el = document.getElementById(id);
         if (!el) return null;
         return Math.max(0, el.getBoundingClientRect().top + y - offset);
       });
-
       if (rawTops.some((t) => t === null)) {
+        cachedTops = null;
+      } else {
+        const tops = rawTops as number[];
+        for (let i = 1; i < tops.length; i++) {
+          if (tops[i] <= tops[i - 1] + 20) tops[i] = tops[i - 1] + 20;
+        }
+        cachedTops = tops;
+      }
+      cachedLeftSpans = measureLinkSpans(leftWingRef.current, 3);
+      cachedRightSpans = measureLinkSpans(rightWingRef.current, 3);
+    };
+
+    measureLayout();
+
+    // Pure arithmetic mapping from cached layout metrics — zero DOM reads during scroll
+    const getSectionAlignedFill = (): { left: number; right: number; overall: number } => {
+      const y = window.scrollY;
+      const maxScroll = cachedMaxScroll;
+      const tops = cachedTops;
+
+      if (!tops) {
         const p = Math.max(0, Math.min(1, y / maxScroll));
         return { left: Math.max(0, Math.min(1, p / 0.5)), right: Math.max(0, Math.min(1, (p - 0.5) / 0.5)), overall: p };
       }
 
-      const tops = rawTops as number[];
-      for (let i = 1; i < tops.length; i++) {
-        if (tops[i] <= tops[i - 1] + 20) tops[i] = tops[i - 1] + 20;
-      }
       const endScroll = Math.max(maxScroll, tops[5] + 40);
-
-      const leftSpans = measureLinkSpans(leftWingRef.current, 3);
-      const rightSpans = measureLinkSpans(rightWingRef.current, 3);
+      const leftSpans = cachedLeftSpans;
+      const rightSpans = cachedRightSpans;
 
       let left = 0;
       let right = 0;
@@ -496,6 +519,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
     });
     const leftSurf = makeSurface();
     const rightSurf = makeSurface();
+    const nextHBuffer = new Float32Array(N + 1);
 
     const init = getSectionAlignedFill();
     let targetLeft = init.left;
@@ -524,7 +548,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
       const k = 34;
       const damping = activeEnergy < 0.03 ? 6.8 : 2.65;
       const spread = 130;
-      const nextH = new Float32Array(N + 1);
+      const nextH = nextHBuffer;
       const ph = phase + phaseOffset;
 
       for (let i = 0; i <= N; i++) {
@@ -673,8 +697,20 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
       }
     };
 
+    let measureRaf = 0;
+    const onLayoutChange = () => {
+      if (measureRaf) return;
+      measureRaf = requestAnimationFrame(() => {
+        measureRaf = 0;
+        measureLayout();
+        onScrollLiquid();
+      });
+    };
+    const bodyResizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(onLayoutChange) : null;
+    bodyResizeObserver?.observe(document.body);
     window.addEventListener("scroll", onScrollLiquid, { passive: true });
-    window.addEventListener("resize", onScrollLiquid, { passive: true });
+    window.addEventListener("resize", onLayoutChange, { passive: true });
+    window.addEventListener("load", onLayoutChange, { passive: true });
 
     const tick = (now: number) => {
       const dt = Math.min(0.032, Math.max(0.004, (now - lastTime) / 1000));
@@ -767,8 +803,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
     rafId = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(rafId);
+      cancelAnimationFrame(measureRaf);
+      bodyResizeObserver?.disconnect();
       window.removeEventListener("scroll", onScrollLiquid);
-      window.removeEventListener("resize", onScrollLiquid);
+      window.removeEventListener("resize", onLayoutChange);
+      window.removeEventListener("load", onLayoutChange);
     };
   }, [reduced]);
 
@@ -780,37 +819,37 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
 
   useEffect(() => {
     if (!mobileOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMobileOpen(false);
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [mobileOpen]);
 
-  // Scroll-velocity inertia physics: the floating navbar subtly pitches and shifts with scroll momentum
+  // Scroll-velocity inertia physics: pure 2D GPU translateY avoids re-rasterizing fixed backdrop-filter blur
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
   const smoothVelocity = useSpring(scrollVelocity, { stiffness: 140, damping: 24, mass: 0.65 });
-  const navInertiaY = useTransform(smoothVelocity, [-2400, 0, 2400], [5, 0, -5]);
-  const navInertiaTilt = useTransform(smoothVelocity, [-2400, 0, 2400], [4.5, 0, -4.5]);
+  const navInertiaY = useTransform(smoothVelocity, [-2400, 0, 2400], [4, 0, -4]);
 
   const isDocked = introPhase === "docking" || introPhase === "complete";
   const wingSpring = reduced
     ? { duration: 0 }
-    : { type: "spring" as const, stiffness: 138, damping: 20, mass: 0.95, delay: 0.22 };
+    : { type: "spring" as const, stiffness: 150, damping: 22, mass: 0.9, delay: 0.56 };
   const pillSpring = reduced
     ? { duration: 0 }
-    : { type: "spring" as const, stiffness: 155, damping: 21, mass: 0.85, delay: 0.34 };
+    : { type: "spring" as const, stiffness: 160, damping: 22, mass: 0.85, delay: 0.64 };
 
   return (
     <>
       <motion.header
         className={`delta-header ${onBlue ? "on-blue" : ""} ${scrolled ? "is-scrolled" : ""}`}
-        style={
-          reduced || introPhase !== "complete"
-            ? undefined
-            : { y: navInertiaY, rotateX: navInertiaTilt, transformPerspective: 900 }
-        }
+        style={reduced ? undefined : { y: navInertiaY }}
       >
         {/* Far-left Cell-Division Wave ↔ Pause Pill (decoupled curl + split physics) */}
         <div className="delta-left-slot">
@@ -827,10 +866,15 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
               type="button"
               className={`delta-pill-btn delta-wave-pill ${paused ? "is-paused" : ""} ${waveBouncing ? "is-bouncing" : ""}`}
               onClick={handleWaveToggle}
-              onMouseEnter={() => setWaveHovered(true)}
-              onMouseLeave={() => setWaveHovered(false)}
-              onFocus={() => setWaveHovered(true)}
-              onBlur={() => setWaveHovered(false)}
+              onPointerEnter={(e) => {
+                if (e.pointerType === "mouse" && !suppressWaveHoverRef.current) {
+                  setWaveHovered(true);
+                }
+              }}
+              onPointerLeave={() => {
+                suppressWaveHoverRef.current = false;
+                setWaveHovered(false);
+              }}
               aria-label={paused ? "Resume animations" : "Pause animations"}
               aria-pressed={paused}
             >
@@ -889,7 +933,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                           type: "spring",
                           stiffness: 210,
                           damping: 22,
-                          delay: 0.28 + staggerOrder * 0.055,
+                          delay: 0.62 + staggerOrder * 0.045,
                         }
                   }
                 >
@@ -924,7 +968,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                 aria-hidden="true"
                 initial={{ scale: 0.72, opacity: 0 }}
                 animate={{ scale: [0.72, 1.05, 2.1], opacity: [0, 0.88, 0] }}
-                transition={{ duration: 0.65, delay: 0.56, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.58, delay: 0.96, ease: [0.16, 1, 0.3, 1] }}
               />
             )}
             <div
@@ -1008,7 +1052,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                           type: "spring",
                           stiffness: 210,
                           damping: 22,
-                          delay: 0.28 + idx * 0.055,
+                          delay: 0.62 + idx * 0.045,
                         }
                   }
                 >

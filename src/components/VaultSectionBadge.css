@@ -37,7 +37,7 @@
   box-sizing: border-box;
   transform-origin: 18% 85%;
   box-shadow: none;
-  will-change: transform, opacity, top;
+  will-change: transform, opacity;
 }
 
 /* Keep main section headlines crisply layered in front and snugly close to the sticker */

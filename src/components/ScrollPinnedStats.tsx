@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef } from "react";
+import { memo, useEffect, useId, useMemo, useRef } from "react";
 import { useMotionPreference } from "./MotionSystem";
 import "./ScrollPinnedStats.css";
 
@@ -25,10 +25,9 @@ const DIGIT_STRIP = [
 ];
 
 const CELL_HEIGHT_EM = 1.12;
-const TOTAL_SCROLL_BUDGET = 480; // px of downward scroll for full reveal
+const TOTAL_SCROLL_BUDGET = 460; // px of downward scroll for full reveal
 
 // Cubic Bezier for the full-width 30–39° slanted exponential curve (viewBox 1440 × 460)
-// Flows smoothly from bottom-left (0, 446) all the way to the far right edge (1440, 18) with zero top cut.
 const VB_W = 1440;
 const VB_H = 460;
 const P0 = { x: 0, y: 446 };
@@ -97,13 +96,19 @@ function tokenizeAllStats(stats: readonly StatItem[]) {
 
 /**
  * Compact Bilt-inspired rolling odometer metrics band with a full-width,
- * uncut Attio-style exponential growth graph + live leading pointer & vertical
- * progress guide line sweeping all the way to the right edge of the display.
+ * GPU-composited Attio-style exponential growth graph + leading progress pointer.
+ *
+ * Chrome 120fps optimizations:
+ * - Static pre-rasterized SVG revealed via compositor `clip-path: inset(...)` (zero SVG re-rasterization).
+ * - Pointer dot & vertical guide line moved strictly via `translate3d` (zero Layout/Paint per frame).
+ * - Non-passive `wheel`/`touchmove` capture is attached ONLY while this band is in the viewport
+ *   so the rest of the page stays on Chrome's fast threaded compositor scroll path.
  */
-export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
+function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const svgRevealRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const clipRectRef = useRef<SVGRectElement>(null);
   const pointerDotRef = useRef<HTMLSpanElement>(null);
   const pointerLineRef = useRef<HTMLSpanElement>(null);
   const digitStripRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -116,14 +121,21 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
   );
 
   useEffect(() => {
+    let bgW = bgRef.current?.clientWidth || window.innerWidth;
+    let bgH = bgRef.current?.clientHeight || 360;
+    let wasRolling = false;
+    let wasVisible = false;
+
     const applyVisuals = (scrubP: number, entryP: number, instant = false) => {
       const gridEl = gridRef.current;
       if (gridEl) {
         const rolling = !instant && scrubP > 0.002 && scrubP < 0.996;
-        gridEl.classList.toggle("is-rolling", rolling);
+        if (rolling !== wasRolling) {
+          wasRolling = rolling;
+          gridEl.classList.toggle("is-rolling", rolling);
+        }
       }
 
-      // Update every digit reel directly on the GPU without React re-renders
       for (let i = 0; i < digitMetas.length; i++) {
         const stripEl = digitStripRefs.current[i];
         if (!stripEl) continue;
@@ -146,42 +158,56 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
         stripEl.style.transform = `translate3d(0, ${-(rowOffset * CELL_HEIGHT_EM).toFixed(4)}em, 0)`;
       }
 
-      // Evaluate exact tip (x, y) on the cubic Bezier so the curve, hatch, vertical guide line,
-      // and circular pointer stay 100% pixel-locked together all the way to the right edge.
+      // Evaluate exact tip (x, y) on the cubic Bezier
       const graphLinear = instant ? 1 : Math.min(1, entryP * 0.14 + scrubP * 0.86);
       const t = 1 - Math.pow(1 - graphLinear, 2.2);
       const pt = evalCurve(t);
 
-      const clipRect = clipRectRef.current;
-      if (clipRect) {
-        clipRect.setAttribute("width", pt.x.toFixed(2));
+      const xFrac = pt.x / VB_W;
+      const yFrac = pt.y / VB_H;
+      const rightInsetPct = Math.max(0, (1 - xFrac) * 100);
+
+      const revealEl = svgRevealRef.current;
+      if (revealEl) {
+        revealEl.style.clipPath = rightInsetPct <= 0.05 ? "inset(0 0% 0 0)" : `inset(0 ${rightInsetPct.toFixed(3)}% 0 0)`;
       }
 
-      const xPct = (pt.x / VB_W) * 100;
-      const yPct = (pt.y / VB_H) * 100;
-      const visibleOpacity = graphLinear > 0.008 ? "1" : "0";
+      const px = xFrac * bgW;
+      const py = yFrac * bgH;
+      const isVisible = graphLinear > 0.008;
 
       const dotEl = pointerDotRef.current;
       if (dotEl) {
-        dotEl.style.left = `${xPct.toFixed(3)}%`;
-        dotEl.style.top = `${yPct.toFixed(3)}%`;
-        dotEl.style.opacity = visibleOpacity;
+        dotEl.style.transform = `translate3d(${px.toFixed(2)}px, ${py.toFixed(2)}px, 0) translate(-50%, -50%)`;
+        if (isVisible !== wasVisible) dotEl.style.opacity = isVisible ? "1" : "0";
       }
 
       const lineEl = pointerLineRef.current;
       if (lineEl) {
-        lineEl.style.left = `${xPct.toFixed(3)}%`;
-        lineEl.style.top = `${yPct.toFixed(3)}%`;
-        lineEl.style.opacity = visibleOpacity;
+        const lineScaleY = Math.max(0, 1 - yFrac);
+        lineEl.style.transform = `translate3d(${px.toFixed(2)}px, 0, 0) translateX(-50%) scaleY(${lineScaleY.toFixed(4)})`;
+        if (isVisible !== wasVisible) lineEl.style.opacity = isVisible ? "1" : "0";
       }
+      wasVisible = isVisible;
     };
+
+    const ro = new ResizeObserver(() => {
+      if (bgRef.current) {
+        bgW = bgRef.current.clientWidth || bgW;
+        bgH = bgRef.current.clientHeight || bgH;
+      }
+      if (reduced) applyVisuals(1, 1, true);
+    });
+    if (bgRef.current) ro.observe(bgRef.current);
 
     if (reduced) {
       applyVisuals(1, 1, true);
-      return;
+      return () => ro.disconnect();
     }
 
     let completed = false;
+    let captureAttached = false;
+    let inViewport = false;
     let targetScrub = 0;
     let displayScrub = 0;
     let targetEntry = 0;
@@ -244,15 +270,15 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
         completed = true;
         targetScrub = 1;
         targetEntry = 1;
-        removeCaptureListeners();
+        detachCapture();
+        window.removeEventListener("scroll", onScroll);
         return false;
       }
       return true;
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (completed) return;
-      if (e.deltaY <= 0) return; // Never hold upward scrolling
+      if (completed || e.deltaY <= 0) return;
       if (advanceByDelta(e.deltaY)) {
         e.preventDefault();
       }
@@ -269,13 +295,45 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
       const currentY = e.touches[0].clientY;
       const deltaY = touchLastY - currentY;
       touchLastY = currentY;
-      if (deltaY <= 0) return; // Never hold upward scrolling
+      if (deltaY <= 0) return;
       if (advanceByDelta(deltaY * 1.45)) {
         e.preventDefault();
       }
     };
 
+    const attachCapture = () => {
+      if (captureAttached || completed) return;
+      captureAttached = true;
+      window.addEventListener("wheel", onWheel, { passive: false });
+      window.addEventListener("touchstart", onTouchStart, { passive: true });
+      window.addEventListener("touchmove", onTouchMove, { passive: false });
+    };
+
+    const detachCapture = () => {
+      if (!captureAttached) return;
+      captureAttached = false;
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+    };
+
     const onScroll = () => {
+      if (!inViewport && !completed) {
+        const el = hostRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < window.innerHeight * 0.14) {
+          completed = true;
+          targetScrub = 1;
+          targetEntry = 1;
+          displayScrub = 1;
+          displayEntry = 1;
+          applyVisuals(1, 1, false);
+          detachCapture();
+          window.removeEventListener("scroll", onScroll);
+        }
+        return;
+      }
       const el = hostRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -295,26 +353,34 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
         displayScrub = 1;
         displayEntry = 1;
         applyVisuals(1, 1, false);
-        removeCaptureListeners();
+        detachCapture();
+        window.removeEventListener("scroll", onScroll);
       }
     };
 
-    const removeCaptureListeners = () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("scroll", onScroll);
-    };
+    // Scope non-passive wheel capture strictly to when the stats band is in view!
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry.isIntersecting;
+        if (inViewport && !completed) {
+          attachCapture();
+          onScroll();
+        } else {
+          detachCapture();
+        }
+      },
+      { rootMargin: "40px 0px" }
+    );
+    if (hostRef.current) io.observe(hostRef.current);
 
-    window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("scroll", onScroll, { passive: true });
-
     onScroll();
 
     return () => {
-      removeCaptureListeners();
+      io.disconnect();
+      ro.disconnect();
+      detachCapture();
+      window.removeEventListener("scroll", onScroll);
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [reduced, digitMetas]);
@@ -322,7 +388,6 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
   const hatchId = `attio-hatch-${uid}`;
   const washId = `attio-wash-${uid}`;
   const areaClipId = `attio-area-clip-${uid}`;
-  const revealClipId = `attio-reveal-clip-${uid}`;
 
   const curvePath = `M ${P0.x} ${P0.y} C ${P1.x} ${P1.y}, ${P2.x} ${P2.y}, ${P3.x} ${P3.y}`;
   const areaPath = `${curvePath} L ${VB_W} ${VB_H} L 0 ${VB_H} Z`;
@@ -333,48 +398,43 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
       className="stats-scroll-band"
       aria-label="Key production metrics"
     >
-      {/* Full-width Attio-inspired exponential graph extending cleanly to the far right edge */}
-      <div className="stats-attio-bg" aria-hidden="true">
-        <svg
-          className="stats-attio-svg"
-          viewBox={`0 0 ${VB_W} ${VB_H}`}
-          preserveAspectRatio="none"
-          focusable="false"
+      {/* Full-width Attio-inspired exponential graph revealed via GPU-composited clip-path */}
+      <div ref={bgRef} className="stats-attio-bg" aria-hidden="true">
+        <div
+          ref={svgRevealRef}
+          className="stats-attio-reveal"
+          style={{ clipPath: reduced ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)" }}
         >
-          <defs>
-            <pattern
-              id={hatchId}
-              width="11"
-              height="11"
-              patternUnits="userSpaceOnUse"
-            >
-              <line
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="11"
-                className="stats-attio-hatch-line"
-              />
-            </pattern>
-            <linearGradient id={washId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" className="stats-attio-wash-top" />
-              <stop offset="100%" className="stats-attio-wash-bottom" />
-            </linearGradient>
-            <clipPath id={areaClipId}>
-              <path d={areaPath} />
-            </clipPath>
-            <clipPath id={revealClipId}>
-              <rect
-                ref={clipRectRef}
-                x="0"
-                y="0"
-                width={reduced ? VB_W : 0}
-                height={VB_H}
-              />
-            </clipPath>
-          </defs>
+          <svg
+            className="stats-attio-svg"
+            viewBox={`0 0 ${VB_W} ${VB_H}`}
+            preserveAspectRatio="none"
+            focusable="false"
+          >
+            <defs>
+              <pattern
+                id={hatchId}
+                width="11"
+                height="11"
+                patternUnits="userSpaceOnUse"
+              >
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="11"
+                  className="stats-attio-hatch-line"
+                />
+              </pattern>
+              <linearGradient id={washId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" className="stats-attio-wash-top" />
+                <stop offset="100%" className="stats-attio-wash-bottom" />
+              </linearGradient>
+              <clipPath id={areaClipId}>
+                <path d={areaPath} />
+              </clipPath>
+            </defs>
 
-          <g clipPath={`url(#${revealClipId})`}>
             <g clipPath={`url(#${areaClipId})`}>
               <rect x="0" y="0" width={VB_W} height={VB_H} fill={`url(#${washId})`} />
               <rect x="0" y="0" width={VB_W} height={VB_H} fill={`url(#${hatchId})`} />
@@ -385,10 +445,10 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
               className="stats-attio-stroke"
               vectorEffect="non-scaling-stroke"
             />
-          </g>
-        </svg>
+          </svg>
+        </div>
 
-        {/* Leading vertical progress line + circular pointer riding on the front tip of the curve */}
+        {/* GPU-transformed vertical progress line + circular pointer on the front tip */}
         <span ref={pointerLineRef} className="stats-attio-pointer-line" />
         <span ref={pointerDotRef} className="stats-attio-pointer-dot" />
       </div>
@@ -450,3 +510,5 @@ export default function ScrollPinnedStats({ stats }: { stats: readonly StatItem[
     </div>
   );
 }
+
+export default memo(ScrollPinnedStats);

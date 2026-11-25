@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -24,8 +24,10 @@ import LivingDesk from "./components/LivingDesk";
 import ProjectVideoDialog from "./components/ProjectVideoDialog";
 import AboutEditorial from "./components/AboutEditorial";
 import SkillsPanel from "./components/SkillsPanel";
+import SkillsShowcase from "./components/SkillsShowcase";
 import "./components/SkillsShowcase.css";
 import ProjectGallery from "./components/ProjectGallery";
+import { completePrewarmTask } from "./components/PrewarmManager";
 import ScrollPinnedStats from "./components/ScrollPinnedStats";
 import { SectionWatermarkCards, VaultSticker } from "./components/VaultSectionBadge";
 import {
@@ -124,22 +126,12 @@ function MorivedaTypewriter({ reduced }: { reduced: boolean }) {
   );
 }
 
-const SkillsShowcase = lazy(() => import("./components/SkillsShowcase"));
-
 function SkillsSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [nearby, setNearby] = useState(() => window.location.hash === "#skills");
-  useEffect(() => {
-    if (nearby || !sectionRef.current) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setNearby(true);
-    }, { rootMargin: "600px" });
-    observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, [nearby]);
+  // Mount eagerly with zero lazy-chunk waterfall so the 3D Skills City bakes cleanly under the loader curtain
   return (
     <section id="skills" className="skills-showcase" ref={sectionRef} data-reduced="false" aria-label="Skills and capabilities">
-      {nearby && <Suspense fallback={null}><SkillsShowcase sectionRef={sectionRef} /></Suspense>}
+      <SkillsShowcase sectionRef={sectionRef} />
     </section>
   );
 }
@@ -171,23 +163,30 @@ function Portfolio() {
     [caseOpen, setCaseOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null),
     { reduced } = useMotionPreference();
+  // Load 3D Moriveda monitor scripts immediately under the loader curtain so nothing loads after entering the landing page
   useEffect(() => {
-    const scene = document.querySelector(".monitor-scene")!;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      observer.disconnect();
-      const script = document.createElement("script");
-      script.src = asset("monitor/model.js");
-      const start = () => {
-        const controls = document.createElement("script");
-        controls.src = asset("monitor/turn.js");
-        document.body.append(controls);
-      };
-      script.onload = start;
-      document.body.append(script);
-    }, { rootMargin: "800px" });
-    observer.observe(scene);
-    return () => observer.disconnect();
+    let cancelled = false;
+    if (document.querySelector(`script[src="${asset("monitor/model.js")}"]`)) {
+      completePrewarmTask("monitor");
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = asset("monitor/model.js");
+    script.async = true;
+    script.onload = () => {
+      if (cancelled) return;
+      const controls = document.createElement("script");
+      controls.src = asset("monitor/turn.js");
+      controls.async = true;
+      controls.onload = () => completePrewarmTask("monitor");
+      controls.onerror = () => completePrewarmTask("monitor");
+      document.body.append(controls);
+    };
+    script.onerror = () => completePrewarmTask("monitor");
+    document.body.append(script);
+    return () => {
+      cancelled = true;
+    };
   }, []);
   useEffect(() => {
     const fragment = window.location.hash.slice(1);
@@ -198,25 +197,50 @@ function Portfolio() {
     const sections = [
       ...document.querySelectorAll<HTMLElement>("main section[id]"),
     ];
+    // Cache section document tops off the scroll path so scrolling triggers zero reflows
+    let sectionTops: Array<{ id: string; top: number }> = [];
+    let threshold = window.innerHeight * 0.35;
+    const measureSections = () => {
+      const y = window.scrollY;
+      threshold = window.innerHeight * 0.35;
+      sectionTops = sections.map((s) => ({
+        id: s.id,
+        top: s.getBoundingClientRect().top + y,
+      }));
+    };
+    measureSections();
     let scheduled = 0;
+    let lastActive = "home";
     const update = () => {
       scheduled = 0;
+      const probe = window.scrollY + threshold;
       let current = "home";
-      for (const section of sections) {
-        if (section.getBoundingClientRect().top <= window.innerHeight * 0.35)
-          current = section.id;
+      for (let i = 0; i < sectionTops.length; i++) {
+        if (sectionTops[i].top <= probe) current = sectionTops[i].id;
       }
-      setActive(current);
+      if (current !== lastActive) {
+        lastActive = current;
+        setActive(current);
+      }
     };
     const schedule = () => {
       if (!scheduled) scheduled = requestAnimationFrame(update);
     };
+    const onLayout = () => {
+      measureSections();
+      schedule();
+    };
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(onLayout) : null;
+    ro?.observe(document.body);
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", onLayout, { passive: true });
+    window.addEventListener("load", onLayout, { passive: true });
     update();
     return () => {
+      ro?.disconnect();
       window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", onLayout);
+      window.removeEventListener("load", onLayout);
       cancelAnimationFrame(frame);
       cancelAnimationFrame(scheduled);
     };
@@ -261,12 +285,10 @@ function Portfolio() {
               <span className="zero-orb zero-orb-b" />
             </div>
             <div className="hero-copy">
-              <Reveal>
-                <div className="eyebrow">
-                  <span className="status-dot" />
-                  <Scramble text="HELLO PARTITION_0, I'M" />
-                </div>
-              </Reveal>
+              <div className="eyebrow">
+                <span className="status-dot" />
+                <Scramble text="HELLO PARTITION_0, I'M" scrambleOnMount={false} />
+              </div>
               <h1 aria-label={profile.name}>
                 {["Aditya", "Malviya."].map((name) => (
                   <span className="name-line" aria-hidden="true" key={name}>
@@ -278,28 +300,24 @@ function Portfolio() {
                   </span>
                 ))}
               </h1>
-              <Reveal delay={0.3}>
-                <div className="role-sticker">
-                  <Scramble text="AZURE DATA" />
-                  <br />
-                  <Scramble text="ENGINEER" />
-                </div>
-              </Reveal>
-              <Reveal delay={0.4}>
-                <p>{profile.tagline}</p>
-                <div className="hero-links">
-                  <a className="text-link" href="#experience">
-                    Explore my work <ArrowUpRight size={20} />
-                  </a>
-                  <button
-                    className="text-link intro-link"
-                    onClick={(event) => playProject("intro", event.currentTarget)}
-                    aria-haspopup="dialog"
-                  >
-                    <Play size={15} fill="currentColor" /> Watch my 70-sec intro
-                  </button>
-                </div>
-              </Reveal>
+              <div className="role-sticker">
+                <Scramble text="AZURE DATA" scrambleOnMount={false} />
+                <br />
+                <Scramble text="ENGINEER" scrambleOnMount={false} />
+              </div>
+              <p>{profile.tagline}</p>
+              <div className="hero-links">
+                <a className="text-link" href="#experience">
+                  Explore my work <ArrowUpRight size={20} />
+                </a>
+                <button
+                  className="text-link intro-link"
+                  onClick={(event) => playProject("intro", event.currentTarget)}
+                  aria-haspopup="dialog"
+                >
+                  <Play size={15} fill="currentColor" /> Watch my 70-sec intro
+                </button>
+              </div>
             </div>
             <motion.div
               className="hero-scene"
@@ -429,7 +447,7 @@ function Portfolio() {
                   <div className={`research-figure research-paper${activeResearchNote ? " is-shifted" : ""}`}>
                     <span className="research-kicker">SKEWBENCH / {data.research.year}</span>
                     <h3>THE SKEW QUESTION</h3>
-                    <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1536" height="1024" loading="lazy" /></a>
+                    <a href={asset(data.research.document)} target="_blank" rel="noreferrer" aria-label="Read AQE vs Salting research paper"><img src={asset(data.research.image)} alt={data.research.imageAlt} width="1536" height="1024" loading="eager" decoding="async" /></a>
                     <p>A conceptual illustration of adaptive splitting and selective salting. Read the paper for measured results and limitations.</p>
                   </div>
                 </div>
@@ -457,7 +475,7 @@ function Portfolio() {
             <div className="monitor-sticky">
               <div className="monitor-heading section-heading"><div><VaultSticker text="INDEPENDENT WORK" /><h2><RippleWords text="Built end to end" suffix={<span className="orange">.</span>} /></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
               <div className="monitor-stage">
-                <img className="monitor-poster" loading="lazy" src={asset("monitor/turn/0.webp")} alt="Moriveda storefront monitor"/>
+                <img className="monitor-poster" loading="eager" decoding="async" src={asset("monitor/turn/0.webp")} alt="Moriveda storefront monitor"/>
                 <div className="monitor-screen-overlay" id="screen-mouse-layer" role="button" tabIndex={0} aria-label="Interactive Moriveda storefront preview — click to switch pages">
                   <div className="monitor-screen-sheen" aria-hidden="true" />
                   <div className="monitor-click-ripple" aria-hidden="true" />

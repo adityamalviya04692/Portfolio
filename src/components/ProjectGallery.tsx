@@ -38,7 +38,7 @@ export default function ProjectGallery({ projects, onExplore }: Props) {
                   {index === 0 && <em className="showcase-latest">LATEST</em>}
                 </span>
                 <span className="carousel-artwork">
-                  <img src={asset(`assets/projects/${project.id}-portrait.png`)} alt="" width="880" height="980" loading="lazy" />
+                  <img src={asset(`assets/projects/${project.id}-portrait.png`)} alt="" width="880" height="980" loading="eager" decoding="async" />
                 </span>
                 <span className="carousel-caption">
                   <span className="showcase-category">{project.category}</span>

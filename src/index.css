@@ -21,9 +21,17 @@ html {
   scroll-behavior: smooth;
   --section-scroll-padding: 100px;
   scroll-padding-top: var(--section-scroll-padding);
+  overflow-x: clip;
+  max-width: 100%;
 }
-body {
+body,
+main {
   margin: 0;
+  overflow-x: clip;
+  max-width: 100%;
+}
+main > section {
+  overflow-x: clip;
 }
 button,
 a,
@@ -186,7 +194,9 @@ h1 {
 }
 h1 > span:first-of-type {
   background: linear-gradient(105deg, #ed8838 22%, #b78152 58%, #4b7b8b 100%);
+  -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
 }
 .name-dot {
@@ -1295,24 +1305,21 @@ footer > a:not(.monogram) {
   min-height: 900px;
   overflow: clip;
 }
-/* Limit the opening reveal to the hero, keeping the long page out of its composited layer. */
-@media (prefers-reduced-motion: no-preference) {
-  html:not([data-motion="off"]) .hero-scroll {
-    transform-origin: 50% 0%;
-    transition: transform .76s cubic-bezier(.22, 1, .36, 1) .08s, opacity .76s cubic-bezier(.22, 1, .36, 1) .08s;
-  }
-  .hero-scroll[data-intro-loading] {
-    transform: translateY(20px) scale(1.035);
-    opacity: .12;
-  }
-}
+/* Keep .hero-scroll and .hero-frame free of backface-visibility/will-change layer traps so Chrome never drops background-clip:text on load or refresh. */
 .hero-frame {
   position: sticky;
   top: 0;
   overflow: hidden;
   transform-origin: 50% 100%;
   background: var(--cream);
-  will-change: transform;
+  border-radius: 0;
+  transition: border-radius 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-frame[data-rounded="true"] {
+  border-radius: 48px;
+}
+.hero-copy {
+  -webkit-font-smoothing: antialiased;
 }
 .hero {
   max-height: none;
@@ -1324,21 +1331,22 @@ footer > a:not(.monogram) {
   display: block;
   background: none !important;
   color: var(--orange) !important;
-  overflow: hidden;
+  overflow: visible;
   padding-bottom: 0.1em;
   margin-bottom: -0.1em;
   white-space: nowrap;
 }
+.hero-copy .name-line .ripple-ink,
+.hero-copy .name-line .ripple-slice {
+  background: linear-gradient(105deg, #ed8838 18%, #c98453 56%, #3b7194 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 .name-letter {
   display: inline-block;
-  background: linear-gradient(110deg, #ed8838, #c98453, #3b7194, #ed8838);
-  background-size: 400% 100%;
-  background-clip: text;
-  color: transparent;
-  animation: name-color 9s ease-in-out infinite;
-}
-.name-line:nth-child(2) .name-letter {
-  animation-delay: -3s;
+  color: inherit;
 }
 .hero-copy p {
   font-size: 16px;
@@ -3129,9 +3137,6 @@ html[data-motion="off"] .showcase-film-preview .showcase-film-play { transform: 
   height: 100%;
   pointer-events: none;
 }
-.ld-part {
-  will-change: transform;
-}
 .living-desk:not(.ld-ready) .ld-plate,
 .living-desk:not(.ld-ready) .ld-part {
   visibility: hidden;
@@ -3156,7 +3161,6 @@ html[data-motion="off"] .showcase-film-preview .showcase-film-play { transform: 
   background-size: 100% 100%;
   background-repeat: no-repeat;
   pointer-events: none;
-  will-change: transform;
 }
 .ld-overlay {
   position: absolute;
@@ -3477,9 +3481,10 @@ html[data-theme="dark"] .hero-frame {
     background-position: 0 0, -150px 0, -190px 70px, -200px 20px, 0 0, 0 0, 0 0, 0 0;
   }
 }
-html[data-theme="dark"] .name-letter,
+html[data-theme="dark"] .hero-copy .name-line .ripple-ink,
+html[data-theme="dark"] .hero-copy .name-line .ripple-slice,
 html[data-theme="dark"] h1 > span:first-of-type {
-  background-image: linear-gradient(110deg, #ed8838, #e3a46f, #8dbbe0, #ed8838);
+  background-image: linear-gradient(105deg, #ed8838 18%, #e3a46f 56%, #8dbbe0 100%);
 }
 html[data-theme="dark"] .hero-copy > p,
 html[data-theme="dark"] .hero-copy p {
@@ -4466,7 +4471,7 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
   .research-note { transition: none; }
 }
 
-#freelance {padding-inline:0;padding-top:0;overflow:visible}
+#freelance {padding-inline:0;padding-top:0;overflow-x:clip;overflow-y:visible}
 #freelance > .section-wrap {width:var(--site-rail,min(86%,1080px));max-width:1080px;margin-inline:auto;padding-inline:0;margin-top:-28px}
 #freelance .freelance-copy {padding-top:0}
 .monitor-scene{height:175svh}
@@ -4653,12 +4658,52 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
     --site-rail: min(90%, 1080px);
     --site-gutter: 5%;
   }
+  .hero-scroll {
+    height: auto;
+    min-height: 100svh;
+  }
   .hero {
-    padding-inline: var(--site-gutter);
+    padding: 96px var(--site-gutter) 44px;
+    min-height: 100svh;
+    height: auto;
+    max-height: none;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .hero-copy {
+    width: 100%;
+    padding-top: 4px;
+  }
+  .hero h1 {
+    font-size: clamp(54px, 15vw, 84px);
+    letter-spacing: -3px;
+    line-height: 0.96;
+  }
+  .hero-scene {
+    position: relative;
+    width: 106%;
+    right: auto;
+    left: -3%;
+    top: auto;
+    bottom: auto;
+    margin-top: 14px;
+    transform: none;
+    translate: none;
   }
   .hero-bottom {
-    left: var(--site-gutter);
-    right: var(--site-gutter);
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    margin-top: 14px;
+  }
+  .freelance-copy h3 {
+    font-size: clamp(38px, 11vw, 52px);
+  }
+  .email-link {
+    overflow-wrap: anywhere;
   }
   .about,
   .about-editorial,

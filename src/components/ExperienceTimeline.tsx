@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import entries from "../data/experience.json";
 import { RippleWord } from "./HeadingRipples";
@@ -204,9 +204,10 @@ const dateLeadIns = [
   ["January 2022", "2021"],
 ] as const;
 
-export default function ExperienceTimeline() {
+const ExperienceTimeline = memo(function ExperienceTimeline() {
   const timeline = useRef<HTMLDivElement>(null);
   const segmentRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const drawRailRef = useRef<(() => void) | null>(null);
   const { reduced } = useMotionPreference();
   const [reachedCount, setReachedCount] = useState(0);
   const [turnedFlags, setTurnedFlags] = useState<boolean[]>(() => entries.map(() => false));
@@ -225,6 +226,7 @@ export default function ExperienceTimeline() {
       next[idx] = true;
       return next;
     });
+    drawRailRef.current?.();
   }, []);
 
   useEffect(() => {
@@ -245,16 +247,33 @@ export default function ExperienceTimeline() {
     );
     rows.forEach((row) => observer.observe(row));
 
+    let inViewport = false;
+    let railDocTop = 0;
+    let railHeight = 0;
+    let rowTops: number[] = rows.map(() => 0);
+
+    const measureMetrics = () => {
+      const rect = rail.getBoundingClientRect();
+      railDocTop = rect.top + window.scrollY;
+      railHeight = rect.height;
+      rowTops = rows.map((row) => row.offsetTop);
+    };
+    measureMetrics();
+
     let frame = 0;
     const drawRail = () => {
       frame = 0;
-      const { top, height } = rail.getBoundingClientRect();
+      const top = railDocTop - window.scrollY;
+      const height = railHeight;
       const distance = Math.max(0, Math.min(height, window.innerHeight * 0.78 - top));
       let count = 0;
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
-        const reached = distance >= row.offsetTop;
-        row.toggleAttribute("data-rail-reached", reached);
+        const rowTop = rowTops[i];
+        const reached = distance >= rowTop;
+        if (reached !== row.hasAttribute("data-rail-reached")) {
+          row.toggleAttribute("data-rail-reached", reached);
+        }
         if (reached) count = i + 1;
 
         // Each vertical line segment only flows downward AFTER its calendar pages finish turning!
@@ -263,35 +282,58 @@ export default function ExperienceTimeline() {
           if (!turnedRef.current[i]) {
             segEl.style.setProperty("--seg-progress", "0");
           } else {
-            const segStart = row.offsetTop + 22;
-            const segEnd = i < rows.length - 1 ? rows[i + 1].offsetTop - 22 : height;
+            const segStart = rowTop + 22;
+            const segEnd = i < rows.length - 1 ? rowTops[i + 1] - 22 : height;
             const span = Math.max(1, segEnd - segStart);
             const segP = Math.max(0, Math.min(1, (distance - segStart) / span));
             segEl.style.setProperty("--seg-progress", segP.toFixed(4));
           }
         }
       }
-      setReachedCount((prev) => Math.max(prev, count));
+      setReachedCount((prev) => (count > prev ? count : prev));
     };
 
     const schedule = () => {
+      if (!inViewport) return;
       if (!frame) frame = requestAnimationFrame(drawRail);
     };
-    const resize = new ResizeObserver(schedule);
+    drawRailRef.current = () => {
+      if (!frame) frame = requestAnimationFrame(drawRail);
+    };
+
+    const sectionGate = new IntersectionObserver(
+      ([entry]) => {
+        inViewport = entry.isIntersecting;
+        if (inViewport) {
+          measureMetrics();
+          schedule();
+        }
+      },
+      { rootMargin: "220px 0px" },
+    );
+    sectionGate.observe(rail);
+
+    const onResize = () => {
+      measureMetrics();
+      if (inViewport) schedule();
+    };
+    const resize = new ResizeObserver(onResize);
     resize.observe(rail);
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", onResize, { passive: true });
     drawRail();
 
     return () => {
+      drawRailRef.current = null;
+      sectionGate.disconnect();
       observer.disconnect();
       resize.disconnect();
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      window.removeEventListener("resize", onResize);
       rail.classList.remove("experience-motion");
     };
-  }, [reduced, turnedFlags]);
+  }, [reduced]);
 
   return (
     <section id="experience" className="experience blue-section" aria-labelledby="experience-heading">
@@ -388,7 +430,7 @@ export default function ExperienceTimeline() {
                 </Accordion>
               </div>
               <div className="experience-entry-visual">
-                <img src={asset(entry.image)} alt={entry.imageAlt} width="1200" height="770" loading="lazy" />
+                <img src={asset(entry.image)} alt={entry.imageAlt} width="1200" height="770" loading="eager" decoding="async" />
               </div>
             </article>
           ))}
@@ -396,4 +438,6 @@ export default function ExperienceTimeline() {
       </div>
     </section>
   );
-}
+});
+
+export default ExperienceTimeline;

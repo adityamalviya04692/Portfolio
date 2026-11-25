@@ -1,8 +1,7 @@
 /* ==========================================================================
    Compact Bilt-Inspired Rolling Odometer Metrics Band + Attio-Style Scroll Graph
-   - Cards lifted higher under About bio/photo.
-   - 35–42° slanted exponential graph extends all the way down to the rounded
-     bottom edge of the blue #about section.
+   - GPU-composited clip-path graph reveal & transform-only pointer (0 layout/frame).
+   - Zero backdrop-filter over animating SVG (prevents Chrome GPU blur stalls).
    ========================================================================== */
 
 /* Flush bottom on #about so the Attio watermark hatch fills cleanly to the rounded edge */
@@ -30,6 +29,13 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  contain: layout style paint;
+}
+
+.stats-attio-reveal {
+  position: absolute;
+  inset: 0;
+  will-change: clip-path;
 }
 
 .stats-attio-svg {
@@ -59,12 +65,14 @@
   stroke-linecap: round;
 }
 
-/* Leading vertical progress guide line dropping from the active curve tip */
+/* Leading vertical progress guide line — positioned strictly via GPU translate3d + scaleY */
 .stats-attio-pointer-line {
   position: absolute;
+  left: 0;
   bottom: 0;
   width: 1px;
-  transform: translateX(-50%);
+  height: 100%;
+  transform-origin: center bottom;
   background: linear-gradient(
     to bottom,
     rgba(242, 189, 131, 0.58) 0%,
@@ -72,20 +80,21 @@
     rgba(242, 189, 131, 0.03) 100%
   );
   opacity: 0;
-  will-change: left, top, opacity;
+  will-change: transform, opacity;
 }
 
-/* Crisp circular pointer riding on the front tip of the advancing curve */
+/* Crisp circular pointer riding on the front tip — positioned strictly via GPU translate3d */
 .stats-attio-pointer-dot {
   position: absolute;
+  left: 0;
+  top: 0;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #f2bd83;
   box-shadow: 0 0 0 4px rgba(242, 189, 131, 0.22);
-  transform: translate(-50%, -50%);
   opacity: 0;
-  will-change: left, top, opacity;
+  will-change: transform, opacity;
 }
 
 html[data-theme="dark"] .stats-attio-hatch-line {
@@ -129,26 +138,25 @@ html[data-theme="dark"] .stats-attio-pointer-dot {
   padding: clamp(14px, 1.5vw, 19px) clamp(14px, 1.6vw, 20px);
   border-radius: clamp(16px, 1.7vw, 22px);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(16, 43, 121, 0.42);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: rgba(16, 43, 121, 0.72);
+  contain: layout style;
   transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
 }
 
 .stats-bilt-card:hover {
   border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(16, 43, 121, 0.56);
+  background: rgba(16, 43, 121, 0.84);
   transform: translateY(-2px);
 }
 
 html[data-theme="dark"] .stats-bilt-card {
   border-color: rgba(255, 255, 255, 0.13);
-  background: rgba(11, 23, 57, 0.48);
+  background: rgba(11, 23, 57, 0.76);
 }
 
 html[data-theme="dark"] .stats-bilt-card:hover {
   border-color: rgba(255, 255, 255, 0.24);
-  background: rgba(11, 23, 57, 0.64);
+  background: rgba(11, 23, 57, 0.88);
 }
 
 .stats-bilt-value {

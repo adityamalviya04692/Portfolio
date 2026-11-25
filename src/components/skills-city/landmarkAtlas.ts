@@ -1,8 +1,11 @@
 import * as T from "three";
-import { loadModels } from "./landmarks";
+import { buildModels, type loadProfiles } from "./landmarks";
 import { createMaterials } from "./materials";
 
-type Lot = { kind: string; w: number; d: number; h: number };
+export type Lot = { kind: string; w: number; d: number; h: number };
+function makeCanvas() {
+  return typeof document === "undefined" ? new OffscreenCanvas(1, 1) : document.createElement("canvas");
+}
 const FOUNDATION = 2.8;
 
 // Match the existing Canvas2D projection: x = .88t(gx-gy),
@@ -12,7 +15,7 @@ const elevation = Math.PI / 6;
 // A small generated sky/skyline reflection captures the difference between
 // reflective office glass, a satin metal roof and diffuse concrete.
 function facadeEnvironment(renderer: T.WebGLRenderer) {
-  const sky = document.createElement("canvas");
+  const sky = makeCanvas();
   sky.width = 512;
   sky.height = 256;
   const ctx = sky.getContext("2d")!;
@@ -42,8 +45,8 @@ function facadeEnvironment(renderer: T.WebGLRenderer) {
   return env;
 }
 
-function clayPass(canvas: HTMLCanvasElement, dark: boolean) {
-  const mono = document.createElement("canvas");
+function clayPass(canvas: ReturnType<typeof makeCanvas>, dark: boolean) {
+  const mono = makeCanvas();
   mono.width = canvas.width;
   mono.height = canvas.height;
   const ctx = mono.getContext("2d")!;
@@ -65,7 +68,7 @@ function clayPass(canvas: HTMLCanvasElement, dark: boolean) {
   return mono;
 }
 
-export async function createLandmarkAtlas(lots: Lot[], signal: AbortSignal) {
+export function createLandmarkAtlas(lots: Lot[], profiles: Awaited<ReturnType<typeof loadProfiles>>) {
   const materials = createMaterials();
   const scene = new T.Scene();
   let renderer: T.WebGLRenderer | undefined;
@@ -84,10 +87,9 @@ export async function createLandmarkAtlas(lots: Lot[], signal: AbortSignal) {
     renderer?.forceContextLoss();
   }
   try {
-    const models = await loadModels(materials, signal);
+    const models = buildModels(materials, profiles);
     for (const { root } of models) scene.add(root);
-    signal.throwIfAborted();
-    const surface = new T.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "low-power" });
+    const surface = new T.WebGLRenderer({ canvas: makeCanvas(), alpha: true, antialias: true, powerPreference: "low-power" });
     renderer = surface;
     surface.setClearColor(0, 0);
     surface.toneMapping = T.ACESFilmicToneMapping;
@@ -117,15 +119,14 @@ export async function createLandmarkAtlas(lots: Lot[], signal: AbortSignal) {
     camera.far = 4200;
     const columns = Math.ceil(Math.sqrt(models.length));
     const rows = Math.ceil(models.length / columns);
-    const order = new Map(models.map((m, i) => [m.kind, i]));
     const lotByKind = new Map(lots.map((lot) => [lot.kind, lot]));
     let cachedTile = -1,
       cachedDark = false;
     let width = 0,
       height = 0,
       baseline = 0;
-    const color = document.createElement("canvas");
-    let mono = document.createElement("canvas");
+    const color = makeCanvas();
+    let mono = makeCanvas();
     const samples = 2;
 
     function prepare(tile: number, dark: boolean) {
@@ -198,34 +199,12 @@ export async function createLandmarkAtlas(lots: Lot[], signal: AbortSignal) {
     }
     return {
       dispose,
-      sprite(kind: string, tile: number, isColor: boolean, dark: boolean) {
-        const index = order.get(kind);
-        if (
-          index === undefined ||
-          ((cachedTile !== tile || cachedDark !== dark) && surface.getContext().isContextLost())
-        )
-          return;
+      async bake(tile: number, dark: boolean) {
         prepare(tile, dark);
-        const sx = (index % columns) * width * samples;
-        const sy = Math.floor(index / columns) * height * samples;
-        return (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-          ctx.drawImage(
-            isColor ? color : mono,
-            sx,
-            sy,
-            width * samples,
-            height * samples,
-            x - width / 2,
-            y - baseline,
-            width,
-            height,
-          );
-          if (!isColor && models[index].elevation) {
-            ctx.save();
-            ctx.globalAlpha *= dark ? .62 : .45;
-            ctx.drawImage(color, sx, sy, width*samples, height*samples, x-width/2, y-baseline, width, height);
-            ctx.restore();
-          }
+        const [colored, clay] = await Promise.all([createImageBitmap(color), createImageBitmap(mono)]);
+        return {
+          colored, clay, tile, dark, width, height, baseline, columns, samples,
+          models: models.map(({ kind, elevation }) => ({ kind, raised: Boolean(elevation) })),
         };
       },
     };
@@ -235,4 +214,4 @@ export async function createLandmarkAtlas(lots: Lot[], signal: AbortSignal) {
   }
 }
 
-export type LandmarkAtlas = Awaited<ReturnType<typeof createLandmarkAtlas>>;
+export type BakedAtlas = Awaited<ReturnType<ReturnType<typeof createLandmarkAtlas>["bake"]>>;

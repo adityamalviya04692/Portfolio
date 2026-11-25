@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useMotionPreference } from "./MotionSystem";
+import { completePrewarmTask } from "./PrewarmManager";
 import scene from "../data/livingDesk.json";
 
 /*
@@ -141,12 +142,18 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
     Promise.all(
       urls.map((url) => {
         const img = new Image();
+        img.decoding = "async";
         img.src = url;
-        return img.decode();
+        return img.decode().catch(() => {});
       }),
     )
-      .then(() => alive && setReady(true))
-      .catch(() => {});
+      .then(() => {
+        if (alive) setReady(true);
+        completePrewarmTask("desk");
+      })
+      .catch(() => {
+        completePrewarmTask("desk");
+      });
     return () => {
       alive = false;
     };
@@ -359,7 +366,7 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
         </g>
         <polygon className="ld-flash ld-flash-left" points={points(screenLeft)} />
 
-        {/* Right monitor: packets flow through the pipeline into the cloud */}
+        {/* Right monitor: packets flow through the pipeline into the cloud (zero per-frame SVG blur) */}
         <ellipse className="ld-pulse" cx="958" cy="324" rx="22" ry="30" fill="url(#ld-cool)" />
         <ellipse className="ld-pulse ld-pulse-b" cx="957" cy="394" rx="22" ry="30" fill="url(#ld-cool)" />
         <ellipse className="ld-pulse ld-pulse-c" cx="1062" cy="392" rx="30" ry="24" fill="url(#ld-cool)" />
@@ -367,7 +374,7 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
           [0, 1].map((k) => {
             const begin = `${-(i * 0.65 + k * 1.3)}s`;
             return (
-              <circle key={`${i}-${k}`} r="2.6" fill="#dffaff" filter="url(#ld-glow)" opacity="0">
+              <circle key={`${i}-${k}`} r="2.8" fill="#dffaff" stroke="rgba(125, 211, 252, 0.55)" strokeWidth="1.6" opacity="0">
                 <animateMotion dur="2.6s" repeatCount="indefinite" begin={begin} path={d} />
                 <animate
                   attributeName="opacity"
@@ -385,7 +392,7 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
 
         {/* Night-only: moonlight on the wall, string lights, dust in the lamp light */}
         <g className="ld-nightonly">
-          <g className="ld-moonlight" filter="url(#ld-soft)">
+          <g className="ld-moonlight">
             {panes.map((pane, i) => (
               <polygon key={i} points={points(pane)} fill="url(#ld-moon)" />
             ))}
@@ -402,7 +409,7 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
           ))}
           {bulbs.map(([x, y], i) => (
             <g key={i} className="ld-bulb" style={{ animationDelay: `${-((i * 0.73) % 3.2)}s` }}>
-              <circle cx={x} cy={y + 4} r="7" fill={bulbColors[i % bulbColors.length]} opacity="0.35" filter="url(#ld-bloom)" />
+              <circle cx={x} cy={y + 4} r="8" fill={bulbColors[i % bulbColors.length]} opacity="0.22" />
               <rect x={x - 1.6} y={y - 0.5} width="3.2" height="2.6" rx="0.8" fill="#2b2f42" />
               <ellipse cx={x} cy={y + 4.6} rx="2.6" ry="3.4" fill={bulbColors[i % bulbColors.length]} />
             </g>
@@ -415,8 +422,8 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
         {/* Webcam status light */}
         <circle className="ld-led" cx="993" cy="272" r="1.7" fill="#62e59c" />
 
-        {/* Warm air rising from the coffee */}
-        <g transform="translate(982 517)" filter="url(#ld-soft)">
+        {/* Warm air rising from the coffee (zero per-frame SVG blur) */}
+        <g transform="translate(982 517)">
           <g className="ld-steam-puff">
             {[0, 1, 2].map((i) => (
               <path
@@ -425,7 +432,7 @@ export default function LivingDesk({ src, alt }: { src: string; alt: string }) {
                 style={{ animationDelay: `${-i * 1.4}s` }}
                 d={i % 2 ? "M0 0 C 7 -10, -7 -20, 0 -30 S 7 -50, 0 -60" : "M0 0 C -7 -10, 7 -20, 0 -30 S -7 -50, 0 -60"}
                 fill="none"
-                stroke="#fffaf1"
+                stroke="rgba(255, 250, 241, 0.58)"
                 strokeWidth="7"
                 strokeLinecap="round"
               />

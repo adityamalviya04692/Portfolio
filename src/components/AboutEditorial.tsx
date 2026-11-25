@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
 import { useMotionPreference } from "./MotionSystem";
 import { VaultSticker } from "./VaultSectionBadge";
@@ -10,19 +10,6 @@ export default function AboutEditorial({ onIntro }: { onIntro: (trigger: HTMLBut
   const video = useRef<HTMLVideoElement>(null);
   const [waving, setWaving] = useState(false);
   const { reduced } = useMotionPreference();
-
-  const photo = useRef<HTMLElement>(null);
-  const [loadPortrait, setLoadPortrait] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setLoadPortrait(true);
-        observer.disconnect();
-      }
-    }, { rootMargin: "350px" });
-    if (photo.current) observer.observe(photo.current);
-    return () => observer.disconnect();
-  }, []);
 
   const playWave = () => {
     const clip = video.current;
@@ -44,7 +31,7 @@ export default function AboutEditorial({ onIntro }: { onIntro: (trigger: HTMLBut
             <p>Senior Data Engineer</p>
             <p>{data.profile.location}</p>
           </div>
-          <figure className="about-editorial-photo" ref={photo}>
+          <figure className="about-editorial-photo">
             <button
               type="button"
               className="about-editorial-frame"
@@ -55,7 +42,7 @@ export default function AboutEditorial({ onIntro }: { onIntro: (trigger: HTMLBut
               }}
               aria-label="Play Aditya’s welcome wave"
             >
-              <img src={loadPortrait ? asset("assets/aditya-editorial-portrait.webp") : undefined} width="1254" height="1254" alt="Portrait of Aditya Malviya" />
+              <img src={asset("assets/aditya-editorial-portrait.webp")} decoding="async" width="1254" height="1254" alt="Portrait of Aditya Malviya" />
               <video
                 ref={video}
                 src={asset("assets/videos/profile-wave.mp4")}

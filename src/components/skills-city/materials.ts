@@ -10,7 +10,7 @@ function seeded(seed: number) {
 // One tile contains twelve floors. The smaller mip levels retain the alternating
 // glass and spandrel bands when the camera pulls back from a façade.
 function curtainWall() {
-  const surface = document.createElement("canvas");
+  const surface = typeof document === "undefined" ? new OffscreenCanvas(512, 384) : document.createElement("canvas");
   surface.width = 512;
   surface.height = 384;
   const ctx = surface.getContext("2d")!;

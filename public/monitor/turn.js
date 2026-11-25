@@ -22,7 +22,9 @@ function load(key) {
 function requestPaint() {
   if (!frameRequest) frameRequest = requestAnimationFrame(paint);
 }
+let nearMonitor = false;
 function measure(event) {
+  if (!nearMonitor) return;
   if (event?.type === "resize" || event?.type === "monitorinvalidate") lastPose = "";
   const travel = scene.offsetHeight - document.querySelector('.monitor-sticky').offsetHeight;
   const lead = window.innerHeight * 0.72;
@@ -207,7 +209,7 @@ let lastTime = 0;
 let lastPose = '';
 function paint(now) {
   frameRequest = 0;
-  if (!ready) return;
+  if (!ready || !nearMonitor) return;
   const elapsed = Math.min(40, lastTime ? now - lastTime : 16);
   lastTime = now;
   position += (target - position) * (1 - Math.exp(-elapsed / 135));
@@ -246,6 +248,19 @@ function paint(now) {
   for (let step = 1; step <= 4; step++) load(Math.min(100, Math.max(0, index + direction * step)));
   if (target !== position) requestPaint();
 }
+const monitorVisibility = new IntersectionObserver(([entry]) => {
+  nearMonitor = entry.isIntersecting;
+  if (nearMonitor) {
+    lastTime = 0;
+    lastPose = '';
+    measure();
+  } else {
+    cancelAnimationFrame(frameRequest);
+    frameRequest = 0;
+    setScreenDemo(false);
+  }
+}, { rootMargin: '240px' });
+monitorVisibility.observe(scene);
 addEventListener('scroll', measure, {passive:true});
 addEventListener('resize', () => { measure(); if (demoActive) placeCursor(curX, curY); });
 addEventListener('monitorinvalidate', measure);

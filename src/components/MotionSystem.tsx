@@ -1,8 +1,10 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -16,12 +18,21 @@ import {
   motion,
   useInView,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
 } from "framer-motion";
 import ParticleEngineer from "./ParticleEngineer";
+import {
+  completePrewarmTask,
+  predecodeImages,
+  registerPrewarmTask,
+  subscribePrewarm,
+  updatePrewarmTask,
+  waitForPrewarm,
+} from "./PrewarmManager";
 
 export type IntroPhase = "loading" | "docking" | "complete";
 
@@ -29,32 +40,38 @@ const MotionContext = createContext<{
   reduced: boolean;
   paused: boolean;
   togglePaused: () => void;
-  introPhase: IntroPhase;
-  dockReady: boolean;
 }>({
   reduced: false,
   paused: false,
   togglePaused: () => {},
+});
+const IntroContext = createContext<{
+  introPhase: IntroPhase;
+  dockReady: boolean;
+}>({
   introPhase: "complete",
   dockReady: true,
 });
 export const useMotionPreference = () => useContext(MotionContext);
+export const useIntroState = () => useContext(IntroContext);
 const asset = (name: string) => `${import.meta.env.BASE_URL}assets/${name}`;
 
 export function MotionSystem({ children }: { children: ReactNode }) {
   const systemReduced = useReducedMotion();
-  const [paused, setPaused] = useState(
-    () => localStorage.getItem("portfolio-motion") === "paused",
-  );
-  const reduced = Boolean(systemReduced || paused);
+  const [motionChoice, setMotionChoice] = useState<"paused" | "on" | null>(() => {
+    try {
+      const saved = localStorage.getItem("portfolio-motion");
+      return saved === "paused" || saved === "on" ? saved : null;
+    } catch {
+      return null;
+    }
+  });
+  const paused = motionChoice === "paused" || (motionChoice === null && Boolean(systemReduced));
+  const reduced = paused;
   const [introPhase, setIntroPhase] = useState<IntroPhase>(() =>
-    systemReduced || localStorage.getItem("portfolio-motion") === "paused"
-      ? "complete"
-      : "loading",
+    paused ? "complete" : "loading",
   );
-  const [dockReady, setDockReady] = useState(() =>
-    Boolean(systemReduced || localStorage.getItem("portfolio-motion") === "paused"),
-  );
+  const [dockReady, setDockReady] = useState(() => paused);
   const loadPct = useMotionValue(0);
   const progressText = useTransform(loadPct, value => String(Math.round(value)).padStart(3, "0") + "%");
   const progressScale = useTransform(loadPct, [0, 100], [0, 1]);
@@ -64,17 +81,18 @@ export function MotionSystem({ children }: { children: ReactNode }) {
   const trailRef = useRef<HTMLDivElement>(null);
   const introDoneRef = useRef(false);
   const handoffStartedRef = useRef(false);
-  const togglePaused = () => {
-    setPaused((prev) => {
-      const next = !prev;
+  const togglePaused = useCallback(() => {
+    setMotionChoice((prev) => {
+      const currentlyPaused = prev === "paused" || (prev === null && Boolean(systemReduced));
+      const next = currentlyPaused ? "on" : "paused";
       try {
-        localStorage.setItem("portfolio-motion", next ? "paused" : "on");
+        localStorage.setItem("portfolio-motion", next);
       } catch {
         /* ignore storage failures */
       }
       return next;
     });
-  };
+  }, [systemReduced]);
 
   useEffect(() => {
     delete document.documentElement.dataset.palette;
@@ -122,13 +140,30 @@ export function MotionSystem({ children }: { children: ReactNode }) {
     let endScale = 1;
     const startedAt = performance.now();
     const START_SCALE_VAL = 118 / 54;
-    const MIN_DRAW_MS = 1080;
+    const MIN_DRAW_MS = 1480;
+    const MAX_PREWARM_WAIT_MS = 5500;
     const FLIGHT_DURATION_MS = 1040;
     const timers: number[] = [];
 
-    const pctCtrl = animate(loadPct, 100, {
-      duration: 1.0,
+    // Register ALL startup tasks so nothing continues loading after the curtain lifts
+    registerPrewarmTask("fonts");
+    registerPrewarmTask("media");
+    registerPrewarmTask("desk");
+    registerPrewarmTask("monitor");
+    registerPrewarmTask("city");
+
+    let pctCtrl: ReturnType<typeof animate> | null = animate(loadPct, 18, {
+      duration: 0.45,
       ease: [0.22, 1, 0.36, 1],
+    });
+    const unsubPrewarm = subscribePrewarm((progress) => {
+      if (!alive || dockingScheduled) return;
+      const target = Math.min(99, Math.max(loadPct.get(), Math.round(18 + progress * 81)));
+      pctCtrl?.stop();
+      pctCtrl = animate(loadPct, target, {
+        duration: 0.34,
+        ease: [0.22, 1, 0.36, 1],
+      });
     });
 
     // Smooth S-curve feather path starting from the exact idle float position (zero jump/chop)
@@ -153,9 +188,9 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       rz: Math.sin(t * 2.1) * 2.4,
       scale: START_SCALE_VAL * (1 - .12 * Math.pow(1 - Math.min(1, t / .38), 3)),
     });
-    const idleDuration = 2400;
-    const idle = medallion.animate(Array.from({ length: 73 }, (_, i) => {
-      const p = idleAt(i / 72 * idleDuration / 1000);
+    const idleDuration = 4800;
+    const idle = medallion.animate(Array.from({ length: 121 }, (_, i) => {
+      const p = idleAt(i / 120 * idleDuration / 1000);
       return { transform: transform(p.x, p.y, p.scale, 0, p.rz) };
     }), { duration: idleDuration, fill: "both" });
     animations.push(idle);
@@ -165,6 +200,11 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       dockingScheduled = true;
       const elapsed = performance.now() - startedAt;
       const wait = Math.max(0, MIN_DRAW_MS - elapsed);
+      pctCtrl?.stop();
+      pctCtrl = animate(loadPct, 100, {
+        duration: Math.max(0.24, wait / 1000),
+        ease: [0.22, 1, 0.36, 1],
+      });
       timers.push(
         window.setTimeout(() => {
           if (!alive) return;
@@ -203,38 +243,54 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       );
     };
 
-    const failSafe = window.setTimeout(beginDocking, idleDuration);
-    const image = new Image();
-    image.src = asset("workspace-aditya.webp");
-    image
-      .decode()
-      .catch(() => {})
-      .then(() => document.fonts.ready)
-      .then(beginDocking);
+    const failSafe = window.setTimeout(beginDocking, MAX_PREWARM_WAIT_MS + 400);
+
+    // Pre-decode critical Hero & About imagery upfront so Chrome never stalls mid-scroll
+    predecodeImages(
+      [
+        asset("workspace-aditya.webp"),
+        asset("workspace-aditya-plate.webp"),
+        asset("aditya-editorial-portrait.webp"),
+        asset("research-aqe-vs-salting.webp"),
+        `${import.meta.env.BASE_URL}monitor/turn/0.webp`,
+      ],
+      (p) => updatePrewarmTask("media", p),
+    ).then(() => completePrewarmTask("media"));
+
+    document.fonts.ready.then(() => completePrewarmTask("fonts"));
+    waitForPrewarm(MAX_PREWARM_WAIT_MS).then(beginDocking);
 
     return () => {
       alive = false;
+      unsubPrewarm();
       animations.forEach(animation => animation.cancel());
-      pctCtrl.stop();
+      pctCtrl?.stop();
       clearTimeout(failSafe);
       timers.forEach((id) => clearTimeout(id));
     };
   }, []);
 
   const isDocking = introPhase === "docking";
+  const motionValue = useMemo(
+    () => ({ reduced, paused, togglePaused }),
+    [reduced, paused],
+  );
+  const introValue = useMemo(
+    () => ({ introPhase, dockReady }),
+    [introPhase, dockReady],
+  );
 
   return (
-    <MotionContext.Provider value={{ reduced, paused, togglePaused, introPhase, dockReady }}>
+    <MotionContext.Provider value={motionValue}>
+      <IntroContext.Provider value={introValue}>
       <MotionConfig reducedMotion={reduced ? "always" : "never"}>
         <LayoutGroup id="delta-portfolio-stage">
           {/* Layer 1: Atmospheric loading curtain — fades away cleanly while the logo floats above it */}
-          <AnimatePresence>
-            {introPhase !== "complete" && (
+          {introPhase !== "complete" && (
               <motion.div
                 className={`page-loader delta-classic-loader ${isDocking ? "is-docking" : ""}`}
                 initial={{ opacity: 1 }}
                 animate={{ opacity: isDocking ? 0 : 1 }}
-                exit={{ opacity: 0 }}
                 transition={{
                   duration: 0.62,
                   delay: isDocking ? 0.14 : 0,
@@ -252,7 +308,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
                 <motion.div
                   className="delta-orbit-halo"
                   aria-hidden="true"
-                  initial={{ scale: 0.78, opacity: 0, rotate: -24 }}
+                  initial={{ scale: 0.92, opacity: 0.55, rotate: 0 }}
                   animate={
                     isDocking
                       ? { scale: 1.85, opacity: 0, rotate: 54 }
@@ -263,7 +319,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
 
                 <motion.div
                   className="delta-classic-loader-meta"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 1, y: 0 }}
                   animate={isDocking ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
                   transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                 >
@@ -280,26 +336,22 @@ export function MotionSystem({ children }: { children: ReactNode }) {
                 </motion.div>
               </motion.div>
             )}
-          </AnimatePresence>
 
           {/* Layer 2: Dedicated Flying Logo Medallion — 100% pixel-identical 54px clone of navbar am. with feather-floating flight */}
           {introPhase !== "complete" && (
             <div className="delta-flying-stage" aria-hidden="true">
               <div className="delta-flight-trail" ref={trailRef} style={{ opacity: 0 }} />
-              <motion.div
+              <div
                 ref={medallionRef}
                 className={`delta-flying-medallion ${isDocking ? "is-flying" : ""}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ opacity: { duration: 0.28, ease: "easeOut" } }}
               >
                 <div className="delta-drawn-medallion">
-                  {/* Exact same navbar am. typography — blooms in cleanly as the SVG stroke draw completes */}
+                  {/* Exact same navbar am. typography — crisp bloom right as stroke completes */}
                   <motion.span
                     className="delta-am-mark"
-                    initial={{ opacity: 0, scale: 0.92 }}
+                    initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.34, delay: 0.52, ease: "easeOut" }}
+                    transition={{ duration: 0.26, delay: 0.28, ease: "easeOut" }}
                   >
                     a<span className="monogram-accent">m.</span>
                   </motion.span>
@@ -329,7 +381,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
                       }}
                     />
 
-                    {/* Tight-kerned stroke preview of "am." that traces first, then dissolves into the real mark */}
+                    {/* Tight-kerned stroke preview of "am." that traces quickly, then dissolves into the real mark */}
                     <motion.text
                       x="57"
                       y="78"
@@ -338,21 +390,22 @@ export function MotionSystem({ children }: { children: ReactNode }) {
                       initial={{ strokeDashoffset: 320, opacity: 1 }}
                       animate={{ strokeDashoffset: 0, opacity: 0 }}
                       transition={{
-                        strokeDashoffset: { duration: 0.62, delay: 0.06, ease: [0.22, 1, 0.36, 1] },
-                        opacity: { duration: 0.24, delay: 0.64, ease: "easeOut" },
+                        strokeDashoffset: { duration: 0.38, delay: 0, ease: [0.22, 1, 0.36, 1] },
+                        opacity: { duration: 0.2, delay: 0.32, ease: "easeOut" },
                       }}
                     >
                       a<tspan className="delta-draw-m">m.</tspan>
                     </motion.text>
                   </svg>
                 </div>
-              </motion.div>
+              </div>
             </div>
           )}
 
           {children}
         </LayoutGroup>
       </MotionConfig>
+      </IntroContext.Provider>
     </MotionContext.Provider>
   );
 }
@@ -388,9 +441,11 @@ export function Reveal({
 export function Scramble({
   text,
   className = "",
+  scrambleOnMount = true,
 }: {
   text: string;
   className?: string;
+  scrambleOnMount?: boolean;
 }) {
   const ref = useRef<HTMLSpanElement>(null),
     visible = useInView(ref, { once: true, amount: 0.5 });
@@ -398,7 +453,7 @@ export function Scramble({
     [display, setDisplay] = useState(text),
     [replay, setReplay] = useState(0);
   useEffect(() => {
-    if (!visible || reduced) {
+    if (reduced || (!scrambleOnMount && replay === 0) || (scrambleOnMount && !visible && replay === 0)) {
       setDisplay(text);
       return;
     }
@@ -508,7 +563,8 @@ export function Counter({ value }: { value: string }) {
 
 export function HeroFrame({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null),
-    { reduced, introPhase } = useMotionPreference();
+    frameRef = useRef<HTMLDivElement>(null),
+    { reduced } = useMotionPreference();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -518,17 +574,28 @@ export function HeroFrame({ children }: { children: ReactNode }) {
     damping: 24,
     mass: 0.55,
   });
+  // Toggle rounded card corners once via CSS instead of re-rasterizing border-radius every scroll frame
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    const el = frameRef.current;
+    if (!el || reduced) return;
+    const shouldRound = latest > 0.015;
+    if (shouldRound && !el.dataset.rounded) {
+      el.dataset.rounded = "true";
+    } else if (!shouldRound && el.dataset.rounded) {
+      delete el.dataset.rounded;
+    }
+  });
   const scale = useTransform(smoothProgress, [0, 0.65], [1, 0.82]),
     rotate = useTransform(smoothProgress, [0, 0.65], [0, -3]),
     y = useTransform(smoothProgress, [0, 0.65], [0, -100]),
-    opacity = useTransform(smoothProgress, [0.3, 0.8], [1, 0.15]),
-    radius = useTransform(smoothProgress, [0, 0.5], [0, 70]);
+    opacity = useTransform(smoothProgress, [0.3, 0.8], [1, 0.15]);
   return (
-    <div className="hero-scroll" ref={ref} data-intro-loading={!reduced && introPhase === "loading" || undefined}>
+    <div className="hero-scroll" ref={ref}>
       <motion.div
+        ref={frameRef}
         className="hero-frame"
         style={
-          reduced ? {} : { scale, rotate, y, opacity, borderRadius: radius }
+          reduced ? {} : { scale, rotate, y, opacity }
         }
       >
         {children}

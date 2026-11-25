@@ -5,7 +5,7 @@ import { useMotionPreference } from "./MotionSystem";
 
 const controls = "a[href], button, input, [role='button']";
 const media = ".portrait-play, .carousel-thumb, .research-figure a, .project-play-cover, video, .ld-hits polygon";
-const freeControls = media + ", .motion-accordion button, .email-link, .preview-open, .hero-bottom a, .skip-link, .pause-toggle, .research-note, input";
+const freeControls = media + ", .motion-accordion button, .email-link, .preview-open, .hero-bottom a, .skip-link, .pause-toggle, .delta-wave-pill, .research-note, input";
 const fittedShapes = ".skills-content .tags > span, .project-play-stamp, .portrait-play-icon";
 const primary = ".button, .contact-pill, .delta-contact-pill, .showcase-primary";
 const normal: IpadCursorStyle = {
@@ -135,8 +135,12 @@ export default function PortfolioCursor() {
     };
 
     const hide = () => {
-      if (cursor) document.documentElement.dataset.customPointer = "idle";
-      fitShape(null);
+      if (cursor && document.documentElement.dataset.customPointer !== "idle") {
+        document.documentElement.dataset.customPointer = "idle";
+      }
+      if (cursor && cursor.hasAttribute("data-fit")) {
+        fitShape(null);
+      }
     };
     const key = (e: KeyboardEvent) => { if (e.key === "Tab") hide(); };
     const stop = () => {
@@ -161,7 +165,7 @@ export default function PortfolioCursor() {
     document.addEventListener("keydown", key);
     document.addEventListener("fullscreenchange", positionLayer);
     window.addEventListener("blur", hide);
-    window.addEventListener("scroll", hide, true);
+    window.addEventListener("scroll", hide, { capture: true, passive: true });
     eligible.addEventListener("change", stop);
     return () => {
       stop();
@@ -170,7 +174,7 @@ export default function PortfolioCursor() {
       document.removeEventListener("keydown", key);
       document.removeEventListener("fullscreenchange", positionLayer);
       window.removeEventListener("blur", hide);
-      window.removeEventListener("scroll", hide, true);
+      window.removeEventListener("scroll", hide, { capture: true });
       eligible.removeEventListener("change", stop);
     };
   }, [reduced]);
