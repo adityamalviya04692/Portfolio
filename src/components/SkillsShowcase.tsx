@@ -2419,6 +2419,7 @@ export default function SkillsShowcase() {
     const groundColor = document.createElement("canvas");
     const slicesMono = Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas"));
     const slicesColor = Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas"));
+    const sliceTop = new WeakMap<HTMLCanvasElement, number>();
     ensureLogoImagesLoaded();
     let cW = 0;
     let cH = 0;
@@ -2597,16 +2598,6 @@ export default function SkillsShowcase() {
         });
       }
 
-      // Bake static buildings, metro pillars, and street lamps into 16 depth-sorted transparent slices
-      const sliceCtxs = sliceCanvases.map((sc) => {
-        sc.width = W * dpr;
-        sc.height = H * dpr;
-        const sctx = sc.getContext("2d")!;
-        sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        sctx.clearRect(0, 0, W, H);
-        return sctx;
-      });
-
       const mz = 24;
       const pillars: Array<{ depth: number; type: "p"; gx: number }> = [];
       for (let x = -18; x <= 18; x += 2.2) pillars.push({ depth: x + METRO_Y, type: "p", gx: x });
@@ -2617,6 +2608,28 @@ export default function SkillsShowcase() {
         ...pillars,
       ];
       list.sort((a, b) => a.depth - b.depth);
+      // Each depth slice covers a narrow strip of the isometric city. Keep the
+      // world coordinates and pixel density while omitting transparent rows.
+      const bounds = sliceCanvases.map(() => ({ top: H, bottom: 0 }));
+      for (const item of list) {
+        const range = bounds[depthToBand(item.depth)];
+        const building = item.type === "s" ? item.data : undefined;
+        const center = building ? iso(building.gx, building.gy)[1] : H * .62 + item.depth * tile * .44;
+        const margin = building ? tile * (building.w + building.d) * .44 + 40 : 12;
+        const height = building ? Math.max(2 * building.h, 2 * tile) + 32 : mz;
+        range.top = Math.min(range.top, center - height - margin);
+        range.bottom = Math.max(range.bottom, center + margin);
+      }
+      const sliceCtxs = sliceCanvases.map((canvas, band) => {
+        const top = Math.max(0, Math.floor(bounds[band].top * dpr));
+        const bottom = Math.min(groundCanvas.height, Math.ceil(bounds[band].bottom * dpr));
+        canvas.width = groundCanvas.width;
+        canvas.height = Math.max(0, bottom - top);
+        sliceTop.set(canvas, top);
+        const context = canvas.getContext("2d")!;
+        context.setTransform(dpr, 0, 0, dpr, 0, -top);
+        return context;
+      });
       const textBounds = Array.from(cityHeaderRef.current?.children ?? []).map(el => {
         const range = document.createRange();
         range.selectNodeContents(el);
@@ -2794,7 +2807,11 @@ export default function SkillsShowcase() {
           }
         }
         drawCityMicroEventsForBand(ctx, iso, tile, isColor, isDark, time, b, depthToBand);
-        ctx.drawImage(sliceCanvases[b], 0, 0, W, H);
+        const slice = sliceCanvases[b];
+        if (slice.height) {
+          const pixelHeight = H / groundCanvas.height;
+          ctx.drawImage(slice, 0, sliceTop.get(slice)! * pixelHeight, W, slice.height * pixelHeight);
+        }
 
         // Dynamic dark-mode building window lights switching organically ON and OFF in this depth band
         if (isDark && isColor) {
@@ -3032,7 +3049,7 @@ export default function SkillsShowcase() {
     };
 
     const applyFluidColorWave = (W: number, H: number, dpr: number, isDark: boolean, time: number, irisP: number) => {
-      if (waveCanvas.width !== W * dpr || waveCanvas.height !== H * dpr) {
+      if (waveCanvas.width !== Math.floor(W * dpr) || waveCanvas.height !== Math.floor(H * dpr)) {
         waveCanvas.width = W * dpr;
         waveCanvas.height = H * dpr;
       }
@@ -3148,10 +3165,6 @@ export default function SkillsShowcase() {
       lastFrame = now;
 
       const rect = section.getBoundingClientRect();
-      if (rect.bottom < -220 || rect.top > window.innerHeight + 220) {
-        rafId = requestAnimationFrame(render);
-        return;
-      }
 
       smoothScrollVel += (rawScrollVel - smoothScrollVel) * 0.12;
       rawScrollVel *= 0.86;
@@ -3173,7 +3186,7 @@ export default function SkillsShowcase() {
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
 
         if (W > 0 && H > 0) {
-          if (monoCanvas.width !== W * dpr || monoCanvas.height !== H * dpr) {
+          if (monoCanvas.width !== Math.floor(W * dpr) || monoCanvas.height !== Math.floor(H * dpr)) {
             monoCanvas.width = W * dpr;
             monoCanvas.height = H * dpr;
             colorCanvas.width = W * dpr;
@@ -3242,7 +3255,7 @@ export default function SkillsShowcase() {
         rowPhase[r] = (rowPhase[r] + (ARC_ROWS[r].baseSpeed + velBoost) * dt) % 1;
       }
 
-      for (const n of arcNodes) {
+      if (arcVis > 0) for (const n of arcNodes) {
         let u = (n.basePhase + rowPhase[n.rIdx]) % 1;
         if (u < 0) u += 1;
         const norm = (u - 0.5) * 2;
@@ -3256,8 +3269,23 @@ export default function SkillsShowcase() {
       rafId = requestAnimationFrame(render);
     };
 
-    rafId = requestAnimationFrame(render);
+    let nearby = false;
+    const syncFrames = () => {
+      cancelAnimationFrame(rafId);
+      if (nearby && !document.hidden) {
+        lastFrame = performance.now();
+        rafId = requestAnimationFrame(render);
+      }
+    };
+    const cityVisibility = new IntersectionObserver(([entry]) => {
+      nearby = entry.isIntersecting;
+      syncFrames();
+    }, { rootMargin: "220px" });
+    cityVisibility.observe(section);
+    document.addEventListener("visibilitychange", syncFrames);
     return () => {
+      cityVisibility.disconnect();
+      document.removeEventListener("visibilitychange", syncFrames);
       cancelAnimationFrame(rafId);
       preloadLandmarks.disconnect();
       mapSize.disconnect();

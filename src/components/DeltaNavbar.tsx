@@ -656,6 +656,10 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
     };
 
     const onScrollLiquid = () => {
+      if (!rafId) {
+        lastTime = performance.now();
+        rafId = requestAnimationFrame(tick);
+      }
       const y = window.scrollY;
       const dy = y - lastY;
       lastY = y;
@@ -753,7 +757,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         }
       }
 
-      rafId = requestAnimationFrame(tick);
+      const settled = calmFactor === 0 &&
+        Math.abs(targetLeft - fillLeft) + Math.abs(targetRight - fillRight) < .00001 &&
+        Math.abs(velLeft) + Math.abs(velRight) < .00001 &&
+        leftSurf.h.every(h => h === 0) && rightSurf.h.every(h => h === 0);
+      rafId = settled ? 0 : requestAnimationFrame(tick);
     };
 
     rafId = requestAnimationFrame(tick);
