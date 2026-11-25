@@ -1,0 +1,153 @@
+/* ==========================================================================
+   The Vault: Card Features — Tight Vertical Chronological Watermark Deck
+   Directly Behind Each Main Section Sticker + Uniform Section Header Rhythm
+   ========================================================================== */
+
+.vault-sticker-stage {
+  position: relative;
+  display: inline-grid;
+  place-items: start;
+  margin-bottom: 4px;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.vault-sticker-stage .label-sticker.vault-sticker-front {
+  position: relative;
+  z-index: 3;
+  margin-bottom: 0;
+  transform-origin: 18% 85%;
+  box-shadow: 0 8px 20px rgba(8, 18, 52, 0.18);
+  will-change: transform, opacity;
+}
+
+/* Same-sized chronological watermark cards stacked tightly above (passed) & below (upcoming) */
+.vault-sticker-stage .label-sticker.vault-chrono-wm {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  margin-bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  box-sizing: border-box;
+  transform-origin: 18% 85%;
+  box-shadow: none;
+  will-change: transform, opacity, top;
+}
+
+/* Keep main section headlines crisply layered in front and snugly close to the sticker */
+.about-editorial header,
+.skills-city-header,
+.experience-header,
+.section-heading,
+.contact .section-wrap > div:first-child {
+  position: relative;
+}
+
+.about-editorial header h2,
+.skills-city-header h2,
+.experience-header h2,
+.section-heading h2,
+.contact h2 {
+  position: relative;
+  z-index: 2;
+  margin-top: 2px;
+}
+
+/* Uniform side & center alignment across ALL section headers and their cards (1080px centered rail) */
+.about-editorial {
+  padding-inline: 0;
+}
+
+.about-editorial-inner,
+.education-band > .section-wrap,
+.experience > .section-wrap,
+.research-section > .section-wrap,
+.contact > .section-wrap {
+  width: min(86%, 1080px);
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.experience,
+.research-section,
+.contact {
+  padding-inline: 0;
+}
+
+.skills-city-header {
+  width: min(86%, 1080px);
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.showcase-section .section-heading {
+  width: min(86%, 1080px);
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.monitor-sticky {
+  padding-inline: 0;
+}
+
+.monitor-heading.section-heading,
+.monitor-caption {
+  width: min(86%, 1080px);
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+#freelance > .section-wrap {
+  width: min(86%, 1080px);
+  max-width: 1080px;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+/* Website-style typing animation for moriveda.in (zero layout shift on replay) */
+.moriveda-typewriter {
+  position: relative;
+  display: inline-block;
+  line-height: 1.12;
+  cursor: pointer;
+}
+
+.moriveda-ghost {
+  display: inline-block;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
+.moriveda-typed {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.moriveda-caret {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 3px;
+  height: 0.78em;
+  margin-left: 5px;
+  border-radius: 2px;
+  background: var(--orange, #ed8838);
+  transform: translateY(0.04em);
+  animation: moriveda-caret-blink 0.85s steps(2, start) infinite;
+}
+
+@keyframes moriveda-caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}

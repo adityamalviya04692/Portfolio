@@ -3932,10 +3932,10 @@ html[data-theme="dark"] .showcase-film-play {
    Project carousel: swipeable cards that open the project explorer dialog.
    ====================================================================== */
 .showcase-section { --project-gutter: 32px; padding-inline: 0; }
-.showcase-section .section-wrap { max-width: none; }
+.showcase-section .section-wrap { width: 100%; max-width: none; }
 .showcase-section [role="region"] { overflow-x: clip; }
 .showcase-section .section-heading h2 { font-size: clamp(36px, 4.3vw, 61px); }
-.showcase-section .section-heading { margin-inline: var(--project-gutter); }
+.showcase-section .section-heading { width: var(--site-rail, min(86%, 1080px)); max-width: 1080px; margin-inline: auto; }
 .project-card-grid {
   --tilt: 25deg;
   --depth: clamp(48px, 6vw, 86px);
@@ -4456,12 +4456,11 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
 }
 
 #freelance {padding-inline:0;padding-top:0;overflow:visible}
-#freelance > .section-wrap {padding-inline:clamp(18px,4vw,60px)}
+#freelance > .section-wrap {width:var(--site-rail,min(86%,1080px));max-width:1080px;margin-inline:auto;padding-inline:0;margin-top:-28px}
 #freelance .freelance-copy {padding-top:0}
-#freelance > .section-wrap {margin-top:-28px}
 .monitor-scene{height:175svh}
-.monitor-sticky{height:100svh;position:sticky;top:0;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(64px,9vh,90px) max(5vw,calc((100vw - 1200px)/2)) 8px}
-.monitor-heading.section-heading{position:relative;margin:0;z-index:2;pointer-events:none;opacity:var(--copy-opacity,0)}
+.monitor-sticky{height:100svh;position:sticky;top:0;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(64px,9vh,90px) 0 8px}
+.monitor-heading.section-heading{position:relative;width:var(--site-rail,min(86%,1080px));max-width:1080px;margin:0 auto;z-index:2;pointer-events:none;opacity:var(--copy-opacity,0)}
 .monitor-heading [data-ripple], .monitor-heading .label-sticker{pointer-events:auto}
 .monitor-stage{position:absolute;inset:0;opacity:0}
 .monitor-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
@@ -4570,4 +4569,234 @@ html[data-theme='dark'] .research-note span { color: #554f47; }
 
 .monitor-cursor[data-clicking="true"] svg {
   transform: scale(0.84) translate(0.5px, 1.5px);
+}
+
+/* ==========================================================================
+   Unified Site-Wide Layout Rail & Spacing Rhythm
+   Keeps every section header, card, and container perfectly aligned on the
+   same centered 1080px / 86% rail (90% on small screens) with zero double padding.
+   ========================================================================== */
+:root {
+  --site-rail: min(86%, 1080px);
+  --site-gutter: max(7%, calc((100% - 1080px) / 2));
+}
+
+.hero {
+  padding-inline: var(--site-gutter);
+}
+
+.hero-bottom {
+  left: var(--site-gutter);
+  right: var(--site-gutter);
+}
+
+.about-editorial,
+.education-band,
+.experience,
+.projects,
+.showcase-section,
+.research-section,
+#freelance,
+.contact {
+  padding-inline: 0;
+}
+
+.about-editorial-inner,
+.stats-sticky-inner,
+.skills-city-header,
+.skills-orbit-top,
+.education-band > .section-wrap,
+.experience > .section-wrap,
+.experience .experience-wrap,
+.showcase-section .section-heading,
+.research-section > .section-wrap,
+.monitor-heading.section-heading,
+.monitor-caption,
+#freelance > .section-wrap,
+.contact > .section-wrap {
+  width: var(--site-rail);
+  max-width: 1080px;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+.section-heading {
+  gap: 24px 40px;
+}
+
+@media (min-width: 1500px) {
+  .hero {
+    padding-inline: var(--site-gutter);
+  }
+}
+
+@media (max-width: 800px) {
+  .showcase-section,
+  .research-section {
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --site-rail: min(90%, 1080px);
+    --site-gutter: 5%;
+  }
+  .hero {
+    padding-inline: var(--site-gutter);
+  }
+  .hero-bottom {
+    left: var(--site-gutter);
+    right: var(--site-gutter);
+  }
+  .about,
+  .about-editorial,
+  .education-band,
+  .experience,
+  .projects,
+  .showcase-section,
+  .research-section,
+  #freelance,
+  .contact {
+    padding-inline: 0;
+  }
+}
+
+/* ==========================================================================
+   Research Section — Tactile Writing Pad Top & Bottom Borders
+   Uses the exact same section palette (#e9e4d8 on #f4f0e6 in light mode,
+   #131729 on #0e1120 in dark mode) with spiral punch holes + tear perforation
+   at the top seam and a crisp serrated torn-pad edge at the bottom seam.
+   ========================================================================== */
+#research.research-section {
+  --pad-bg: #e9e4d8;
+  --pad-outer: var(--cream, #f4f0e6);
+  --pad-border: #cfc7b5;
+  --pad-ring: #b9b09c;
+  --pad-rule: rgba(16, 43, 121, 0.042);
+
+  position: relative;
+  border-top: 0;
+  border-bottom: 0;
+  background-color: var(--pad-bg);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 31px,
+    var(--pad-rule) 31px,
+    var(--pad-rule) 32px
+  );
+  background-position: 0 42px;
+  padding-top: clamp(64px, 6.2vw, 92px);
+  padding-bottom: clamp(56px, 5.6vw, 84px);
+}
+
+html[data-theme="dark"] #research.research-section {
+  --pad-bg: var(--night-2, #131729);
+  --pad-outer: var(--night, #0e1120);
+  --pad-border: #2a3354;
+  --pad-ring: #3d4973;
+  --pad-rule: rgba(255, 255, 255, 0.028);
+}
+
+/* Top seam: writing-pad binding strip, spiral wire ticks, punched holes & tear perforation */
+#research.research-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  z-index: 3;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 13px,
+      var(--pad-ring) 13px 15px,
+      transparent 15px 17px,
+      var(--pad-ring) 17px 19px,
+      transparent 19px 32px
+    ),
+    radial-gradient(
+      circle at 16px 17px,
+      var(--pad-outer) 0 4.6px,
+      var(--pad-border) 4.6px 5.6px,
+      transparent 5.8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--pad-border) 0 5px,
+      transparent 5px 10px
+    ),
+    linear-gradient(
+      to bottom,
+      var(--pad-outer) 0 7px,
+      var(--pad-border) 7px 8px,
+      var(--pad-bg) 8px 100%
+    );
+  background-size:
+    32px 13px,
+    32px 36px,
+    10px 1px,
+    100% 36px;
+  background-position:
+    0 0,
+    0 0,
+    0 32px,
+    0 0;
+  background-repeat:
+    repeat-x,
+    repeat-x,
+    repeat-x,
+    no-repeat;
+}
+
+/* Bottom seam: micro-perforation + serrated torn writing-pad paper edge */
+#research.research-section::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  z-index: 3;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      var(--pad-border) 0 5px,
+      transparent 5px 10px
+    ),
+    linear-gradient(
+      -45deg,
+      var(--pad-outer) 0 5.5px,
+      var(--pad-border) 5.5px 6.6px,
+      transparent 6.7px
+    ),
+    linear-gradient(
+      45deg,
+      var(--pad-outer) 0 5.5px,
+      var(--pad-border) 5.5px 6.6px,
+      transparent 6.7px
+    );
+  background-size:
+    10px 1px,
+    16px 12px,
+    16px 12px;
+  background-position:
+    0 2px,
+    0 10px,
+    0 10px;
+  background-repeat:
+    repeat-x,
+    repeat-x,
+    repeat-x;
+}
+
+@media (min-width: 1024px) and (min-height: 700px) {
+  #research.research-section {
+    padding-top: 58px;
+    padding-bottom: 50px;
+  }
 }

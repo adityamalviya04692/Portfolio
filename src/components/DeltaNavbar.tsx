@@ -377,6 +377,25 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
   const [logoFlipCount, setLogoFlipCount] = useState(0);
   const bounceTimer = useRef<number | null>(null);
 
+  // Liquid-pipe scroll fill refs (section-precise across left & right wings + tethered center buoy)
+  const leftWingRef = useRef<HTMLDivElement>(null);
+  const rightWingRef = useRef<HTMLDivElement>(null);
+  const leftBackRef = useRef<SVGPathElement>(null);
+  const leftFrontRef = useRef<SVGPathElement>(null);
+  const leftSlashRef = useRef<SVGPathElement>(null);
+  const leftDrop1Ref = useRef<SVGCircleElement>(null);
+  const leftDrop2Ref = useRef<SVGCircleElement>(null);
+  const leftSubmergedRef = useRef<HTMLDivElement>(null);
+
+  const rightBackRef = useRef<SVGPathElement>(null);
+  const rightFrontRef = useRef<SVGPathElement>(null);
+  const rightSlashRef = useRef<SVGPathElement>(null);
+  const rightDrop1Ref = useRef<SVGCircleElement>(null);
+  const rightDrop2Ref = useRef<SVGCircleElement>(null);
+  const rightSubmergedRef = useRef<HTMLDivElement>(null);
+
+  const logoBuoyRef = useRef<HTMLDivElement>(null);
+
   const triggerBurst = (id: string) => {
     setBurstKey((prev) => ({ id, count: prev.count + 1 }));
   };
@@ -398,6 +417,352 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Section-aligned liquid-pipe progress + bold shallow-water wave physics that settle calm when idle
+  useEffect(() => {
+    const measureLinkSpans = (wingEl: HTMLDivElement | null, count: number): Array<[number, number]> => {
+      const fallback: Array<[number, number]> = Array.from({ length: count }, (_, i) => [i / count, (i + 1) / count]);
+      if (!wingEl) return fallback;
+      const wRect = wingEl.getBoundingClientRect();
+      if (wRect.width < 20) return fallback;
+      const links = Array.from(wingEl.querySelectorAll<HTMLAnchorElement>("a.delta-nav-link"));
+      if (links.length !== count) return fallback;
+      return links.map((a) => {
+        const r = a.getBoundingClientRect();
+        return [
+          Math.max(0, Math.min(1, (r.left - wRect.left) / wRect.width)),
+          Math.max(0, Math.min(1, (r.right - wRect.left) / wRect.width)),
+        ];
+      });
+    };
+
+    // Maps current scrollY precisely to each section's exact visual span in the left & right wings
+    const getSectionAlignedFill = (): { left: number; right: number; overall: number } => {
+      const y = window.scrollY;
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const offset = window.innerHeight * 0.28;
+
+      const ids = ["about", "experience", "projects", "research", "freelance", "contact"];
+      const rawTops = ids.map((id) => {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        return Math.max(0, el.getBoundingClientRect().top + y - offset);
+      });
+
+      if (rawTops.some((t) => t === null)) {
+        const p = Math.max(0, Math.min(1, y / maxScroll));
+        return { left: Math.max(0, Math.min(1, p / 0.5)), right: Math.max(0, Math.min(1, (p - 0.5) / 0.5)), overall: p };
+      }
+
+      const tops = rawTops as number[];
+      for (let i = 1; i < tops.length; i++) {
+        if (tops[i] <= tops[i - 1] + 20) tops[i] = tops[i - 1] + 20;
+      }
+      const endScroll = Math.max(maxScroll, tops[5] + 40);
+
+      const leftSpans = measureLinkSpans(leftWingRef.current, 3);
+      const rightSpans = measureLinkSpans(rightWingRef.current, 3);
+
+      let left = 0;
+      let right = 0;
+      const lerp = (a: number, b: number, t: number) => a + (b - a) * Math.max(0, Math.min(1, t));
+
+      if (y < tops[0]) {
+        left = lerp(0, leftSpans[0][0], y / Math.max(1, tops[0]));
+      } else if (y < tops[1]) {
+        left = lerp(leftSpans[0][0], leftSpans[0][1], (y - tops[0]) / Math.max(1, tops[1] - tops[0]));
+      } else if (y < tops[2]) {
+        left = lerp(leftSpans[0][1], leftSpans[1][1], (y - tops[1]) / Math.max(1, tops[2] - tops[1]));
+      } else if (y < tops[3]) {
+        left = lerp(leftSpans[1][1], 1, (y - tops[2]) / Math.max(1, tops[3] - tops[2]));
+      } else if (y < tops[4]) {
+        left = 1;
+        right = lerp(0, rightSpans[0][1], (y - tops[3]) / Math.max(1, tops[4] - tops[3]));
+      } else if (y < tops[5]) {
+        left = 1;
+        right = lerp(rightSpans[0][1], rightSpans[1][1], (y - tops[4]) / Math.max(1, tops[5] - tops[4]));
+      } else {
+        left = 1;
+        right = lerp(rightSpans[1][1], 1, (y - tops[5]) / Math.max(1, endScroll - tops[5]));
+      }
+
+      return { left, right, overall: (left + right) * 0.5 };
+    };
+
+    const N = 16; // 17 smooth surface nodes across the 46px pipe height
+    const makeSurface = () => ({
+      h: new Float32Array(N + 1),
+      v: new Float32Array(N + 1),
+    });
+    const leftSurf = makeSurface();
+    const rightSurf = makeSurface();
+
+    const init = getSectionAlignedFill();
+    let targetLeft = init.left;
+    let targetRight = init.right;
+    let fillLeft = init.left;
+    let fillRight = init.right;
+    let velLeft = 0;
+    let velRight = 0;
+    let prevVelLeft = 0;
+    let prevVelRight = 0;
+    let surge = 0;
+    let calmFactor = 0;
+    let lastY = window.scrollY;
+    let lastScrollTime = 0;
+    let phase = 0;
+    let lastTime = performance.now();
+    let rafId = 0;
+
+    const stepSurface = (
+      surf: { h: Float32Array; v: Float32Array },
+      dt: number,
+      accelImpulse: number,
+      activeEnergy: number,
+      phaseOffset: number,
+    ) => {
+      const k = 34;
+      const damping = activeEnergy < 0.03 ? 6.8 : 2.65;
+      const spread = 130;
+      const nextH = new Float32Array(N + 1);
+      const ph = phase + phaseOffset;
+
+      for (let i = 0; i <= N; i++) {
+        const f = i / N;
+        const sloshDrive = (0.5 - f) * accelImpulse * 2.4;
+        const primaryWave = Math.sin(f * Math.PI * 2.15 - ph * 2.75) * activeEnergy * 4.4;
+        const secondaryWave = Math.cos(f * Math.PI * 3.8 + ph * 1.9) * activeEnergy * 1.65;
+        const left = i > 0 ? surf.h[i - 1] : surf.h[i];
+        const right = i < N ? surf.h[i + 1] : surf.h[i];
+        const laplacian = left + right - 2 * surf.h[i];
+
+        const acc = -k * surf.h[i] + spread * laplacian + sloshDrive + (primaryWave + secondaryWave) * 14;
+        surf.v[i] = (surf.v[i] + acc * dt) * Math.exp(-damping * dt);
+        let next = surf.h[i] + surf.v[i] * dt;
+        if (activeEnergy < 0.01 && Math.abs(next) < 0.03 && Math.abs(surf.v[i]) < 0.03) {
+          next = 0;
+          surf.v[i] = 0;
+        }
+        nextH[i] = Math.max(-8.8, Math.min(8.8, next));
+      }
+      surf.h.set(nextH);
+    };
+
+    const updateWing = (
+      localP: number,
+      surf: { h: Float32Array; v: Float32Array },
+      backEl: SVGPathElement | null,
+      frontEl: SVGPathElement | null,
+      slashEl: SVGPathElement | null,
+      drop1El: SVGCircleElement | null,
+      drop2El: SVGCircleElement | null,
+      submergedEl: HTMLDivElement | null,
+      phaseOffset: number,
+      activeEnergy: number,
+    ) => {
+      const clamped = Math.max(0, Math.min(1, localP));
+      if (clamped <= 0.001) {
+        if (backEl) backEl.setAttribute("d", "");
+        if (frontEl) frontEl.setAttribute("d", "");
+        if (slashEl) slashEl.setAttribute("opacity", "0");
+        if (drop1El) drop1El.setAttribute("opacity", "0");
+        if (drop2El) drop2El.setAttribute("opacity", "0");
+        if (submergedEl) submergedEl.style.clipPath = "inset(0 100% 0 0)";
+        return;
+      }
+      if (clamped >= 0.999) {
+        const full = "M 0 0 L 100 0 L 100 46 L 0 46 Z";
+        if (backEl) backEl.setAttribute("d", full);
+        if (frontEl) frontEl.setAttribute("d", full);
+        if (slashEl) slashEl.setAttribute("opacity", "0");
+        if (drop1El) drop1El.setAttribute("opacity", "0");
+        if (drop2El) drop2El.setAttribute("opacity", "0");
+        if (submergedEl) submergedEl.style.clipPath = "inset(0 0% 0 0)";
+        return;
+      }
+
+      const baseX = clamped * 100;
+      const edgeTaper = Math.sin(clamped * Math.PI);
+      const scale = reduced ? 0 : 0.62 + 0.38 * edgeTaper;
+      const ph = phase + phaseOffset;
+
+      const frontPts: [number, number][] = [];
+      const backPts: [number, number][] = [];
+      for (let i = 0; i <= N; i++) {
+        const f = i / N;
+        const y = f * 46;
+        const restMeniscus = Math.sin(f * Math.PI) * -0.45 * edgeTaper;
+        const liveCrest =
+          (Math.sin(f * Math.PI * 2.1 - ph * 2.65) * 3.1 + Math.cos(f * Math.PI * 3.6 + ph * 1.9) * 1.15) *
+          activeEnergy;
+        const dxFront = (surf.h[i] * 0.72 + liveCrest) * scale + restMeniscus;
+        const dxBack =
+          (surf.h[i] * 0.55 + Math.sin(f * Math.PI * 1.95 - ph * 2.05 + 1.45) * activeEnergy * 4.4) * scale +
+          activeEnergy * 3.2 * edgeTaper +
+          restMeniscus;
+        frontPts.push([Math.max(0, Math.min(100, baseX + dxFront)), y]);
+        backPts.push([Math.max(0, Math.min(100, baseX + dxBack)), y]);
+      }
+
+      const buildSmoothArea = (pts: [number, number][]) => {
+        let d = `M 0 0 L ${pts[0][0].toFixed(2)} 0`;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const mx = (pts[i][0] + pts[i + 1][0]) * 0.5;
+          const my = (pts[i][1] + pts[i + 1][1]) * 0.5;
+          d += ` Q ${pts[i][0].toFixed(2)} ${pts[i][1].toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+        }
+        const last = pts[pts.length - 1];
+        d += ` L ${last[0].toFixed(2)} 46 L 0 46 Z`;
+        return d;
+      };
+
+      if (backEl) backEl.setAttribute("d", buildSmoothArea(backPts));
+      if (frontEl) frontEl.setAttribute("d", buildSmoothArea(frontPts));
+
+      if (slashEl) {
+        const slashAlpha = reduced ? 0 : Math.min(0.62, activeEnergy * 0.52) * edgeTaper;
+        if (slashAlpha > 0.015) {
+          const sx = Math.max(4, baseX - 3.6 + Math.sin(ph * 1.5) * 1.8);
+          const dSlash = `M ${(sx - 5.2).toFixed(1)} 46 L ${(sx + 1.8).toFixed(1)} 0 L ${(sx + 4.8).toFixed(1)} 0 L ${(sx - 2.2).toFixed(1)} 46 Z`;
+          slashEl.setAttribute("d", dSlash);
+          slashEl.setAttribute("opacity", slashAlpha.toFixed(2));
+        } else {
+          slashEl.setAttribute("opacity", "0");
+        }
+      }
+
+      const dropAlpha = reduced ? 0 : Math.min(0.82, Math.max(0, (activeEnergy - 0.16) * 1.15)) * edgeTaper;
+      if (drop1El) {
+        drop1El.setAttribute("cx", Math.min(99, baseX + 2.8 + activeEnergy * 3.8).toFixed(2));
+        drop1El.setAttribute("cy", (13 + Math.sin(ph * 2.5) * 5.5).toFixed(2));
+        drop1El.setAttribute("r", (1.15 + activeEnergy * 0.68).toFixed(2));
+        drop1El.setAttribute("opacity", dropAlpha.toFixed(2));
+      }
+      if (drop2El) {
+        drop2El.setAttribute("cx", Math.min(99, baseX + 2.0 + activeEnergy * 2.9).toFixed(2));
+        drop2El.setAttribute("cy", (31 + Math.cos(ph * 2.1) * 5.5).toFixed(2));
+        drop2El.setAttribute("r", (0.95 + activeEnergy * 0.54).toFixed(2));
+        drop2El.setAttribute("opacity", (dropAlpha * 0.78).toFixed(2));
+      }
+
+      if (submergedEl) {
+        const poly = [
+          "0% 0%",
+          ...frontPts.map(([px, py]) => `${px.toFixed(2)}% ${((py / 46) * 100).toFixed(1)}%`),
+          "0% 100%",
+        ].join(", ");
+        submergedEl.style.clipPath = `polygon(${poly})`;
+      }
+    };
+
+    const onScrollLiquid = () => {
+      const y = window.scrollY;
+      const dy = y - lastY;
+      lastY = y;
+      lastScrollTime = performance.now();
+      const next = getSectionAlignedFill();
+      targetLeft = next.left;
+      targetRight = next.right;
+      if (!reduced) {
+        surge = Math.min(1.65, surge + Math.min(0.62, Math.abs(dy) * 0.014));
+        calmFactor = 1;
+      }
+    };
+
+    window.addEventListener("scroll", onScrollLiquid, { passive: true });
+    window.addEventListener("resize", onScrollLiquid, { passive: true });
+
+    const tick = (now: number) => {
+      const dt = Math.min(0.032, Math.max(0.004, (now - lastTime) / 1000));
+      lastTime = now;
+
+      let accelLeft = 0;
+      let accelRight = 0;
+      if (reduced) {
+        fillLeft = targetLeft;
+        fillRight = targetRight;
+        velLeft = 0;
+        velRight = 0;
+        surge = 0;
+        calmFactor = 0;
+      } else {
+        prevVelLeft = velLeft;
+        prevVelRight = velRight;
+        velLeft = (velLeft + (targetLeft - fillLeft) * 68 * dt) * Math.exp(-10.2 * dt);
+        velRight = (velRight + (targetRight - fillRight) * 68 * dt) * Math.exp(-10.2 * dt);
+        fillLeft = Math.max(0, Math.min(1, fillLeft + velLeft * dt));
+        fillRight = Math.max(0, Math.min(1, fillRight + velRight * dt));
+        accelLeft = Math.max(-36, Math.min(36, ((velLeft - prevVelLeft) / dt) * 0.7 + velLeft * 26));
+        accelRight = Math.max(-36, Math.min(36, ((velRight - prevVelRight) / dt) * 0.7 + velRight * 26));
+        surge = Math.max(0, surge * Math.exp(-2.6 * dt));
+
+        const idleMs = now - lastScrollTime;
+        if (idleMs > 450 && Math.abs(velLeft) < 0.004 && Math.abs(velRight) < 0.004) {
+          calmFactor = Math.max(0, calmFactor * Math.exp(-2.8 * dt));
+          if (calmFactor < 0.005) calmFactor = 0;
+        }
+        phase += dt * (2.4 + surge * 5.2) * Math.max(0.12, calmFactor);
+      }
+
+      const activeEnergy = Math.min(1.6, (surge + (Math.abs(velLeft) + Math.abs(velRight)) * 3.8) * calmFactor);
+      if (!reduced) {
+        stepSurface(leftSurf, dt, accelLeft, activeEnergy, 0);
+        stepSurface(rightSurf, dt, accelRight, activeEnergy, 1.5);
+      }
+
+      updateWing(
+        fillLeft,
+        leftSurf,
+        leftBackRef.current,
+        leftFrontRef.current,
+        leftSlashRef.current,
+        leftDrop1Ref.current,
+        leftDrop2Ref.current,
+        leftSubmergedRef.current,
+        0,
+        activeEnergy,
+      );
+      updateWing(
+        fillRight,
+        rightSurf,
+        rightBackRef.current,
+        rightFrontRef.current,
+        rightSlashRef.current,
+        rightDrop1Ref.current,
+        rightDrop2Ref.current,
+        rightSubmergedRef.current,
+        1.5,
+        activeEnergy,
+      );
+
+      // Center am. logo moves ONLY when the liquid wave actually passes through the center from left to right
+      if (logoBuoyRef.current) {
+        const passingCenter = fillLeft >= 0.88 && fillRight <= 0.24;
+        if (reduced || !passingCenter || activeEnergy < 0.02) {
+          logoBuoyRef.current.style.transform = "translate3d(0, 0, 0) rotate(0deg)";
+        } else {
+          // Smooth bell curve peaking right as fluid bridges left -> logo -> right
+          const leftEntry = Math.min(1, (fillLeft - 0.88) / 0.12);
+          const rightExit = Math.min(1, (0.24 - fillRight) / 0.24);
+          const passStrength = Math.min(leftEntry, rightExit);
+          const bobStrength = Math.min(1, activeEnergy * passStrength * 1.15);
+          const bx = Math.sin(phase * 1.25) * 2.0 * bobStrength;
+          const by = Math.cos(phase * 1.7) * -3.0 * bobStrength;
+          const rot = Math.sin(phase * 1.4) * 3.8 * bobStrength;
+          logoBuoyRef.current.style.transform = `translate3d(${bx.toFixed(2)}px, ${by.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg)`;
+        }
+      }
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScrollLiquid);
+      window.removeEventListener("resize", onScrollLiquid);
+    };
+  }, [reduced]);
 
   useEffect(() => {
     return () => {
@@ -471,8 +836,9 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
 
         {/* Center Unified Split-Wing Assembly + Flush Circular "am." Logo Dock */}
         <nav className="delta-center-assembly" aria-label="Main navigation">
-          {/* Left Glass Wing unfurls outward from behind the docked circular am. logo */}
+          {/* Left Glass Wing — section-aligned liquid-filling pipe with pixel-precise submerged text overlay */}
           <motion.div
+            ref={leftWingRef}
             className="delta-wing delta-wing-left"
             initial={reduced ? false : { opacity: 0, x: 56, scaleX: 0.58 }}
             animate={
@@ -482,9 +848,22 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
             }
             transition={wingSpring}
           >
+            <svg className="delta-pipe-svg" viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="delta-liquid-grad-l" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="var(--delta-liquid-a)" />
+                  <stop offset="100%" stopColor="var(--delta-liquid-b)" />
+                </linearGradient>
+              </defs>
+              <path ref={leftBackRef} className="delta-liquid-back" />
+              <path ref={leftFrontRef} fill="url(#delta-liquid-grad-l)" className="delta-liquid-front" />
+              <path ref={leftSlashRef} className="delta-liquid-slash" opacity="0" />
+              <circle ref={leftDrop1Ref} className="delta-liquid-drop" cx="0" cy="14" r="1.4" opacity="0" />
+              <circle ref={leftDrop2Ref} className="delta-liquid-drop" cx="0" cy="30" r="1.1" opacity="0" />
+            </svg>
+
             {LEFT_NAV.map((item, idx) => {
               const isActive = active === item.id;
-              // Radiate outward from center: Projects (0) -> Experience (1) -> About (2)
               const staggerOrder = LEFT_NAV.length - 1 - idx;
               return (
                 <motion.a
@@ -506,17 +885,6 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                         }
                   }
                 >
-                  {isActive && (
-                    <motion.span
-                      className="delta-nav-active-pill"
-                      layoutId="delta-nav-pill"
-                      transition={
-                        reduced
-                          ? { duration: 0 }
-                          : { type: "spring", stiffness: 360, damping: 30, mass: 0.75 }
-                      }
-                    />
-                  )}
                   {burstKey.id === item.id && (
                     <span key={burstKey.count} className="delta-click-burst" aria-hidden="true" />
                   )}
@@ -529,11 +897,19 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                 </motion.a>
               );
             })}
+
+            {/* Pixel-aligned submerged text layer clipped to the exact live wavy liquid meniscus */}
+            <div ref={leftSubmergedRef} className="delta-wing-submerged delta-wing-submerged-left" aria-hidden="true">
+              {LEFT_NAV.map((item) => (
+                <span key={item.id} className={`delta-nav-link-ghost ${active === item.id ? "is-active" : ""}`}>
+                  {item.label}
+                </span>
+              ))}
+            </div>
           </motion.div>
 
-          {/* Center Circular "am." Logo Dock — exact pixel landing target for the flying medallion */}
+          {/* Center Circular "am." Logo Dock — tethered buoy that subtly rides emerging waves */}
           <div className="delta-logo-slot" id="delta-logo-dock">
-            {/* Kinetic landing halo right when the flying medallion docks in the navbar */}
             {introPhase === "docking" && !reduced && (
               <motion.span
                 className="delta-dock-ripple"
@@ -544,6 +920,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
               />
             )}
             <div
+              ref={logoBuoyRef}
               className="delta-logo-flight-wrap"
               style={{ opacity: dockReady || reduced ? 1 : 0 }}
             >
@@ -579,8 +956,9 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
             </div>
           </div>
 
-          {/* Right Glass Wing unfurls outward symmetrically from behind the circular am. logo */}
+          {/* Right Glass Wing — section-aligned liquid-filling pipe with pixel-precise submerged text overlay */}
           <motion.div
+            ref={rightWingRef}
             className="delta-wing delta-wing-right"
             initial={reduced ? false : { opacity: 0, x: -56, scaleX: 0.58 }}
             animate={
@@ -590,6 +968,20 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
             }
             transition={wingSpring}
           >
+            <svg className="delta-pipe-svg" viewBox="0 0 100 46" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="delta-liquid-grad-r" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="var(--delta-liquid-b)" />
+                  <stop offset="100%" stopColor="var(--delta-liquid-c)" />
+                </linearGradient>
+              </defs>
+              <path ref={rightBackRef} className="delta-liquid-back" />
+              <path ref={rightFrontRef} fill="url(#delta-liquid-grad-r)" className="delta-liquid-front" />
+              <path ref={rightSlashRef} className="delta-liquid-slash" opacity="0" />
+              <circle ref={rightDrop1Ref} className="delta-liquid-drop" cx="0" cy="14" r="1.4" opacity="0" />
+              <circle ref={rightDrop2Ref} className="delta-liquid-drop" cx="0" cy="30" r="1.1" opacity="0" />
+            </svg>
+
             {RIGHT_NAV.map((item, idx) => {
               const isActive = active === item.id;
               return (
@@ -612,17 +1004,6 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                         }
                   }
                 >
-                  {isActive && (
-                    <motion.span
-                      className="delta-nav-active-pill"
-                      layoutId="delta-nav-pill"
-                      transition={
-                        reduced
-                          ? { duration: 0 }
-                          : { type: "spring", stiffness: 360, damping: 30, mass: 0.75 }
-                      }
-                    />
-                  )}
                   {burstKey.id === item.id && (
                     <span key={burstKey.count} className="delta-click-burst" aria-hidden="true" />
                   )}
@@ -635,6 +1016,15 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                 </motion.a>
               );
             })}
+
+            {/* Pixel-aligned submerged text layer clipped to the exact live wavy liquid meniscus */}
+            <div ref={rightSubmergedRef} className="delta-wing-submerged delta-wing-submerged-right" aria-hidden="true">
+              {RIGHT_NAV.map((item) => (
+                <span key={item.id} className={`delta-nav-link-ghost ${active === item.id ? "is-active" : ""}`}>
+                  {item.label}
+                </span>
+              ))}
+            </div>
           </motion.div>
         </nav>
 

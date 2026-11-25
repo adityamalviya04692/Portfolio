@@ -8,7 +8,8 @@
   position: relative;
   z-index: 6;
   border-radius: 0 0 48px 48px;
-  overflow: hidden;
+  padding-bottom: clamp(28px, 3.2vw, 44px);
+  overflow-x: clip;
 }
 
 .skills-showcase {
@@ -194,7 +195,9 @@ html[data-theme="dark"] .skills-orbit-layer {
 .skills-orbit-top {
   position: relative;
   z-index: 25;
-  width: min(88%, 1120px);
+  width: min(86%, 1080px);
+  max-width: 1080px;
+  margin-inline: auto;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -625,7 +628,7 @@ html[data-theme="dark"] .skills-cat-option:hover {
 .education-band {
   background: var(--section-blue, #102b79);
   color: var(--cream, #f4f0e6);
-  padding: 0 7% 36px;
+  padding: 0 0 36px;
   margin-top: -12px;
   overflow-x: clip;
 }

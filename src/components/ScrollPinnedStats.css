@@ -1,0 +1,260 @@
+/* ==========================================================================
+   Compact Bilt-Inspired Rolling Odometer Metrics Band + Attio-Style Scroll Graph
+   - Cards lifted higher under About bio/photo.
+   - 35–42° slanted exponential graph extends all the way down to the rounded
+     bottom edge of the blue #about section.
+   ========================================================================== */
+
+/* Flush bottom on #about so the Attio watermark hatch fills cleanly to the rounded edge */
+#about.about.blue-section:has(.stats-scroll-band) {
+  padding-bottom: 0;
+  overflow: clip;
+}
+
+.stats-scroll-band {
+  position: relative;
+  width: 100%;
+  margin-top: clamp(4px, 0.8vw, 12px);
+  padding: clamp(8px, 1vw, 14px) 0 clamp(46px, 5.2vw, 68px);
+  overflow: visible;
+  isolation: isolate;
+}
+
+/* Full-bleed subtle Attio-style slanted exponential graph extending to the very bottom of #about */
+.stats-attio-bg {
+  position: absolute;
+  top: clamp(-170px, -13vw, -110px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.stats-attio-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.stats-attio-hatch-line {
+  stroke: rgba(255, 255, 255, 0.065);
+  stroke-width: 1;
+}
+
+.stats-attio-wash-top {
+  stop-color: #f2bd83;
+  stop-opacity: 0.06;
+}
+
+.stats-attio-wash-bottom {
+  stop-color: #9dc2ff;
+  stop-opacity: 0.012;
+}
+
+.stats-attio-stroke {
+  stroke: rgba(242, 189, 131, 0.38);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+/* Leading vertical progress guide line dropping from the active curve tip */
+.stats-attio-pointer-line {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    rgba(242, 189, 131, 0.58) 0%,
+    rgba(242, 189, 131, 0.16) 65%,
+    rgba(242, 189, 131, 0.03) 100%
+  );
+  opacity: 0;
+  will-change: left, top, opacity;
+}
+
+/* Crisp circular pointer riding on the front tip of the advancing curve */
+.stats-attio-pointer-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f2bd83;
+  box-shadow: 0 0 0 4px rgba(242, 189, 131, 0.22);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  will-change: left, top, opacity;
+}
+
+html[data-theme="dark"] .stats-attio-hatch-line {
+  stroke: rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="dark"] .stats-attio-wash-top {
+  stop-color: #f2bd83;
+  stop-opacity: 0.048;
+}
+
+html[data-theme="dark"] .stats-attio-stroke {
+  stroke: rgba(242, 189, 131, 0.32);
+}
+
+html[data-theme="dark"] .stats-attio-pointer-dot {
+  background: #f2bd83;
+  box-shadow: 0 0 0 4px rgba(242, 189, 131, 0.18);
+}
+
+.stats-sticky-inner {
+  position: relative;
+  z-index: 1;
+  width: var(--site-rail, min(86%, 1080px));
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.stats-bilt-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(10px, 1.3vw, 16px);
+}
+
+.stats-bilt-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(12px, 1.4vw, 18px);
+  min-height: clamp(102px, 9.5vw, 122px);
+  padding: clamp(14px, 1.5vw, 19px) clamp(14px, 1.6vw, 20px);
+  border-radius: clamp(16px, 1.7vw, 22px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(16, 43, 121, 0.42);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
+}
+
+.stats-bilt-card:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(16, 43, 121, 0.56);
+  transform: translateY(-2px);
+}
+
+html[data-theme="dark"] .stats-bilt-card {
+  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(11, 23, 57, 0.48);
+}
+
+html[data-theme="dark"] .stats-bilt-card:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(11, 23, 57, 0.64);
+}
+
+.stats-bilt-value {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  row-gap: 2px;
+  font-family: "DM Sans", sans-serif;
+  font-size: clamp(22px, 2.1vw, 30px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #f2bd83;
+  font-variant-numeric: tabular-nums;
+  text-shadow: none;
+}
+
+.bilt-digit-viewport {
+  display: inline-block;
+  height: 1.12em;
+  line-height: 1.12em;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.stats-bilt-grid.is-rolling .bilt-digit-viewport {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 14%,
+    #000 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 14%,
+    #000 86%,
+    transparent 100%
+  );
+}
+
+.bilt-digit-strip {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.bilt-digit-cell {
+  display: block;
+  height: 1.12em;
+  line-height: 1.12em;
+  text-align: center;
+}
+
+.bilt-symbol {
+  display: inline-block;
+  line-height: 1.12em;
+}
+
+.bilt-unit {
+  display: inline-block;
+  margin-left: 0.18em;
+  font-size: 0.6em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+  color: rgba(242, 189, 131, 0.92);
+  white-space: nowrap;
+}
+
+.stats-bilt-label {
+  margin: 0;
+  font-size: clamp(10.5px, 0.88vw, 12px);
+  line-height: 1.4;
+  color: rgba(228, 234, 248, 0.84);
+  max-width: 24ch;
+}
+
+@media (max-width: 960px) {
+  .stats-bilt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stats-bilt-card {
+    min-height: 98px;
+  }
+}
+
+@media (max-width: 560px) {
+  .stats-attio-bg {
+    top: -80px;
+  }
+  .stats-bilt-grid {
+    gap: 10px;
+  }
+  .stats-bilt-card {
+    min-height: 90px;
+    padding: 12px 13px;
+    border-radius: 15px;
+    gap: 8px;
+  }
+  .stats-bilt-value {
+    font-size: clamp(20px, 5.4vw, 25px);
+  }
+  .stats-bilt-label {
+    font-size: 10.5px;
+  }
+}

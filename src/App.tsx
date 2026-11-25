@@ -26,6 +26,8 @@ import AboutEditorial from "./components/AboutEditorial";
 import SkillsPanel from "./components/SkillsPanel";
 import SkillsShowcase from "./components/SkillsShowcase";
 import ProjectGallery from "./components/ProjectGallery";
+import ScrollPinnedStats from "./components/ScrollPinnedStats";
+import { SectionWatermarkCards, VaultSticker } from "./components/VaultSectionBadge";
 import {
   Accordion,
   Counter,
@@ -42,6 +44,85 @@ const profile = data.profile,
   email = `mailto:${profile.social.email}`;
 const moriveda = data.projects.find((project) => project.id === "moriveda")!;
 const skillProjects = data.projects.filter((project) => project.id !== "moriveda");
+
+function MorivedaTypewriter({ reduced }: { reduced: boolean }) {
+  const fullText = "moriveda.in";
+  const hostRef = useRef<HTMLHeadingElement>(null);
+  const [shown, setShown] = useState(reduced ? fullText.length : 0);
+  const [runId, setRunId] = useState(0);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (reduced) {
+      setShown(fullText.length);
+      return;
+    }
+    const el = hostRef.current;
+    if (!el || !("IntersectionObserver" in window)) {
+      setInView(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [reduced]);
+
+  useEffect(() => {
+    if (reduced || !inView) return;
+    setShown(0);
+    let idx = 0;
+    let timer = 0;
+    const step = () => {
+      idx += 1;
+      setShown(idx);
+      if (idx < fullText.length) {
+        // Realistic website typing cadence with a tiny beat before the domain extension
+        const delay = fullText[idx] === "." ? 190 : 95 + ((idx * 23) % 45);
+        timer = window.setTimeout(step, delay);
+      }
+    };
+    timer = window.setTimeout(step, 220);
+    return () => window.clearTimeout(timer);
+  }, [inView, runId, reduced]);
+
+  const typed = fullText.slice(0, shown);
+  const dotIdx = typed.indexOf(".");
+  const base = dotIdx >= 0 ? typed.slice(0, dotIdx) : typed;
+  const tld = dotIdx >= 0 ? typed.slice(dotIdx) : "";
+
+  return (
+    <h3
+      ref={hostRef}
+      className="moriveda-typewriter"
+      aria-label="moriveda.in"
+      onClick={() => !reduced && setRunId((n) => n + 1)}
+      onPointerEnter={(e) => {
+        if (e.pointerType === "mouse" && !reduced && shown === fullText.length) {
+          setRunId((n) => n + 1);
+        }
+      }}
+    >
+      <span className="moriveda-ghost" aria-hidden="true">
+        moriveda<span className="orange">.in</span>
+      </span>
+      <span className="moriveda-typed" aria-hidden="true">
+        <span>
+          {base}
+          {tld && <span className="orange">{tld}</span>}
+        </span>
+        {!reduced && <span className="moriveda-caret" />}
+      </span>
+    </h3>
+  );
+}
 
 function Portfolio() {
   const [activeVideo, setActiveVideo] = useState({ id: "", request: 0, explore: false });
@@ -148,7 +229,7 @@ function Portfolio() {
       <PortfolioCursor />
       <HeadingRipples />
       <DeltaNavbar
-        active={active}
+        active={active === "skills" || active === "education" ? "about" : active}
         email={email}
         onBlue={["about", "education", "experience", "contact"].includes(active)}
       />
@@ -242,19 +323,9 @@ function Portfolio() {
           </section>
         </HeroFrame>
         <section id="about" className="about blue-section">
+          <SectionWatermarkCards section="about" tone="blue" />
           <AboutEditorial onIntro={(trigger) => playProject("intro", trigger)} />
-          <div className="section-wrap">
-            <div className="stats">
-              {data.stats.map((stat, i) => (
-                <Reveal key={stat.label} delay={i * 0.08}>
-                  <strong>
-                    <Counter value={stat.value} />
-                  </strong>
-                  <span>{stat.label}</span>
-                </Reveal>
-              ))}
-            </div>
-          </div>
+          <ScrollPinnedStats stats={data.stats} />
         </section>
         {!reduced && <SkillsShowcase />}
         <section id={reduced ? "skills" : "education"} className="education-band blue-section" aria-label={reduced ? "Skills, education and certifications" : "Education and certifications"}>
@@ -288,10 +359,11 @@ function Portfolio() {
         </section>
         <ExperienceTimeline />
         <section id="projects" className="projects showcase-section" aria-labelledby="projects-heading">
+          <SectionWatermarkCards section="projects" tone="light" />
           <div className="section-wrap">
             <Reveal className="section-heading">
               <div>
-                <Scramble className="label-sticker" text="PERSONAL PROJECTS" />
+                <VaultSticker text="PERSONAL PROJECTS" />
                 <h2 id="projects-heading"><RippleWords text="Built to explore" suffix={<span className="orange">.</span>} /></h2>
               </div>
               <p>Tools I built to explore reel-first search, orchestration, <br />document AI, data quality, pipeline design, Spark diagnostics and SQL.</p>
@@ -300,9 +372,10 @@ function Portfolio() {
           </div>
         </section>
         <section id="research" className="research-section" aria-labelledby="research-heading" onMouseLeave={() => setActiveResearchNote(null)}>
+          <SectionWatermarkCards section="research" tone="light" />
           <div className="section-wrap">
             <Reveal className="section-heading">
-              <div><Scramble className="label-sticker" text="INDEPENDENT RESEARCH" /><h2 id="research-heading"><RippleWords text="Built on evidence" suffix={<span className="orange">.</span>} /></h2></div>
+              <div><VaultSticker text="INDEPENDENT RESEARCH" /><h2 id="research-heading"><RippleWords text="Built on evidence" suffix={<span className="orange">.</span>} /></h2></div>
               <p>Testing the assumptions behind <br />Spark performance tuning.</p>
             </Reveal>
             <Reveal>
@@ -372,9 +445,10 @@ function Portfolio() {
           </div>
         </section>
         <section id="freelance" className="projects freelance-section">
+          <SectionWatermarkCards section="freelance" tone="light" />
           <div className="monitor-scene" data-reduced={reduced}>
             <div className="monitor-sticky">
-              <div className="monitor-heading section-heading"><div><Scramble className="label-sticker" text="INDEPENDENT WORK" /><h2><RippleWords text="Built end to end" suffix={<span className="orange">.</span>} /></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
+              <div className="monitor-heading section-heading"><div><VaultSticker text="INDEPENDENT WORK" /><h2><RippleWords text="Built end to end" suffix={<span className="orange">.</span>} /></h2></div><p>One brand. Every layer.<br/>From idea to a live storefront.</p></div>
               <div className="monitor-stage">
                 <img className="monitor-poster" loading="lazy" src={asset("monitor/turn/0.webp")} alt="Moriveda storefront monitor"/>
                 <div className="monitor-screen-overlay" id="screen-mouse-layer" role="button" tabIndex={0} aria-label="Interactive Moriveda storefront preview — click to switch pages">
@@ -415,9 +489,7 @@ function Portfolio() {
                     <div className="project-meta">
                       <span>SOLO FULL-STACK BUILD · MAY–JUN 2026</span>
                     </div>
-                    <h3>
-                      Moriveda<span className="orange">.</span>
-                    </h3>
+                    <MorivedaTypewriter reduced={reduced} />
                     <p>
                       A pan-India D2C commerce platform, built freelance for a
                       friend's wellness brand. I owned research, design, code,
@@ -467,9 +539,10 @@ function Portfolio() {
           </div>
         </section>
         <section id="contact" className="contact blue-section">
+          <SectionWatermarkCards section="contact" tone="blue" />
           <div className="section-wrap">
             <Reveal>
-              <Scramble className="label-sticker light" text="HAVE SOMETHING IN MIND?" />
+              <VaultSticker text="HAVE SOMETHING IN MIND?" light />
               <h2>
                 <RippleWords text="Let's work" />
                 <br />

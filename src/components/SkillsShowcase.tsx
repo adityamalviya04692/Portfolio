@@ -3,7 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import data from "../data/portfolio.json";
 import skillIcons from "../data/skillIcons.json";
 import { RippleWords } from "./HeadingRipples";
-import { Scramble, useMotionPreference } from "./MotionSystem";
+import { useMotionPreference } from "./MotionSystem";
+import { VaultSticker } from "./VaultSectionBadge";
+import { drawCityMicroEventsForBand } from "./skills-city/cityEvents";
 import type { LandmarkAtlas } from "./skills-city/landmarkAtlas";
 import "./SkillsShowcase.css";
 
@@ -260,8 +262,8 @@ function buildCityStructures(): Struct[] {
         hasSpire: !small && scaleH > 62 && rand() < 0.3,
         hasSolar: !small && rand() < 0.34,
         hasBillboard: !small && scaleH > 34 && rand() < 0.16,
-        hasRoofGarden: !small && rand() < 0.24,
-        trees: rand() < 0.4 ? 1 : 0,
+        hasRoofGarden: !small && rand() < 0.28,
+        trees: rand() < 0.72 ? (rand() < 0.38 ? 2 : 1) : 0,
         seed: rand(),
         palIdx: idx + Math.floor(rand() * 5),
       });
@@ -308,18 +310,29 @@ function buildCityStructures(): Struct[] {
     }
   }
 
-  // PASS 4: Avenue Street Trees & Sidewalk Hedge Planters lining every boulevard
-  for (let p = -15.5; p <= 15.5; p += 1.25) {
+  // PASS 4: Lush Avenue Street Trees, Benches & Planters lining BOTH sides of every boulevard + canal embankments
+  for (let p = -16.0; p <= 16.0; p += 0.84) {
     for (const ry of ROAD_Y) {
-      if (ROAD_X.some((rx) => Math.abs(p - rx) < 0.72)) continue;
+      if (ROAD_X.some((rx) => Math.abs(p - rx) < 0.68)) continue;
       structures.push({ kind: "street_foliage", gx: p, gy: ry + 0.36, w: 0.16, d: 0.16, h: 2, seed: rand(), palIdx: 5 });
+      structures.push({ kind: "street_foliage", gx: p + 0.42, gy: ry - 0.36, w: 0.16, d: 0.16, h: 2, seed: rand(), palIdx: 5 });
     }
     for (const rx of ROAD_X) {
-      if (ROAD_Y.some((ry) => Math.abs(p - ry) < 0.72)) continue;
+      if (ROAD_Y.some((ry) => Math.abs(p - ry) < 0.68)) continue;
       if (p > CANAL_Y0 - 0.5 && p < CANAL_Y1 + 0.5) continue;
       structures.push({ kind: "street_foliage", gx: rx - 0.36, gy: p, w: 0.16, d: 0.16, h: 2, seed: rand(), palIdx: 5 });
+      structures.push({ kind: "street_foliage", gx: rx + 0.36, gy: p + 0.42, w: 0.16, d: 0.16, h: 2, seed: rand(), palIdx: 5 });
     }
   }
+  // Waterfront canal promenade trees & benches + stadium plaza corner trees
+  for (let p = -15.5; p <= 15.5; p += 1.05) {
+    if (ROAD_X.some((rx) => Math.abs(p - rx) < 0.62)) continue;
+    structures.push({ kind: "street_foliage", gx: p, gy: CANAL_Y0 - 0.12, w: 0.14, d: 0.14, h: 2, seed: rand(), palIdx: 5 });
+    structures.push({ kind: "street_foliage", gx: p + 0.5, gy: CANAL_Y1 + 0.13, w: 0.14, d: 0.14, h: 2, seed: rand(), palIdx: 5 });
+  }
+  [[-1.32, -1.12], [1.32, -1.12], [-1.32, 1.02], [1.32, 1.02], [-1.34, 0.0], [1.34, 0.0]].forEach(([sx, sy]) => {
+    structures.push({ kind: "street_foliage", gx: sx, gy: sy, w: 0.16, d: 0.16, h: 2, seed: rand() * 0.45, palIdx: 5 });
+  });
 
   // 6 new distinct architectural logo buildings placed in the expanded right & left city districts.
   // Clear any overlapping generic blocks within their plazas so they stand out cleanly.
@@ -431,27 +444,116 @@ const CRANES = [
   { gx: 3.9, gy: 6.7, z: 48, speed: -0.00046, phase: 4.7 },
 ];
 
-const PEOPLE = Array.from({ length: 72 }, (_, i) => {
+const PEOPLE = Array.from({ length: 168 }, (_, i) => {
   const rand = mulberry32(200 + i * 29);
-  const horizontal = i % 2 === 0;
-  // Strictly centered on the paved sidewalk strips (±0.275 from road centerlines)
+  const isCanal = i >= 140;
+  const horizontal = isCanal ? true : i % 2 === 0;
   const lanesH = ROAD_Y.flatMap((ry) => [ry - 0.275, ry + 0.275]);
   const lanesV = ROAD_X.flatMap((rx) => [rx - 0.275, rx + 0.275]);
+  const canalLanes = [CANAL_Y0 - 0.16, CANAL_Y1 + 0.18];
   return {
     horizontal,
-    lane: horizontal ? lanesH[i % lanesH.length] : lanesV[i % lanesV.length],
+    lane: isCanal ? canalLanes[i % 2] : horizontal ? lanesH[i % lanesH.length] : lanesV[i % lanesV.length],
     pos: -14 + rand() * 28,
-    speed: (0.0065 + rand() * 0.0085) * (rand() < 0.5 ? 1 : -1),
-    coat: ["#ed8838", "#102b79", "#4b7b8b", "#d9534f", "#569674", "#b78152"][i % 6],
+    speed: (0.006 + rand() * 0.009) * (rand() < 0.5 ? 1 : -1),
+    coat: ["#ed8838", "#102b79", "#4b7b8b", "#d9534f", "#569674", "#b78152", "#f5c418", "#7c5cbf"][i % 8],
     hat: rand() < 0.35,
     phase: rand() * Math.PI * 2,
   };
 });
 
+// Mingling human gatherings on stadium plaza apron, Ferris wheel plaza, pond, landmark pedestals & pocket plazas
+const GATHERINGS = (() => {
+  const rand = mulberry32(8191);
+  const coats = ["#ed8838", "#102b79", "#4b7b8b", "#d9534f", "#569674", "#f5c418", "#b78152", "#e26d5c"];
+  const list: Array<{ gx: number; gy: number; z0: number; coat: string; hat: boolean; phase: number }> = [];
+  const hubs: Array<{ gx: number; gy: number; r: number; count: number; z0: number }> = [
+    { gx: -1.18, gy: 0.78, r: 0.28, count: 14, z0: 0 },
+    { gx: 1.18, gy: 0.76, r: 0.28, count: 14, z0: 0 },
+    { gx: 0.0, gy: 0.96, r: 0.42, count: 12, z0: 0 },
+    { gx: 0.0, gy: -1.04, r: 0.38, count: 8, z0: 0 },
+    { gx: FERRIS_POS.gx, gy: FERRIS_POS.gy + 0.34, r: 0.34, count: 10, z0: 3.2 },
+    { gx: 3.85, gy: 3.22, r: 0.38, count: 8, z0: 2.0 },
+    { gx: -0.35, gy: -2.35, r: 0.26, count: 6, z0: 2.8 },
+    { gx: -3.75, gy: 0.56, r: 0.26, count: 6, z0: 2.8 },
+    { gx: 3.65, gy: 0.56, r: 0.26, count: 6, z0: 2.8 },
+    { gx: 0.15, gy: 3.22, r: 0.26, count: 6, z0: 2.8 },
+  ];
+  for (const h of hubs) {
+    for (let k = 0; k < h.count; k++) {
+      const a = rand() * Math.PI * 2;
+      const d = Math.sqrt(rand()) * h.r;
+      list.push({
+        gx: h.gx + Math.cos(a) * d,
+        gy: h.gy + Math.sin(a) * d,
+        z0: h.z0,
+        coat: coats[Math.floor(rand() * coats.length)],
+        hat: rand() < 0.38,
+        phase: rand() * Math.PI * 2,
+      });
+    }
+  }
+  return list;
+})();
+
+// Dynamic night-mode building windows that organically switch ON and OFF across the skyline
+interface NightWindowSlot {
+  gx: number;
+  gy: number;
+  z: number;
+  hw: number;
+  hd: number;
+  a: number;
+  b: number;
+  face: "L" | "R";
+  depth: number;
+  period: number;
+  phase: number;
+  warm: string;
+}
+const NIGHT_WINDOWS: NightWindowSlot[] = (() => {
+  const rand = mulberry32(6617);
+  const slots: NightWindowSlot[] = [];
+  const eligible = new Set(["tower", "stepped", "penthouse", "slim", "terrace", "lshape", "canal_house", "spire"]);
+  for (const s of STRUCTURES) {
+    if (!eligible.has(s.kind) || s.h < 22) continue;
+    if (rand() > 0.58) continue;
+    const hw = s.kind === "slim" ? s.w * 0.37 : s.w * 0.5;
+    const hd = s.kind === "slim" ? s.d * 0.37 : s.d * 0.5;
+    const topZ = s.kind === "terrace" ? s.h * 0.42 : s.kind === "stepped" || s.kind === "penthouse" ? s.h * 0.72 : s.h;
+    const rows = Math.max(2, Math.min(6, s.floors || 3));
+    const cols = Math.max(2, s.cols || 3);
+    const dz = (topZ - 5) / (rows + 1);
+    const picks = 2 + Math.floor(rand() * 2);
+    for (let p = 0; p < picks; p++) {
+      const r = 1 + Math.floor(rand() * rows);
+      const c = Math.floor(rand() * cols);
+      const face: "L" | "R" = rand() < 0.5 ? "L" : "R";
+      const span = face === "L" ? hw : hd;
+      const a = -span + ((c + 0.2) / cols) * span * 2;
+      const b = -span + ((c + 0.8) / cols) * span * 2;
+      slots.push({
+        gx: s.gx,
+        gy: s.gy,
+        z: 3 + r * dz,
+        hw,
+        hd,
+        a,
+        b,
+        face,
+        depth: s.gx + s.gy,
+        period: 0.00055 + rand() * 0.00145,
+        phase: rand() * Math.PI * 2,
+        warm: rand() < 0.5 ? "#ffda94" : "#ff9e4a",
+      });
+    }
+  }
+  return slots;
+})();
+
 const VEHICLES = Array.from({ length: 36 }, (_, i) => {
   const rand = mulberry32(950 + i * 41);
   const horizontal = i % 2 === 0;
-  // Strictly centered inside the two asphalt driving lanes (±0.095 from road centerlines)
   const lanesH = ROAD_Y.flatMap((ry) => [ry - 0.095, ry + 0.095]);
   const lanesV = ROAD_X.flatMap((rx) => [rx - 0.095, rx + 0.095]);
   const laneIdx = i % 8;
@@ -480,14 +582,22 @@ const BOATS = Array.from({ length: 7 }, (_, i) => {
 });
 
 const LAMPS: Array<{ gx: number; gy: number }> = [];
-for (let p = -14; p <= 14; p += 2.0) {
+for (let p = -15.4; p <= 15.4; p += 1.4) {
   for (const ry of ROAD_Y) {
-    if (ROAD_X.every((rx) => Math.abs(p - rx) > 0.65)) LAMPS.push({ gx: p, gy: ry - 0.33 });
+    if (ROAD_X.every((rx) => Math.abs(p - rx) > 0.62)) {
+      LAMPS.push({ gx: p, gy: ry - 0.33 });
+      LAMPS.push({ gx: p + 0.7, gy: ry + 0.33 });
+    }
   }
   for (const rx of ROAD_X) {
-    if (ROAD_Y.every((ry) => Math.abs(p - ry) > 0.65) && (p < CANAL_Y0 - 0.4 || p > CANAL_Y1 + 0.4)) {
+    if (ROAD_Y.every((ry) => Math.abs(p - ry) > 0.62) && (p < CANAL_Y0 - 0.4 || p > CANAL_Y1 + 0.4)) {
       LAMPS.push({ gx: rx + 0.33, gy: p });
+      LAMPS.push({ gx: rx - 0.33, gy: p + 0.7 });
     }
+  }
+  if (ROAD_X.every((rx) => Math.abs(p - rx) > 0.62)) {
+    LAMPS.push({ gx: p, gy: CANAL_Y0 - 0.1 });
+    LAMPS.push({ gx: p + 0.7, gy: CANAL_Y1 + 0.1 });
   }
 }
 
@@ -1956,9 +2066,9 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
 
   if (s.kind === "street_foliage") {
     const seed = s.seed || 0.5;
-    if (seed < 0.48) {
-      drawTree(ctx, iso, s.gx, s.gy, isColor, isDark, 0.72 + seed * 0.35, seed > 0.32);
-    } else {
+    if (seed < 0.68) {
+      drawTree(ctx, iso, s.gx, s.gy, isColor, isDark, 0.72 + seed * 0.32, seed > 0.46);
+    } else if (seed < 0.84) {
       const bp = iso(s.gx, s.gy, 1.2);
       ctx.beginPath(); ctx.ellipse(bp[0] + 1.5, bp[1] + 1, 4.6, 2.2, 0, 0, Math.PI * 2);
       ctx.fillStyle = isDark ? "rgba(0,0,0,0.22)" : "rgba(28,38,54,0.12)"; ctx.fill();
@@ -1967,7 +2077,9 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
       ctx.arc(bp[0], bp[1] - 2.5, 3.0, 0, Math.PI * 2);
       ctx.fillStyle = isColor ? (isDark ? "#26684d" : "#3b8f62") : isDark ? "#33405c" : "#cbd5e1"; ctx.fill();
       ctx.beginPath(); ctx.arc(bp[0] - 0.6, bp[1] - 3.3, 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = isColor ? (seed > 0.8 ? "#f2a359" : "#74c69d") : "#e2e8f0"; ctx.fill();
+      ctx.fillStyle = isColor ? (seed > 0.78 ? "#f2a359" : "#74c69d") : "#e2e8f0"; ctx.fill();
+    } else {
+      box(ctx, iso, s.gx, s.gy, 0.08, 0.04, 0, 2.6, isColor ? "#9c6b43" : lC, isColor ? "#734c2d" : rC, isColor ? "#c99768" : tC, sC);
     }
     return;
   }
@@ -2178,7 +2290,10 @@ function drawStaticStructure(ctx: CanvasRenderingContext2D, iso: IsoFn, tile: nu
     ctx.stroke();
   }
   if (s.trees) {
-    drawTree(ctx, iso, s.gx + hw + 0.13, s.gy + hd, isColor, isDark, 0.8, (s.seed || 0) > 0.6);
+    drawTree(ctx, iso, s.gx + hw + 0.12, s.gy + hd, isColor, isDark, 0.82, (s.seed || 0) > 0.6);
+    if (s.trees > 1) {
+      drawTree(ctx, iso, s.gx - hw - 0.1, s.gy + hd + 0.08, isColor, isDark, 0.74, (s.seed || 0) < 0.45);
+    }
   }
 }
 
@@ -2297,9 +2412,9 @@ export default function SkillsShowcase() {
       });
     });
 
-    // 16-Band Depth-Sliced Occlusion Cache (ground + 16 transparent vertical building slices)
-    const DEPTH_BANDS = 16;
-    const depthToBand = (d: number) => Math.max(0, Math.min(DEPTH_BANDS - 1, Math.floor((d + 20) / 2.5)));
+    // 48-Band Depth-Sliced Occlusion Cache (ground + 48 fine transparent vertical building slices)
+    const DEPTH_BANDS = 48;
+    const depthToBand = (d: number) => Math.max(0, Math.min(DEPTH_BANDS - 1, Math.floor(((d + 20) / 40) * DEPTH_BANDS)));
     const groundMono = document.createElement("canvas");
     const groundColor = document.createElement("canvas");
     const slicesMono = Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas"));
@@ -2497,7 +2612,7 @@ export default function SkillsShowcase() {
       for (let x = -18; x <= 18; x += 2.2) pillars.push({ depth: x + METRO_Y, type: "p", gx: x });
 
       const list = [
-        ...STRUCTURES.map((s) => ({ depth: s.gx + s.gy, type: "s" as const, data: s })),
+        ...STRUCTURES.map((s) => ({ depth: s.gx + s.gy + (s.w + s.d) * 0.28, type: "s" as const, data: s })),
         ...LAMPS.map((l) => ({ depth: l.gx + l.gy, type: "l" as const, data: l })),
         ...pillars,
       ];
@@ -2522,12 +2637,27 @@ export default function SkillsShowcase() {
         } else {
           const b = iso(item.data.gx, item.data.gy, 0);
           const t = iso(item.data.gx, item.data.gy, 10.5);
+          if (isDark && isColor) {
+            const pool = bCtx.createRadialGradient(b[0], b[1], 0.5, b[0], b[1], 9.5);
+            pool.addColorStop(0, "rgba(255, 204, 128, 0.28)");
+            pool.addColorStop(1, "rgba(255, 204, 128, 0)");
+            bCtx.beginPath(); bCtx.ellipse(b[0], b[1], 9.5, 4.8, 0, 0, Math.PI * 2);
+            bCtx.fillStyle = pool; bCtx.fill();
+          }
           bCtx.beginPath(); bCtx.moveTo(...b); bCtx.lineTo(...t);
           bCtx.strokeStyle = isDark ? "#475569" : "#94a3b8";
           bCtx.lineWidth = 1;
           bCtx.stroke();
-          bCtx.beginPath(); bCtx.arc(t[0], t[1], 1.6, 0, Math.PI * 2);
-          bCtx.fillStyle = isColor ? "#f2bd83" : "#e2e8f0";
+          if (isDark && isColor) {
+            const halo = bCtx.createRadialGradient(t[0], t[1], 0.6, t[0], t[1], 7.2);
+            halo.addColorStop(0, "rgba(255, 232, 178, 0.92)");
+            halo.addColorStop(0.42, "rgba(255, 190, 102, 0.36)");
+            halo.addColorStop(1, "rgba(255, 190, 102, 0)");
+            bCtx.beginPath(); bCtx.arc(t[0], t[1], 7.2, 0, Math.PI * 2);
+            bCtx.fillStyle = halo; bCtx.fill();
+          }
+          bCtx.beginPath(); bCtx.arc(t[0], t[1], isDark ? 1.9 : 1.6, 0, Math.PI * 2);
+          bCtx.fillStyle = isColor ? (isDark ? "#fff2c6" : "#f2bd83") : "#e2e8f0";
           bCtx.fill();
         }
       }
@@ -2591,10 +2721,10 @@ export default function SkillsShowcase() {
       // 3. Four stone-and-steel canal bridges above boats
       drawCanalBridges(ctx, iso, tile, isColor, isDark);
 
-      // 4. Bucket moving vehicles & pedestrians into the 16 isometric depth bands
+      // 4. Bucket moving vehicles, pedestrians & plaza gatherings into the 16 isometric depth bands
       type DynamicEntity =
         | { kind: "v"; depth: number; x: number; y: number; z0: number; v: (typeof VEHICLES)[number] }
-        | { kind: "p"; depth: number; x: number; y: number; z0: number; ch: (typeof PEOPLE)[number] };
+        | { kind: "p"; depth: number; x: number; y: number; z0: number; coat: string; hat: boolean; phase: number; speedMult: number };
       const buckets: DynamicEntity[][] = Array.from({ length: DEPTH_BANDS }, () => []);
 
       for (const v of VEHICLES) {
@@ -2612,10 +2742,20 @@ export default function SkillsShowcase() {
         const py = ch.horizontal ? ch.lane : pos;
         const onBridge = !ch.horizontal && py > CANAL_Y0 - 0.12 && py < CANAL_Y1 + 0.12;
         const depth = px + py;
-        buckets[depthToBand(depth)].push({ kind: "p", depth, x: px, y: py, z0: onBridge ? 3.6 : 0, ch });
+        buckets[depthToBand(depth)].push({ kind: "p", depth, x: px, y: py, z0: onBridge ? 3.6 : 0, coat: ch.coat, hat: ch.hat, phase: ch.phase, speedMult: 1 });
+      }
+
+      for (const g of GATHERINGS) {
+        const swayX = Math.sin(time * 0.0014 + g.phase) * 0.025;
+        const swayY = Math.cos(time * 0.0012 + g.phase) * 0.025;
+        const gx = g.gx + swayX;
+        const gy = g.gy + swayY;
+        const depth = gx + gy;
+        buckets[depthToBand(depth)].push({ kind: "p", depth, x: gx, y: gy, z0: g.z0, coat: g.coat, hat: g.hat, phase: g.phase, speedMult: 0.45 });
       }
 
       const ferrisBand = depthToBand(FERRIS_POS.gx + FERRIS_POS.gy);
+      const stadiumBand = depthToBand(0.0 + -0.05);
 
       // 5. Composite back-to-front: entities in band b -> static building slice b (true 3D occlusion!)
       for (let b = 0; b < DEPTH_BANDS; b++) {
@@ -2632,7 +2772,7 @@ export default function SkillsShowcase() {
             ctx.fill();
             box(ctx, iso, e.x, e.y, hw, hd, e.z0, e.z0 + (e.v.isBus ? 5.8 : 3.5), isColor ? e.v.color : "#cbd5e1", isColor ? e.v.color : "#94a3b8", isColor ? "#f4f0e6" : "#e2e8f0", "rgba(0,0,0,0.22)");
           } else {
-            const bob = Math.abs(Math.sin(time * 0.0095 + e.ch.phase)) * 1.8;
+            const bob = Math.abs(Math.sin(time * 0.0095 * e.speedMult + e.phase)) * (e.speedMult < 0.6 ? 1.0 : 1.8);
             const foot = iso(e.x, e.y, e.z0);
             const body = iso(e.x, e.y, e.z0 + 4.4 + bob);
             const head = iso(e.x, e.y, e.z0 + 7.4 + bob);
@@ -2643,17 +2783,134 @@ export default function SkillsShowcase() {
             ctx.beginPath();
             ctx.moveTo(foot[0], foot[1]);
             ctx.lineTo(body[0], body[1]);
-            ctx.strokeStyle = isColor ? e.ch.coat : isDark ? "#64748b" : "#94a3b8";
+            ctx.strokeStyle = isColor ? e.coat : isDark ? "#64748b" : "#94a3b8";
             ctx.lineWidth = 2.5;
             ctx.lineCap = "round";
             ctx.stroke();
             ctx.beginPath();
             ctx.arc(head[0], head[1], 1.7, 0, Math.PI * 2);
-            ctx.fillStyle = isColor ? (e.ch.hat ? "#102b79" : "#f2bd83") : "#cbd5e1";
+            ctx.fillStyle = isColor ? (e.hat ? "#102b79" : "#f2bd83") : "#cbd5e1";
             ctx.fill();
           }
         }
+        drawCityMicroEventsForBand(ctx, iso, tile, isColor, isDark, time, b, depthToBand);
         ctx.drawImage(sliceCanvases[b], 0, 0, W, H);
+
+        // Dynamic dark-mode building window lights switching organically ON and OFF in this depth band
+        if (isDark && isColor) {
+          for (let wi = 0; wi < NIGHT_WINDOWS.length; wi++) {
+            const w = NIGHT_WINDOWS[wi];
+            if (depthToBand(w.depth) !== b) continue;
+            const sig = Math.sin(time * w.period + w.phase);
+            const isOn = sig > 0.08;
+            const p0 = w.face === "L" ? iso(w.gx + w.a, w.gy + w.hd, w.z + 1.85) : iso(w.gx + w.hw, w.gy + w.a, w.z + 1.85);
+            const p1 = w.face === "L" ? iso(w.gx + w.b, w.gy + w.hd, w.z + 1.85) : iso(w.gx + w.hw, w.gy + w.b, w.z + 1.85);
+            const p2 = w.face === "L" ? iso(w.gx + w.b, w.gy + w.hd, w.z - 1.85) : iso(w.gx + w.hw, w.gy + w.b, w.z - 1.85);
+            const p3 = w.face === "L" ? iso(w.gx + w.a, w.gy + w.hd, w.z - 1.85) : iso(w.gx + w.hw, w.gy + w.a, w.z - 1.85);
+            ctx.beginPath();
+            ctx.moveTo(...p0); ctx.lineTo(...p1); ctx.lineTo(...p2); ctx.lineTo(...p3);
+            ctx.closePath();
+            ctx.fillStyle = isOn ? w.warm : "#151b2c";
+            ctx.fill();
+            if (isOn && sig > 0.65) {
+              ctx.strokeStyle = "rgba(255, 232, 170, 0.55)";
+              ctx.lineWidth = 0.9;
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Live football match, cheering stadium crowd & dark-mode floodlights inside central stadium
+        if (b === stadiumBand) {
+          const rim = iso(0.0, -0.05, 34);
+          const pitchX = rim[0];
+          const pitchY = rim[1] + 5;
+          const crowdCols = ["#ed8838", "#38bdf8", "#f5c418", "#ffffff", "#e25241", "#4ade80"];
+          for (let k = 0; k < 64; k++) {
+            const ang = (k / 64) * Math.PI * 2;
+            const ring = k % 2 === 0 ? 0.81 : 0.89;
+            const cheer = Math.max(0, Math.sin(time * 0.0065 - ang * 2.0)) * 2.0;
+            const sx = rim[0] + Math.cos(ang) * tile * ring;
+            const sy = rim[1] + 2 + Math.sin(ang) * tile * (ring * 0.5) - cheer;
+            ctx.beginPath();
+            ctx.arc(sx, sy, 1.55, 0, Math.PI * 2);
+            ctx.fillStyle = isColor ? crowdCols[k % crowdCols.length] : isDark ? "#64748b" : "#94a3b8";
+            ctx.fill();
+          }
+          const tMatch = time * 0.0013;
+          const teamA: Array<[number, number]> = [
+            [-0.48 + Math.sin(tMatch * 1.1) * 0.06, Math.cos(tMatch * 0.9) * 0.08],
+            [-0.24 + Math.cos(tMatch * 1.3) * 0.14, -0.14 + Math.sin(tMatch * 1.2) * 0.08],
+            [-0.18 + Math.sin(tMatch * 1.5 + 1) * 0.16, 0.14 + Math.cos(tMatch * 1.1) * 0.08],
+            [0.06 + Math.cos(tMatch * 1.7 + 2) * 0.18, -0.06 + Math.sin(tMatch * 1.4) * 0.12],
+            [0.14 + Math.sin(tMatch * 1.4 + 3) * 0.15, 0.1 + Math.cos(tMatch * 1.3) * 0.1],
+          ];
+          const teamB: Array<[number, number]> = [
+            [0.48 + Math.cos(tMatch * 1.1) * 0.06, Math.sin(tMatch * 0.9) * 0.08],
+            [0.24 + Math.sin(tMatch * 1.25) * 0.14, 0.13 + Math.cos(tMatch * 1.1) * 0.08],
+            [0.18 + Math.cos(tMatch * 1.45 + 1) * 0.16, -0.14 + Math.sin(tMatch * 1.2) * 0.08],
+            [-0.06 + Math.sin(tMatch * 1.6 + 2) * 0.18, 0.08 + Math.cos(tMatch * 1.5) * 0.11],
+            [-0.14 + Math.cos(tMatch * 1.35 + 3) * 0.15, -0.1 + Math.sin(tMatch * 1.25) * 0.1],
+          ];
+          const drawPlayers = (pts: Array<[number, number]>, col: string) => {
+            ctx.fillStyle = isColor ? col : "#e2e8f0";
+            for (const [ox, oy] of pts) {
+              ctx.beginPath();
+              ctx.arc(pitchX + ox * tile, pitchY + oy * tile, 1.9, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          };
+          drawPlayers(teamA, "#2563eb");
+          drawPlayers(teamB, "#ff7b29");
+          const allPlayers = [...teamA, ...teamB];
+          const passSlot = (tMatch * 0.9) % allPlayers.length;
+          const idx0 = Math.floor(passSlot);
+          const idx1 = (idx0 + 3) % allPlayers.length;
+          const frac = passSlot - idx0;
+          const bx = pitchX + (allPlayers[idx0][0] + (allPlayers[idx1][0] - allPlayers[idx0][0]) * frac) * tile;
+          const by = pitchY + (allPlayers[idx0][1] + (allPlayers[idx1][1] - allPlayers[idx0][1]) * frac) * tile - Math.sin(frac * Math.PI) * 3.2;
+          ctx.beginPath();
+          ctx.arc(bx, by, 1.45, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+
+          if (isDark && isColor) {
+            ctx.save();
+            const pitchGlow = ctx.createRadialGradient(pitchX, pitchY, 2, pitchX, pitchY, tile * 0.85);
+            pitchGlow.addColorStop(0, "rgba(255, 246, 214, 0.28)");
+            pitchGlow.addColorStop(0.6, "rgba(255, 224, 155, 0.12)");
+            pitchGlow.addColorStop(1, "rgba(255, 224, 155, 0)");
+            ctx.beginPath();
+            ctx.ellipse(pitchX, pitchY, tile * 0.82, tile * 0.4, 0, 0, Math.PI * 2);
+            ctx.fillStyle = pitchGlow;
+            ctx.fill();
+
+            [[-0.88, -0.56], [0.88, -0.56], [-0.88, 0.56], [0.88, 0.56]].forEach(([dx, dy]) => {
+              const top = iso(dx, -0.05 + dy, 34 + 19);
+              const beam = ctx.createLinearGradient(top[0], top[1], pitchX, pitchY);
+              beam.addColorStop(0, "rgba(255, 248, 220, 0.36)");
+              beam.addColorStop(0.55, "rgba(255, 236, 182, 0.13)");
+              beam.addColorStop(1, "rgba(255, 236, 182, 0)");
+              ctx.beginPath();
+              ctx.moveTo(top[0], top[1]);
+              ctx.lineTo(pitchX - tile * 0.26, pitchY - tile * 0.1);
+              ctx.lineTo(pitchX + tile * 0.26, pitchY + tile * 0.14);
+              ctx.closePath();
+              ctx.fillStyle = beam;
+              ctx.fill();
+
+              const bulb = ctx.createRadialGradient(top[0], top[1], 1, top[0], top[1], 16);
+              bulb.addColorStop(0, "rgba(255, 255, 240, 0.98)");
+              bulb.addColorStop(0.32, "rgba(255, 230, 165, 0.62)");
+              bulb.addColorStop(1, "rgba(255, 210, 120, 0)");
+              ctx.beginPath();
+              ctx.arc(top[0], top[1], 16, 0, Math.PI * 2);
+              ctx.fillStyle = bulb;
+              ctx.fill();
+            });
+            ctx.restore();
+          }
+        }
 
         // Animated rotating waterfront Ferris wheel in its exact depth band
         if (b === ferrisBand) {
@@ -2718,6 +2975,7 @@ export default function SkillsShowcase() {
         ctx.lineTo(top[0] + Math.cos(ang) * 28, top[1] + Math.sin(ang) * 14);
         ctx.strokeStyle = isColor ? "#f2bd83" : "#cbd5e1"; ctx.lineWidth = 1.9; ctx.stroke();
       }
+
 
       const u = (time * 0.00016) % 1;
       const alt = u > 0.52 ? Math.pow((u - 0.52) / 0.48, 1.7) * 98 : 2;
@@ -3030,7 +3288,7 @@ export default function SkillsShowcase() {
           </div>
 
           <div className="skills-city-header" ref={cityHeaderRef}>
-            <Scramble className="label-sticker" text="SKILLS & CAPABILITIES" />
+            <VaultSticker text="SKILLS & CAPABILITIES" />
             <h2 id="skills-heading" className="skills-city-title">
               <RippleWords text="Data pipelines with" />
               <br />

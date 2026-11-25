@@ -68,8 +68,6 @@ export function MotionSystem({ children }: { children: ReactNode }) {
   const trailY = useMotionValue(0);
   const trailScale = useMotionValue(118 / 54);
   const trailOpacity = useMotionValue(0);
-  const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, { stiffness: 160, damping: 28, mass: 0.6 });
 
   const togglePaused = () => {
     setPaused((prev) => {
@@ -400,10 +398,6 @@ export function MotionSystem({ children }: { children: ReactNode }) {
             </div>
           )}
 
-          <motion.div
-            className="reading-progress"
-            style={{ scaleX: reduced ? scrollYProgress : progress }}
-          />
           {children}
         </LayoutGroup>
       </MotionConfig>

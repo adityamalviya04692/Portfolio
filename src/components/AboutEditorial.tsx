@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { ArrowUpRight, Play } from "lucide-react";
-import { Scramble, useMotionPreference } from "./MotionSystem";
+import { useMotionPreference } from "./MotionSystem";
+import { VaultSticker } from "./VaultSectionBadge";
 import data from "../data/portfolio.json";
 
 const asset = (path: string) => import.meta.env.BASE_URL + path;
@@ -21,7 +22,7 @@ export default function AboutEditorial({ onIntro }: { onIntro: (trigger: HTMLBut
     <div className="about-editorial">
       <div className="about-editorial-inner">
         <header>
-          <Scramble className="label-sticker light" text="A LITTLE ABOUT ME" />
+          <VaultSticker text="A LITTLE ABOUT ME" light />
           <h2>Big on data<span className="orange">.</span> Bigger on <em>impact</em><span className="orange">.</span></h2>
         </header>
         <div className="about-editorial-layout">
