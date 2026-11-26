@@ -29,6 +29,7 @@ import "./components/SkillsShowcase.css";
 import ProjectGallery from "./components/ProjectGallery";
 import { completePrewarmTask } from "./components/PrewarmManager";
 import ScrollPinnedStats from "./components/ScrollPinnedStats";
+import LiquidSectionWave from "./components/LiquidSectionWave";
 import { SectionWatermarkCards, VaultSticker } from "./components/VaultSectionBadge";
 import {
   Accordion,
@@ -278,6 +279,10 @@ function Portfolio() {
         onBlue={["about", "education", "experience", "contact"].includes(active)}
       />
       <main>
+        {/* Top overscroll blue liquid reservoir: sits strictly above y = 0 with zero gap so pulling past the top reveals seamless blue */}
+        <div className="top-overscroll-liquid" aria-hidden="true">
+          <div className="top-overscroll-reservoir" />
+        </div>
         <HeroFrame>
           <section className="hero" id="home">
             <div className="zero-flow-aura" aria-hidden="true">
@@ -383,6 +388,7 @@ function Portfolio() {
           </div>
         </section>
         <ExperienceTimeline />
+        <LiquidSectionWave edge="bottom" seed={3.7} />
         <section id="projects" className="projects showcase-section" aria-labelledby="projects-heading">
           <SectionWatermarkCards section="projects" tone="light" />
           <div className="section-wrap">
@@ -563,6 +569,7 @@ function Portfolio() {
             </Reveal>
           </div>
         </section>
+        <LiquidSectionWave edge="top" seed={5.2} />
         <section id="contact" className="contact blue-section">
           <SectionWatermarkCards section="contact" tone="blue" />
           <div className="section-wrap">

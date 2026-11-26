@@ -102,6 +102,15 @@ export function MotionSystem({ children }: { children: ReactNode }) {
     };
   }, [reduced]);
 
+  useEffect(() => {
+    if (introPhase === "complete") {
+      document.documentElement.dataset.ready = "true";
+    }
+    return () => {
+      delete document.documentElement.dataset.ready;
+    };
+  }, [introPhase]);
+
   const finishHandoff = () => {
     if (handoffStartedRef.current) return;
     handoffStartedRef.current = true;

@@ -61,7 +61,7 @@
 
 .experience-motion .experience-rail-segment {
   transform: scaleY(var(--seg-progress, 0));
-  transition: transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Scroll position already supplies the intermediate rail positions. */
   will-change: transform;
 }
 

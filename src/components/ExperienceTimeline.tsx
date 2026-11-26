@@ -251,271 +251,13 @@ const ExperienceTimeline = memo(function ExperienceTimeline() {
     let railDocTop = 0;
     let railHeight = 0;
     let rowTops: number[] = rows.map(() => 0);
-    let rowStopYs: number[] = rows.map(() => 0);
-    const pausedOnce = rows.map(() => false);
-    let activePauseIdx = -1;
-    let activePauseY = 0;
-    let pauseTimer = 0;
-    let pauseUnlockedAt = 0;
-    let pausePushAccum = 0;
-    let releaseRampUntil = 0;
-    let captureAttached = false;
-    let touchLastY = 0;
-    let prevScrollY = window.scrollY;
-    let anchorJumpUntil = 0;
-
-    // High-physics critically-damped spring + weighted micro-resistance for each project detent
-    let springActive = false;
-    let springY = window.scrollY;
-    let springVel = 0;
-    let springTargetY = 0;
-    let springRaf = 0;
-    let springLastTime = 0;
-    let detentTension = 0;
-    let tensionRowEl: HTMLElement | null = null;
-
-    const setRowTension = (el: HTMLElement | null, px: number) => {
-      if (!el) return;
-      if (Math.abs(px) < 0.08) {
-        el.style.transform = "";
-      } else {
-        el.style.transform = `translate3d(0, ${(-px).toFixed(2)}px, 0)`;
-      }
-    };
-
-    const startPhysicsLoop = () => {
-      if (springRaf) return;
-      springLastTime = performance.now();
-      const tick = (now: number) => {
-        const dt = Math.min(0.05, Math.max(0.001, (now - springLastTime) / 1000));
-        springLastTime = now;
-
-        let sDone = !springActive;
-        if (springActive) {
-          const stiffness = 128;
-          const damping = 22.6;
-          const acc = stiffness * (springTargetY - springY) - damping * springVel;
-          springVel += acc * dt;
-          springY += springVel * dt;
-          if (Math.abs(springTargetY - springY) < 0.45 && Math.abs(springVel) < 4) {
-            springY = springTargetY;
-            springVel = 0;
-            springActive = false;
-            sDone = true;
-          }
-          window.scrollTo({ top: springY, behavior: "instant" });
-          prevScrollY = springY;
-        }
-
-        detentTension *= Math.exp(-10.5 * dt);
-        if (detentTension < 0.05) detentTension = 0;
-        setRowTension(tensionRowEl, detentTension);
-        const tDone = detentTension === 0;
-
-        if (sDone && tDone) {
-          springRaf = 0;
-          return;
-        }
-        springRaf = requestAnimationFrame(tick);
-      };
-      springRaf = requestAnimationFrame(tick);
-    };
-
     const measureMetrics = () => {
       const rect = rail.getBoundingClientRect();
-      const y = window.scrollY;
-      railDocTop = rect.top + y;
+      railDocTop = rect.top + window.scrollY;
       railHeight = rect.height;
-      rowTops = rows.map((row) => row.offsetTop);
-      const navOffset = window.innerWidth <= 720 ? 84 : 104;
-      const available = window.innerHeight - navOffset;
-      rowStopYs = rows.map((row) => {
-        const r = row.getBoundingClientRect();
-        const docTop = r.top + y;
-        const topPad = r.height < available ? navOffset + Math.min(48, (available - r.height) * 0.32) : navOffset;
-        return Math.max(0, Math.round(docTop - topPad));
-      });
+      rowTops = rows.map(row => row.offsetTop);
     };
     measureMetrics();
-
-    const releasePause = (withSmoothRamp = false) => {
-      activePauseIdx = -1;
-      pausePushAccum = 0;
-      springActive = false;
-      if (withSmoothRamp) {
-        releaseRampUntil = performance.now() + 240;
-      }
-      if (pauseTimer) {
-        window.clearTimeout(pauseTimer);
-        pauseTimer = 0;
-      }
-    };
-
-    const engageMagneticDetent = (idx: number, stopY: number, incomingVel = 0) => {
-      pausedOnce[idx] = true;
-      activePauseIdx = idx;
-      activePauseY = stopY;
-      pausePushAccum = 0;
-      const now = performance.now();
-      pauseUnlockedAt = now + 320;
-
-      const row = rows[idx];
-      if (row) {
-        row.classList.add("is-shown");
-        row.toggleAttribute("data-rail-reached", true);
-        if (tensionRowEl && tensionRowEl !== row) setRowTension(tensionRowEl, 0);
-        tensionRowEl = row;
-      }
-      setReachedCount((prev) => Math.max(prev, idx + 1));
-
-      springTargetY = stopY;
-      springY = window.scrollY;
-      springVel = Math.max(-560, Math.min(560, incomingVel));
-      springActive = Math.abs(springTargetY - springY) > 1;
-      if (springActive) {
-        startPhysicsLoop();
-      } else {
-        window.scrollTo({ top: stopY, behavior: "instant" });
-        prevScrollY = stopY;
-      }
-
-      if (pauseTimer) window.clearTimeout(pauseTimer);
-      pauseTimer = window.setTimeout(() => {
-        releasePause(true);
-      }, 820);
-    };
-
-    const handleDownwardDelta = (deltaY: number) => {
-      if (performance.now() < anchorJumpUntil || deltaY <= 0) return false;
-
-      const now = performance.now();
-
-      if (activePauseIdx === -1 && now < releaseRampUntil) {
-        const t = 1 - (releaseRampUntil - now) / 240;
-        const easedGain = 0.24 + 0.76 * (t * t);
-        window.scrollBy({ top: deltaY * easedGain, behavior: "instant" });
-        prevScrollY = window.scrollY;
-        return true;
-      }
-
-      if (activePauseIdx !== -1) {
-        springTargetY = activePauseY;
-        if (!springActive && Math.abs(window.scrollY - activePauseY) > 1) {
-          springY = window.scrollY;
-          springActive = true;
-        }
-        detentTension = Math.min(8.5, detentTension + Math.min(deltaY, 32) * 0.1);
-        startPhysicsLoop();
-
-        if (now >= pauseUnlockedAt) {
-          pausePushAccum += Math.min(deltaY, 48);
-          if (pausePushAccum >= 180) {
-            releasePause(true);
-            return true;
-          }
-        }
-        return true;
-      }
-
-      const y = window.scrollY;
-      for (let i = 0; i < rows.length; i++) {
-        if (pausedOnce[i]) continue;
-        const stopY = rowStopYs[i];
-        const dist = stopY - y;
-
-        if (dist > 0 && dist <= 180) {
-          const approachP = 1 - dist / 180;
-          if (approachP > 0.35) {
-            const row = rows[i];
-            if (row) {
-              row.classList.add("is-shown");
-              row.toggleAttribute("data-rail-reached", true);
-            }
-            setReachedCount((prev) => Math.max(prev, i + 1));
-          }
-
-          const dampingFactor = 0.22 + 0.78 * Math.pow(1 - approachP, 1.5);
-          const dampedMove = Math.min(deltaY * dampingFactor, dist);
-
-          if (dampedMove >= dist - 2 || dist <= 8) {
-            engageMagneticDetent(i, stopY, Math.min(deltaY * 5, 380));
-          } else {
-            const nextY = y + dampedMove;
-            window.scrollTo({ top: nextY, behavior: "instant" });
-            prevScrollY = nextY;
-          }
-          return true;
-        }
-
-        if (y < stopY && y + deltaY >= stopY - 8) {
-          engageMagneticDetent(i, stopY, 440);
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const onWheel = (e: WheelEvent) => {
-      if (performance.now() < anchorJumpUntil) return;
-      if (e.deltaY < 0) {
-        if (activePauseIdx !== -1) releasePause(false);
-        return;
-      }
-      if (e.deltaY === 0) return;
-      if (handleDownwardDelta(e.deltaY)) {
-        e.preventDefault();
-      }
-    };
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        touchLastY = e.touches[0].clientY;
-      }
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (performance.now() < anchorJumpUntil || e.touches.length !== 1) return;
-      const currentY = e.touches[0].clientY;
-      const deltaY = touchLastY - currentY;
-      touchLastY = currentY;
-      if (deltaY < 0) {
-        if (activePauseIdx !== -1) releasePause(false);
-        return;
-      }
-      if (deltaY === 0) return;
-      if (handleDownwardDelta(deltaY * 1.35)) {
-        e.preventDefault();
-      }
-    };
-
-    const attachCapture = () => {
-      if (captureAttached) return;
-      captureAttached = true;
-      window.addEventListener("wheel", onWheel, { passive: false });
-      window.addEventListener("touchstart", onTouchStart, { passive: true });
-      window.addEventListener("touchmove", onTouchMove, { passive: false });
-    };
-
-    const detachCapture = () => {
-      if (!captureAttached) return;
-      captureAttached = false;
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-    };
-
-    const onDocumentClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target?.closest?.('a[href^="#"]')) {
-        anchorJumpUntil = performance.now() + 1000;
-        releasePause(false);
-      }
-    };
-
-    const onHashChange = () => {
-      anchorJumpUntil = performance.now() + 1000;
-      releasePause(false);
-    };
 
     let frame = 0;
     const drawRail = () => {
@@ -527,7 +269,7 @@ const ExperienceTimeline = memo(function ExperienceTimeline() {
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         const rowTop = rowTops[i];
-        const reached = distance >= rowTop || pausedOnce[i];
+        const reached = distance >= rowTop;
         if (reached !== row.hasAttribute("data-rail-reached")) {
           row.toggleAttribute("data-rail-reached", reached);
         }
@@ -553,30 +295,6 @@ const ExperienceTimeline = memo(function ExperienceTimeline() {
     };
 
     const onScroll = () => {
-      const y = window.scrollY;
-      const scrollingDown = y > prevScrollY;
-      const prev = prevScrollY;
-      prevScrollY = y;
-
-      if (inViewport && performance.now() >= anchorJumpUntil) {
-        if (activePauseIdx !== -1 && !springActive && y > activePauseY + 1) {
-          springTargetY = activePauseY;
-          springY = y;
-          springVel = -240;
-          springActive = true;
-          startPhysicsLoop();
-        } else if (activePauseIdx === -1 && scrollingDown) {
-          for (let i = 0; i < rows.length; i++) {
-            if (pausedOnce[i]) continue;
-            const stopY = rowStopYs[i];
-            if (prev <= stopY + 30 && y >= stopY) {
-              engageMagneticDetent(i, stopY, -220);
-              break;
-            }
-          }
-        }
-      }
-
       if (!inViewport) return;
       if (!frame) frame = requestAnimationFrame(drawRail);
     };
@@ -590,11 +308,7 @@ const ExperienceTimeline = memo(function ExperienceTimeline() {
         inViewport = entry.isIntersecting;
         if (inViewport) {
           measureMetrics();
-          attachCapture();
           if (!frame) frame = requestAnimationFrame(drawRail);
-        } else {
-          detachCapture();
-          releasePause(false);
         }
       },
       { rootMargin: "420px 0px" },
@@ -607,8 +321,6 @@ const ExperienceTimeline = memo(function ExperienceTimeline() {
     };
     const resize = new ResizeObserver(onResize);
     resize.observe(rail);
-    document.addEventListener("click", onDocumentClick, true);
-    window.addEventListener("hashchange", onHashChange);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
     drawRail();
@@ -618,13 +330,7 @@ const ExperienceTimeline = memo(function ExperienceTimeline() {
       sectionGate.disconnect();
       observer.disconnect();
       resize.disconnect();
-      detachCapture();
-      releasePause(false);
-      setRowTension(tensionRowEl, 0);
       cancelAnimationFrame(frame);
-      cancelAnimationFrame(springRaf);
-      document.removeEventListener("click", onDocumentClick, true);
-      window.removeEventListener("hashchange", onHashChange);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       rail.classList.remove("experience-motion");

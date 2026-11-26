@@ -384,6 +384,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
   const rightWingRef = useRef<HTMLDivElement>(null);
   const leftBackRef = useRef<SVGPathElement>(null);
   const leftFrontRef = useRef<SVGPathElement>(null);
+  const leftClipRef = useRef<SVGPathElement>(null);
+  const leftInnerFrostRef = useRef<SVGPathElement>(null);
+  const leftHaloRef = useRef<SVGPathElement>(null);
+  const leftRimCyanRef = useRef<SVGPathElement>(null);
+  const leftRimWhiteRef = useRef<SVGPathElement>(null);
   const leftSlashRef = useRef<SVGPathElement>(null);
   const leftDrop1Ref = useRef<SVGCircleElement>(null);
   const leftDrop2Ref = useRef<SVGCircleElement>(null);
@@ -391,6 +396,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
 
   const rightBackRef = useRef<SVGPathElement>(null);
   const rightFrontRef = useRef<SVGPathElement>(null);
+  const rightClipRef = useRef<SVGPathElement>(null);
+  const rightInnerFrostRef = useRef<SVGPathElement>(null);
+  const rightHaloRef = useRef<SVGPathElement>(null);
+  const rightRimCyanRef = useRef<SVGPathElement>(null);
+  const rightRimWhiteRef = useRef<SVGPathElement>(null);
   const rightSlashRef = useRef<SVGPathElement>(null);
   const rightDrop1Ref = useRef<SVGCircleElement>(null);
   const rightDrop2Ref = useRef<SVGCircleElement>(null);
@@ -577,6 +587,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
       surf: { h: Float32Array; v: Float32Array },
       backEl: SVGPathElement | null,
       frontEl: SVGPathElement | null,
+      clipEl: SVGPathElement | null,
+      innerFrostEl: SVGPathElement | null,
+      haloEl: SVGPathElement | null,
+      rimCyanEl: SVGPathElement | null,
+      rimWhiteEl: SVGPathElement | null,
       slashEl: SVGPathElement | null,
       drop1El: SVGCircleElement | null,
       drop2El: SVGCircleElement | null,
@@ -588,6 +603,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
       if (clamped <= 0.001) {
         if (backEl) backEl.setAttribute("d", "");
         if (frontEl) frontEl.setAttribute("d", "");
+        if (clipEl) clipEl.setAttribute("d", "");
+        if (innerFrostEl) innerFrostEl.setAttribute("d", "");
+        if (haloEl) haloEl.setAttribute("d", "");
+        if (rimCyanEl) rimCyanEl.setAttribute("d", "");
+        if (rimWhiteEl) rimWhiteEl.setAttribute("d", "");
         if (slashEl) slashEl.setAttribute("opacity", "0");
         if (drop1El) drop1El.setAttribute("opacity", "0");
         if (drop2El) drop2El.setAttribute("opacity", "0");
@@ -598,6 +618,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         const full = "M 0 0 L 100 0 L 100 46 L 0 46 Z";
         if (backEl) backEl.setAttribute("d", full);
         if (frontEl) frontEl.setAttribute("d", full);
+        if (clipEl) clipEl.setAttribute("d", full);
+        if (innerFrostEl) innerFrostEl.setAttribute("d", "");
+        if (haloEl) haloEl.setAttribute("d", "");
+        if (rimCyanEl) rimCyanEl.setAttribute("d", "");
+        if (rimWhiteEl) rimWhiteEl.setAttribute("d", "");
         if (slashEl) slashEl.setAttribute("opacity", "0");
         if (drop1El) drop1El.setAttribute("opacity", "0");
         if (drop2El) drop2El.setAttribute("opacity", "0");
@@ -607,7 +632,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
 
       const baseX = clamped * 100;
       const edgeTaper = Math.sin(clamped * Math.PI);
-      const scale = reduced ? 0 : 0.62 + 0.38 * edgeTaper;
+      const scale = reduced ? 0 : 0.68 + 0.32 * edgeTaper;
       const ph = phase + phaseOffset;
 
       const frontPts: [number, number][] = [];
@@ -615,18 +640,39 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
       for (let i = 0; i <= N; i++) {
         const f = i / N;
         const y = f * 46;
-        const restMeniscus = Math.sin(f * Math.PI) * -0.45 * edgeTaper;
+        // Realistic glass-tube capillary meniscus: liquid clings slightly ahead at top/bottom walls
+        // and curves smoothly inward at the center, plus a living organic S-swell even at gentle speeds.
+        const wallCapillary = Math.pow(Math.abs(2 * f - 1), 2.4) * 1.35 * edgeTaper;
+        const restBelly = Math.sin(f * Math.PI) * -0.95 * edgeTaper;
+        const gentleLivingWave =
+          (Math.sin(f * Math.PI * 1.85 - ph * 2.2) * 1.15 +
+            Math.cos(f * Math.PI * 3.1 + ph * 1.45) * 0.45) *
+          Math.min(1, 0.28 + activeEnergy * 0.9);
         const liveCrest =
-          (Math.sin(f * Math.PI * 2.1 - ph * 2.65) * 3.1 + Math.cos(f * Math.PI * 3.6 + ph * 1.9) * 1.15) *
+          (Math.sin(f * Math.PI * 2.15 - ph * 2.85) * 3.6 +
+            Math.cos(f * Math.PI * 3.7 + ph * 2.05) * 1.4) *
           activeEnergy;
-        const dxFront = (surf.h[i] * 0.72 + liveCrest) * scale + restMeniscus;
+        const dxFront = (surf.h[i] * 0.85 + liveCrest + gentleLivingWave) * scale + restBelly + wallCapillary;
         const dxBack =
-          (surf.h[i] * 0.55 + Math.sin(f * Math.PI * 1.95 - ph * 2.05 + 1.45) * activeEnergy * 4.4) * scale +
-          activeEnergy * 3.2 * edgeTaper +
-          restMeniscus;
+          (surf.h[i] * 0.62 + Math.sin(f * Math.PI * 1.95 - ph * 2.15 + 1.45) * (0.9 + activeEnergy * 4.6)) * scale +
+          (0.6 + activeEnergy * 3.2) * edgeTaper +
+          restBelly +
+          wallCapillary;
         frontPts.push([Math.max(0, Math.min(100, baseX + dxFront)), y]);
         backPts.push([Math.max(0, Math.min(100, baseX + dxBack)), y]);
       }
+
+      const buildSmoothRim = (pts: [number, number][]) => {
+        let d = `M ${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const mx = (pts[i][0] + pts[i + 1][0]) * 0.5;
+          const my = (pts[i][1] + pts[i + 1][1]) * 0.5;
+          d += ` Q ${pts[i][0].toFixed(2)} ${pts[i][1].toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+        }
+        const last = pts[pts.length - 1];
+        d += ` L ${last[0].toFixed(2)} ${last[1].toFixed(2)}`;
+        return d;
+      };
 
       const buildSmoothArea = (pts: [number, number][]) => {
         let d = `M 0 0 L ${pts[0][0].toFixed(2)} 0`;
@@ -640,8 +686,29 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         return d;
       };
 
+      const frontArea = buildSmoothArea(frontPts);
+      const frontRim = buildSmoothRim(frontPts);
+      const rimOp = Math.min(1, 0.76 + activeEnergy * 0.24) * Math.min(1, edgeTaper * 2.4);
+
       if (backEl) backEl.setAttribute("d", buildSmoothArea(backPts));
-      if (frontEl) frontEl.setAttribute("d", buildSmoothArea(frontPts));
+      if (frontEl) frontEl.setAttribute("d", frontArea);
+      if (clipEl) clipEl.setAttribute("d", frontArea);
+      if (innerFrostEl) {
+        innerFrostEl.setAttribute("d", frontRim);
+        innerFrostEl.setAttribute("opacity", (rimOp * 0.85).toFixed(2));
+      }
+      if (haloEl) {
+        haloEl.setAttribute("d", frontRim);
+        haloEl.setAttribute("opacity", (rimOp * 0.92).toFixed(2));
+      }
+      if (rimCyanEl) {
+        rimCyanEl.setAttribute("d", frontRim);
+        rimCyanEl.setAttribute("opacity", rimOp.toFixed(2));
+      }
+      if (rimWhiteEl) {
+        rimWhiteEl.setAttribute("d", frontRim);
+        rimWhiteEl.setAttribute("opacity", rimOp.toFixed(2));
+      }
 
       if (slashEl) {
         const slashAlpha = reduced ? 0 : Math.min(0.62, activeEnergy * 0.52) * edgeTaper;
@@ -655,7 +722,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         }
       }
 
-      const dropAlpha = reduced ? 0 : Math.min(0.82, Math.max(0, (activeEnergy - 0.16) * 1.15)) * edgeTaper;
+      const dropAlpha = reduced ? 0 : Math.min(0.9, Math.max(0, (activeEnergy - 0.14) * 1.2)) * edgeTaper;
       if (drop1El) {
         drop1El.setAttribute("cx", Math.min(99, baseX + 2.8 + activeEnergy * 3.8).toFixed(2));
         drop1El.setAttribute("cy", (13 + Math.sin(ph * 2.5) * 5.5).toFixed(2));
@@ -755,6 +822,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         leftSurf,
         leftBackRef.current,
         leftFrontRef.current,
+        leftClipRef.current,
+        leftInnerFrostRef.current,
+        leftHaloRef.current,
+        leftRimCyanRef.current,
+        leftRimWhiteRef.current,
         leftSlashRef.current,
         leftDrop1Ref.current,
         leftDrop2Ref.current,
@@ -767,6 +839,11 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
         rightSurf,
         rightBackRef.current,
         rightFrontRef.current,
+        rightClipRef.current,
+        rightInnerFrostRef.current,
+        rightHaloRef.current,
+        rightRimCyanRef.current,
+        rightRimWhiteRef.current,
         rightSlashRef.current,
         rightDrop1Ref.current,
         rightDrop2Ref.current,
@@ -914,12 +991,45 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                   <stop offset="0%" stopColor="var(--delta-liquid-a)" />
                   <stop offset="100%" stopColor="var(--delta-liquid-b)" />
                 </linearGradient>
+                <linearGradient id="delta-glass-sheen-l" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(220, 240, 255, 0.30)" />
+                  <stop offset="28%" stopColor="rgba(120, 188, 255, 0.06)" />
+                  <stop offset="78%" stopColor="rgba(8, 28, 92, 0.05)" />
+                  <stop offset="100%" stopColor="rgba(130, 198, 255, 0.18)" />
+                </linearGradient>
+                <linearGradient id="delta-rim-fade-l" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(230, 245, 255, 0.35)" />
+                  <stop offset="22%" stopColor="rgba(255, 255, 255, 0.96)" />
+                  <stop offset="52%" stopColor="rgba(255, 255, 255, 1)" />
+                  <stop offset="80%" stopColor="rgba(235, 246, 255, 0.92)" />
+                  <stop offset="100%" stopColor="rgba(220, 240, 255, 0.30)" />
+                </linearGradient>
+                <clipPath id="delta-liquid-clip-l">
+                  <path ref={leftClipRef} />
+                </clipPath>
+                <filter id="delta-rim-halo-l" filterUnits="userSpaceOnUse" x="-16" y="-16" width="132" height="78">
+                  <feGaussianBlur stdDeviation="1.5 2.4" />
+                </filter>
+                <filter id="delta-rim-glow-l" filterUnits="userSpaceOnUse" x="-16" y="-16" width="132" height="78">
+                  <feGaussianBlur stdDeviation="0.55 1.1" result="b" />
+                  <feMerge>
+                    <feMergeNode in="b" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
               </defs>
               <path ref={leftBackRef} className="delta-liquid-back" />
               <path ref={leftFrontRef} fill="url(#delta-liquid-grad-l)" className="delta-liquid-front" />
-              <path ref={leftSlashRef} className="delta-liquid-slash" opacity="0" />
-              <circle ref={leftDrop1Ref} className="delta-liquid-drop" cx="0" cy="14" r="1.4" opacity="0" />
-              <circle ref={leftDrop2Ref} className="delta-liquid-drop" cx="0" cy="30" r="1.1" opacity="0" />
+              <g clipPath="url(#delta-liquid-clip-l)">
+                <rect x="0" y="0" width="100" height="46" fill="url(#delta-glass-sheen-l)" />
+                <path ref={leftInnerFrostRef} className="delta-liquid-inner-frost" filter="url(#delta-rim-halo-l)" />
+                <path ref={leftSlashRef} className="delta-liquid-slash" opacity="0" />
+              </g>
+              <path ref={leftHaloRef} className="delta-liquid-halo is-left" filter="url(#delta-rim-halo-l)" />
+              <path ref={leftRimCyanRef} className="delta-liquid-rim-cyan is-left" filter="url(#delta-rim-glow-l)" />
+              <path ref={leftRimWhiteRef} className="delta-liquid-rim-white" stroke="url(#delta-rim-fade-l)" filter="url(#delta-rim-glow-l)" />
+              <circle ref={leftDrop1Ref} className="delta-liquid-drop" cx="0" cy="14" r="1.4" opacity="0" filter="url(#delta-rim-glow-l)" />
+              <circle ref={leftDrop2Ref} className="delta-liquid-drop" cx="0" cy="30" r="1.1" opacity="0" filter="url(#delta-rim-glow-l)" />
             </svg>
 
             {LEFT_NAV.map((item, idx) => {
@@ -1034,12 +1144,45 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                   <stop offset="0%" stopColor="var(--delta-liquid-b)" />
                   <stop offset="100%" stopColor="var(--delta-liquid-c)" />
                 </linearGradient>
+                <linearGradient id="delta-glass-sheen-r" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(255, 242, 224, 0.30)" />
+                  <stop offset="28%" stopColor="rgba(255, 200, 140, 0.06)" />
+                  <stop offset="78%" stopColor="rgba(42, 22, 8, 0.05)" />
+                  <stop offset="100%" stopColor="rgba(255, 214, 160, 0.18)" />
+                </linearGradient>
+                <linearGradient id="delta-rim-fade-r" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="rgba(255, 238, 216, 0.35)" />
+                  <stop offset="22%" stopColor="rgba(255, 250, 242, 0.96)" />
+                  <stop offset="52%" stopColor="rgba(255, 255, 255, 1)" />
+                  <stop offset="80%" stopColor="rgba(255, 244, 228, 0.92)" />
+                  <stop offset="100%" stopColor="rgba(255, 230, 200, 0.30)" />
+                </linearGradient>
+                <clipPath id="delta-liquid-clip-r">
+                  <path ref={rightClipRef} />
+                </clipPath>
+                <filter id="delta-rim-halo-r" filterUnits="userSpaceOnUse" x="-16" y="-16" width="132" height="78">
+                  <feGaussianBlur stdDeviation="1.5 2.4" />
+                </filter>
+                <filter id="delta-rim-glow-r" filterUnits="userSpaceOnUse" x="-16" y="-16" width="132" height="78">
+                  <feGaussianBlur stdDeviation="0.55 1.1" result="b" />
+                  <feMerge>
+                    <feMergeNode in="b" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
               </defs>
               <path ref={rightBackRef} className="delta-liquid-back" />
               <path ref={rightFrontRef} fill="url(#delta-liquid-grad-r)" className="delta-liquid-front" />
-              <path ref={rightSlashRef} className="delta-liquid-slash" opacity="0" />
-              <circle ref={rightDrop1Ref} className="delta-liquid-drop" cx="0" cy="14" r="1.4" opacity="0" />
-              <circle ref={rightDrop2Ref} className="delta-liquid-drop" cx="0" cy="30" r="1.1" opacity="0" />
+              <g clipPath="url(#delta-liquid-clip-r)">
+                <rect x="0" y="0" width="100" height="46" fill="url(#delta-glass-sheen-r)" />
+                <path ref={rightInnerFrostRef} className="delta-liquid-inner-frost" filter="url(#delta-rim-halo-r)" />
+                <path ref={rightSlashRef} className="delta-liquid-slash" opacity="0" />
+              </g>
+              <path ref={rightHaloRef} className="delta-liquid-halo is-right" filter="url(#delta-rim-halo-r)" />
+              <path ref={rightRimCyanRef} className="delta-liquid-rim-cyan is-right" filter="url(#delta-rim-glow-r)" />
+              <path ref={rightRimWhiteRef} className="delta-liquid-rim-white" stroke="url(#delta-rim-fade-r)" filter="url(#delta-rim-glow-r)" />
+              <circle ref={rightDrop1Ref} className="delta-liquid-drop" cx="0" cy="14" r="1.4" opacity="0" filter="url(#delta-rim-glow-r)" />
+              <circle ref={rightDrop2Ref} className="delta-liquid-drop" cx="0" cy="30" r="1.1" opacity="0" filter="url(#delta-rim-glow-r)" />
             </svg>
 
             {RIGHT_NAV.map((item, idx) => {

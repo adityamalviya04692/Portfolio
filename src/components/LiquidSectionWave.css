@@ -1,0 +1,292 @@
+/* ==========================================================================
+   Apple Liquid Glass + Novapharm Live-Morphing Blue Water Border Waves
+   - Tightly proportioned to the section borders with guaranteed text clearance.
+   - Live Snell's-Law SVG feDisplacementMap + 3-channel chromatic prism refraction.
+   - Real-time 40-segment quadratic Bezier wave physics:
+     * edge="bottom" (Experience -> Projects): drains & pulls UP off the screen.
+     * edge="top" (Freelance -> Contact): surges & rolls UP from bottom of screen.
+   ========================================================================== */
+
+:root {
+  --liquid-wave-h: clamp(86px, 9.2vw, 128px);
+}
+
+.liquid-seam {
+  position: relative;
+  width: 100%;
+  height: 0;
+  z-index: 8;
+  pointer-events: none;
+  overflow: visible;
+  user-select: none;
+}
+
+/* Keep SVG defs in layout tree (never display: none) so Chromium resolves url(#filter) & url(#clip) */
+.liquid-defs-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.liquid-seam-viewport {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: var(--liquid-wave-h);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Rising liquid glass flowing UP from bottom into #contact */
+.liquid-seam.is-top .liquid-seam-viewport {
+  bottom: -2px;
+}
+
+/* Draining liquid glass receding UP out of #experience above #projects */
+.liquid-seam.is-bottom .liquid-seam-viewport {
+  top: -2px;
+}
+
+/* Full-width stage hosting live-morphing clipPath + SVG water layers */
+.liquid-glass-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.liquid-glass-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(145, 198, 255, 0.06);
+  transform: translateZ(0);
+}
+
+.liquid-glass-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+/* --------------------------------------------------------------------------
+   Light Theme Optical Water-Depth Absorption Palette
+   Smooth hue/luminance convergence into exact --section-blue (#102b79)
+   well before the seam so zero two-tone horizontal line ever appears.
+   -------------------------------------------------------------------------- */
+.lg-stop-top {
+  stop-color: #6ab0ff;
+  stop-opacity: 0.12;
+}
+
+.lg-stop-upper {
+  stop-color: #2260dc;
+  stop-opacity: 0.40;
+}
+
+.lg-stop-mid {
+  stop-color: #1540ab;
+  stop-opacity: 0.78;
+}
+
+.lg-stop-deep {
+  stop-color: #113188;
+  stop-opacity: 0.96;
+}
+
+.lg-stop-seam {
+  stop-color: var(--section-blue, #102b79);
+  stop-opacity: 1;
+}
+
+.lg-caustic-core {
+  stop-color: rgba(42, 124, 255, 0.30);
+}
+
+.lg-caustic-mid {
+  stop-color: rgba(20, 68, 184, 0.12);
+}
+
+/* Contour-hugging internal glass thickness & refraction sheen */
+.lg-inner-frost-wall {
+  fill: none;
+  stroke: rgba(206, 234, 255, 0.42);
+  stroke-width: 24;
+  stroke-linecap: round;
+}
+
+.lg-inner-cobalt-band {
+  fill: none;
+  stroke: rgba(46, 128, 255, 0.50);
+  stroke-width: 38;
+  stroke-linecap: round;
+}
+
+/* Outer electric-blue luminous halo straddling the curved liquid edge */
+.lg-outer-halo {
+  fill: none;
+  stroke: rgba(68, 144, 255, 0.72);
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+/* Mid glowing cyan-blue glass meniscus */
+.lg-mid-cyan-rim {
+  fill: none;
+  stroke: rgba(162, 218, 255, 0.90);
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Razor-sharp luminous ice-white specular liquid crest */
+.lg-specular-crest {
+  fill: none;
+  stroke-width: 1.95;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* --------------------------------------------------------------------------
+   Dark Theme Optical Water-Depth Absorption Palette
+   -------------------------------------------------------------------------- */
+html[data-theme="dark"] .liquid-glass-backdrop {
+  background: rgba(86, 152, 255, 0.05);
+}
+
+html[data-theme="dark"] .lg-stop-top {
+  stop-color: #5ca2ff;
+  stop-opacity: 0.12;
+}
+
+html[data-theme="dark"] .lg-stop-upper {
+  stop-color: #1b4ab8;
+  stop-opacity: 0.40;
+}
+
+html[data-theme="dark"] .lg-stop-mid {
+  stop-color: #102d78;
+  stop-opacity: 0.78;
+}
+
+html[data-theme="dark"] .lg-stop-deep {
+  stop-color: #0c1d4c;
+  stop-opacity: 0.96;
+}
+
+html[data-theme="dark"] .lg-stop-seam {
+  stop-color: var(--section-blue, #0b1739);
+  stop-opacity: 1;
+}
+
+html[data-theme="dark"] .lg-caustic-core {
+  stop-color: rgba(44, 114, 255, 0.24);
+}
+
+html[data-theme="dark"] .lg-caustic-mid {
+  stop-color: rgba(16, 46, 128, 0.10);
+}
+
+html[data-theme="dark"] .lg-inner-frost-wall {
+  stroke: rgba(176, 216, 255, 0.34);
+}
+
+html[data-theme="dark"] .lg-inner-cobalt-band {
+  stroke: rgba(48, 118, 255, 0.48);
+}
+
+html[data-theme="dark"] .lg-outer-halo {
+  stroke: rgba(68, 138, 255, 0.64);
+}
+
+html[data-theme="dark"] .lg-mid-cyan-rim {
+  stroke: rgba(154, 210, 255, 0.86);
+}
+
+/* Solid 4px seam apron ensuring zero subpixel gap between wave base and .blue-section */
+.liquid-seam-apron {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--section-blue, #102b79);
+}
+
+.liquid-seam.is-top .liquid-seam-apron {
+  bottom: -3px;
+}
+
+.liquid-seam.is-bottom .liquid-seam-apron {
+  top: -3px;
+}
+
+/* Guarantee generous clearance so the border wave NEVER overlaps Projects or Freelance copy */
+#projects.projects.showcase-section {
+  padding-top: max(136px, calc(var(--liquid-wave-h) + 32px));
+}
+
+#freelance.projects.freelance-section {
+  padding-bottom: max(142px, calc(var(--liquid-wave-h) + 34px));
+}
+
+/* Flatten rounded top/bottom corners where a living liquid glass wave forms the section contour */
+html:not([data-motion="off"]) #contact.contact.blue-section {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+html:not([data-motion="off"]) #experience.experience.blue-section {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Top overscroll blue liquid reservoir (sits strictly above y = 0 with zero gap) + native rubber-band canvas match */
+body {
+  background: var(--cream, #f4f0e6);
+}
+
+html[data-ready="true"] {
+  background: var(--section-blue, #102b79);
+}
+
+main {
+  position: relative;
+}
+
+.top-overscroll-liquid {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  width: 100%;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.top-overscroll-reservoir {
+  position: absolute;
+  inset: 0;
+  bottom: -4px;
+  background: var(--section-blue, #102b79);
+}
+
+@media (max-width: 700px) {
+  :root {
+    --liquid-wave-h: clamp(54px, 12vw, 76px);
+  }
+
+  #projects.projects.showcase-section {
+    padding-top: max(84px, calc(var(--liquid-wave-h) + 22px));
+  }
+
+  #freelance.projects.freelance-section {
+    padding-bottom: max(88px, calc(var(--liquid-wave-h) + 24px));
+  }
+}
