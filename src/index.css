@@ -1320,6 +1320,9 @@ footer > a:not(.monogram) {
   border-radius: 48px;
 }
 .hero-copy {
+  /* Keep the painted headline and links together when Chrome removes the loader layer. */
+  transform: translateZ(0);
+  isolation: isolate;
   -webkit-font-smoothing: antialiased;
 }
 .hero {

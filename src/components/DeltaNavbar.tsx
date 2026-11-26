@@ -110,8 +110,8 @@ function WaveToPauseIcon({ paused, hovered }: { paused: boolean; hovered: boolea
       // - Playing hover:  curl = 0.96, split = 0.44  (unmistakable upright || bars tethered by a trembling thread!)
       // - Paused idle:    curl = 1.00, split = 1.00  (crisp detached || bars)
       // - Paused hover:   curl = 0.22, split = 0.58  (bars lean & unfold into a live wave preview!)
-      const targetCurl = s.paused ? (s.hovered ? 0.22 : 1) : s.hovered ? 0.96 : 0;
-      const targetSplit = s.paused ? (s.hovered ? 0.58 : 1) : s.hovered ? 0.44 : 0;
+      const targetCurl = s.paused !== s.hovered ? 1 : 0;
+      const targetSplit = targetCurl;
 
       // Smooth springy curl solver
       const curlDiff = targetCurl - s.curl;
@@ -848,6 +848,7 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
   return (
     <>
       <motion.header
+        data-intro={introPhase}
         className={`delta-header ${onBlue ? "on-blue" : ""} ${scrolled ? "is-scrolled" : ""}`}
         style={reduced ? undefined : { y: navInertiaY }}
       >
@@ -872,6 +873,13 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
                 }
               }}
               onPointerLeave={() => {
+                suppressWaveHoverRef.current = false;
+                setWaveHovered(false);
+              }}
+              onFocus={(event) => {
+                if (event.currentTarget.matches(":focus-visible")) setWaveHovered(true);
+              }}
+              onBlur={() => {
                 suppressWaveHoverRef.current = false;
                 setWaveHovered(false);
               }}

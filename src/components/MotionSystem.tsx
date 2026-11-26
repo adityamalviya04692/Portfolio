@@ -271,6 +271,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
   }, []);
 
   const isDocking = introPhase === "docking";
+  const [curtainGone, setCurtainGone] = useState(false);
   const motionValue = useMemo(
     () => ({ reduced, paused, togglePaused }),
     [reduced, paused],
@@ -286,7 +287,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
       <MotionConfig reducedMotion={reduced ? "always" : "never"}>
         <LayoutGroup id="delta-portfolio-stage">
           {/* Layer 1: Atmospheric loading curtain — fades away cleanly while the logo floats above it */}
-          {introPhase !== "complete" && (
+          {introPhase !== "complete" && !curtainGone && (
               <motion.div
                 className={`page-loader delta-classic-loader ${isDocking ? "is-docking" : ""}`}
                 initial={{ opacity: 1 }}
@@ -296,6 +297,7 @@ export function MotionSystem({ children }: { children: ReactNode }) {
                   delay: isDocking ? 0.14 : 0,
                   ease: [0.65, 0, 0.35, 1],
                 }}
+                onAnimationComplete={() => { if (isDocking) setCurtainGone(true); }}
                 aria-label="Loading portfolio"
               >
                 <div className="delta-loader-grid" aria-hidden="true" />

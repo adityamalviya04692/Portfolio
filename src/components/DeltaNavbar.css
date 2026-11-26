@@ -1060,3 +1060,26 @@ html[data-theme="dark"] .delta-mobile-links a.is-active {
     transition: none !important;
   }
 }
+
+
+/* Anchor the hover outline to the control throughout its press animation. */
+@media (hover: hover) and (pointer: fine) {
+  html .delta-header .delta-wave-pill:hover {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+  html[data-custom-pointer="on"]:has(.delta-wave-pill:hover) .portfolio-cursor {
+    visibility: hidden !important;
+  }
+}
+html .delta-header .delta-wave-pill:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Composite the glass once the moving navbar has reached its resting position. */
+.delta-header[data-intro="loading"] *,
+.delta-header[data-intro="docking"] * {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
