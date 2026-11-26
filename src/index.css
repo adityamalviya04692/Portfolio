@@ -1310,6 +1310,7 @@ footer > a:not(.monogram) {
   position: sticky;
   top: 0;
   overflow: hidden;
+  isolation: isolate;
   transform-origin: 50% 100%;
   background: var(--cream);
   border-radius: 0;

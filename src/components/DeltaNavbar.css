@@ -101,6 +101,7 @@ html[data-theme="dark"] .delta-orbit-halo {
   height: 54px;
   display: grid;
   place-items: center;
+  transform: perspective(900px) scale(2.1852);
   will-change: transform;
 }
 

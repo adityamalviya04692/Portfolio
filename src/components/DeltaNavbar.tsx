@@ -962,13 +962,13 @@ export default function DeltaNavbar({ active, email, onBlue }: DeltaNavbarProps)
 
           {/* Center Circular "am." Logo Dock — tethered buoy that subtly rides emerging waves */}
           <div className="delta-logo-slot" id="delta-logo-dock">
-            {introPhase === "docking" && !reduced && (
+            {dockReady && !reduced && (
               <motion.span
                 className="delta-dock-ripple"
                 aria-hidden="true"
-                initial={{ scale: 0.72, opacity: 0 }}
-                animate={{ scale: [0.72, 1.05, 2.1], opacity: [0, 0.88, 0] }}
-                transition={{ duration: 0.58, delay: 0.96, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ scale: 0.78, opacity: 0 }}
+                animate={{ scale: [0.78, 1.08, 2.05], opacity: [0, 0.72, 0] }}
+                transition={{ duration: 0.56, ease: [0.16, 1, 0.3, 1] }}
               />
             )}
             <div

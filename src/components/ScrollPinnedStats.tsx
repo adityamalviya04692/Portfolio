@@ -205,18 +205,50 @@ function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
       return () => ro.disconnect();
     }
 
-    let completed = false;
+    type LockState = "idle" | "locked" | "holding" | "done";
+    let state: LockState = "idle";
     let captureAttached = false;
-    let inViewport = false;
+    let inZone = false;
     let targetScrub = 0;
     let displayScrub = 0;
     let targetEntry = 0;
     let displayEntry = 0;
     let rafId = 0;
+    let releaseTimer = 0;
     let lastTime = 0;
     let touchLastY = 0;
+    let prevScrollY = window.scrollY;
+    let anchorJumpUntil = 0;
+
+    // High-physics critically-damped spring + elastic resistance state
+    let springActive = false;
+    let springY = window.scrollY;
+    let springVel = 0;
+    let springTargetY = 0;
+    let tension = 0; // subtle 0..9px weighted rubber-band feedback while scrubbing
+    let releaseRampUntil = 0;
 
     applyVisuals(0, 0, false);
+
+    // Exact scrollY that frames Aditya's name, portrait, intro, and all 4 stat cards cleanly:
+    // anchors directly to the bottom of the 4 stat cards (not the padded band wrapper) + 32px breathing room.
+    const getLockY = () => {
+      const targetEl = gridRef.current ?? hostRef.current;
+      if (!targetEl) return 0;
+      const rect = targetEl.getBoundingClientRect();
+      const cardsBottomDoc = rect.bottom + window.scrollY;
+      return Math.max(0, Math.round(cardsBottomDoc + 32 - window.innerHeight));
+    };
+
+    const setElasticOffset = (px: number) => {
+      const gridEl = gridRef.current;
+      if (!gridEl) return;
+      if (Math.abs(px) < 0.08) {
+        gridEl.style.transform = "";
+      } else {
+        gridEl.style.transform = `translate3d(0, ${(-px).toFixed(2)}px, 0)`;
+      }
+    };
 
     const startLoop = () => {
       if (rafId) return;
@@ -226,6 +258,31 @@ function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
         const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
         lastTime = now;
 
+        // 1. Critically-damped spring glide onto lockY (zero jarring instant snap)
+        let springDone = !springActive;
+        if (springActive) {
+          const stiffness = 135;
+          const damping = 23.2; // critically damped: 2 * sqrt(135) ≈ 23.24
+          const acc = stiffness * (springTargetY - springY) - damping * springVel;
+          springVel += acc * dt;
+          springY += springVel * dt;
+          if (Math.abs(springTargetY - springY) < 0.45 && Math.abs(springVel) < 4) {
+            springY = springTargetY;
+            springVel = 0;
+            springActive = false;
+            springDone = true;
+          }
+          window.scrollTo({ top: springY, behavior: "instant" });
+          prevScrollY = springY;
+        }
+
+        // 2. Smooth exponential decay of weighted elastic micro-tension
+        tension *= Math.exp(-11 * dt);
+        if (tension < 0.05) tension = 0;
+        setElasticOffset(tension);
+        const tensionDone = tension === 0;
+
+        // 3. Smooth odometer + exponential curve interpolation
         const scrubAlpha = 1 - Math.exp(-8.8 * dt);
         const entryAlpha = 1 - Math.exp(-9.5 * dt);
 
@@ -240,7 +297,7 @@ function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
 
         applyVisuals(displayScrub, displayEntry, false);
 
-        if (scrubDone && entryDone) {
+        if (scrubDone && entryDone && springDone && tensionDone) {
           rafId = 0;
           return;
         }
@@ -250,35 +307,166 @@ function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
       rafId = requestAnimationFrame(tick);
     };
 
-    const isInHoldZone = () => {
-      const el = hostRef.current;
-      if (!el) return false;
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      return rect.top <= vh * 0.8 && rect.bottom >= vh * 0.18;
+    const finishInstant = () => {
+      state = "done";
+      springActive = false;
+      tension = 0;
+      setElasticOffset(0);
+      if (releaseTimer) {
+        window.clearTimeout(releaseTimer);
+        releaseTimer = 0;
+      }
+      targetScrub = 1;
+      targetEntry = 1;
+      displayScrub = 1;
+      displayEntry = 1;
+      applyVisuals(1, 1, false);
+      detachCapture();
+      window.removeEventListener("scroll", onScroll);
+    };
+
+    const enterHoldingPhase = () => {
+      if (state === "holding" || state === "done") return;
+      state = "holding";
+      targetScrub = 1;
+      targetEntry = 1;
+      startLoop();
+      if (releaseTimer) window.clearTimeout(releaseTimer);
+      // Gentle settle beat so all 4 odometers & growth curve finish in view, then smoothly ramp release
+      releaseTimer = window.setTimeout(() => {
+        releaseTimer = 0;
+        state = "done";
+        releaseRampUntil = performance.now() + 260;
+        window.setTimeout(() => {
+          detachCapture();
+          window.removeEventListener("scroll", onScroll);
+        }, 280);
+      }, 420);
+    };
+
+    const engageMagneticLock = (lockY: number, incomingVel = 0) => {
+      state = "locked";
+      targetEntry = 1;
+      springTargetY = lockY;
+      springY = window.scrollY;
+      // Seed gentle spring velocity so arrival decelerates organically onto lockY
+      springVel = Math.max(-650, Math.min(650, incomingVel));
+      springActive = Math.abs(springTargetY - springY) > 1;
+      if (!springActive) {
+        window.scrollTo({ top: lockY, behavior: "instant" });
+        prevScrollY = lockY;
+      }
+      startLoop();
     };
 
     const advanceByDelta = (deltaY: number) => {
-      if (completed || deltaY <= 0) return false;
-      if (!isInHoldZone()) return false;
+      if (deltaY <= 0) return false;
 
-      const step = Math.min(deltaY, 56) / TOTAL_SCROLL_BUDGET;
+      // Smooth breakaway ramp right after completion so scroll doesn't jerk from 0% to 100%
+      if (state === "done") {
+        const now = performance.now();
+        if (now < releaseRampUntil) {
+          const t = 1 - (releaseRampUntil - now) / 260;
+          const easedGain = 0.22 + 0.78 * (t * t);
+          window.scrollBy({ top: deltaY * easedGain, behavior: "instant" });
+          prevScrollY = window.scrollY;
+          return true;
+        }
+        return false;
+      }
+
+      const lockY = getLockY();
+      const y = window.scrollY;
+
+      if (state === "holding") {
+        springTargetY = lockY;
+        if (!springActive && Math.abs(y - lockY) > 1) {
+          springY = y;
+          springActive = true;
+        }
+        tension = Math.min(7, tension + Math.min(deltaY, 24) * 0.08);
+        startLoop();
+        return true;
+      }
+
+      if (state === "idle") {
+        const distToLock = lockY - y;
+
+        // Viscous magnetic approach zone (220px before lockY):
+        // 1) Pre-roll the numbers early (0 -> 0.24) as the band glides in
+        // 2) Apply progressive magnetic braking so heavy flicks decelerate smoothly instead of hitting a wall
+        if (distToLock > 0 && distToLock <= 220) {
+          const approachP = 1 - distToLock / 220;
+          const preScrub = approachP * 0.24;
+          if (preScrub > targetScrub) targetScrub = preScrub;
+          targetEntry = Math.max(targetEntry, Math.min(1, approachP * 1.15));
+
+          const dampingFactor = 0.22 + 0.78 * Math.pow(1 - approachP, 1.5);
+          const dampedMove = Math.min(deltaY * dampingFactor, distToLock);
+
+          if (dampedMove >= distToLock - 2 || distToLock <= 8) {
+            engageMagneticLock(lockY, Math.min(deltaY * 6, 420));
+            const excess = Math.max(0, deltaY * dampingFactor - distToLock);
+            if (excess > 0) {
+              targetScrub = Math.min(1, targetScrub + Math.min(excess, 32) / TOTAL_SCROLL_BUDGET);
+            }
+          } else {
+            const nextY = y + dampedMove;
+            window.scrollTo({ top: nextY, behavior: "instant" });
+            prevScrollY = nextY;
+          }
+          startLoop();
+          return true;
+        }
+
+        // Catch mega flicks that jump from >220px away right across lockY in a single wheel tick
+        if (y < lockY && y + deltaY >= lockY - 6) {
+          engageMagneticLock(lockY, 520);
+          targetScrub = Math.max(targetScrub, 0.24);
+          startLoop();
+          return true;
+        }
+
+        if (y >= lockY - 6 && y <= lockY + 140) {
+          engageMagneticLock(lockY, 0);
+        } else {
+          return false;
+        }
+      }
+
+      // Locked in magnetic detent: keep spring anchored at lockY + weighted elastic micro-give while scrubbing numbers
+      springTargetY = lockY;
+      if (!springActive && Math.abs(y - lockY) > 1) {
+        springY = y;
+        springActive = true;
+      }
+
+      const step = Math.min(deltaY, 44) / TOTAL_SCROLL_BUDGET;
       targetScrub = Math.min(1, targetScrub + step);
+      tension = Math.min(9, tension + Math.min(deltaY, 34) * 0.11);
       startLoop();
 
       if (targetScrub >= 0.994) {
-        completed = true;
-        targetScrub = 1;
-        targetEntry = 1;
-        detachCapture();
-        window.removeEventListener("scroll", onScroll);
-        return false;
+        enterHoldingPhase();
       }
       return true;
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (completed || e.deltaY <= 0) return;
+      if (performance.now() < anchorJumpUntil) return;
+      if (state === "done" && performance.now() >= releaseRampUntil) return;
+      if (e.deltaY < 0) {
+        if (state === "locked" || state === "holding") {
+          if (releaseTimer) {
+            window.clearTimeout(releaseTimer);
+            releaseTimer = 0;
+          }
+          state = "idle";
+          springActive = false;
+        }
+        return;
+      }
+      if (e.deltaY === 0) return;
       if (advanceByDelta(e.deltaY)) {
         e.preventDefault();
       }
@@ -291,18 +479,51 @@ function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (completed || e.touches.length !== 1) return;
+      if (performance.now() < anchorJumpUntil || e.touches.length !== 1) return;
+      if (state === "done" && performance.now() >= releaseRampUntil) return;
       const currentY = e.touches[0].clientY;
       const deltaY = touchLastY - currentY;
       touchLastY = currentY;
-      if (deltaY <= 0) return;
+      if (deltaY < 0) {
+        if (state === "locked" || state === "holding") {
+          if (releaseTimer) {
+            window.clearTimeout(releaseTimer);
+            releaseTimer = 0;
+          }
+          state = "idle";
+          springActive = false;
+        }
+        return;
+      }
+      if (deltaY === 0) return;
       if (advanceByDelta(deltaY * 1.45)) {
         e.preventDefault();
       }
     };
 
+    const onDocumentClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      const anchor = target?.closest?.('a[href^="#"]') as HTMLAnchorElement | null;
+      if (anchor && anchor.getAttribute("href") !== "#about") {
+        anchorJumpUntil = performance.now() + 1000;
+        springActive = false;
+        if (state === "locked" || state === "holding") {
+          state = "idle";
+          if (releaseTimer) {
+            window.clearTimeout(releaseTimer);
+            releaseTimer = 0;
+          }
+        }
+      }
+    };
+
+    const onHashChange = () => {
+      anchorJumpUntil = performance.now() + 1000;
+      springActive = false;
+    };
+
     const attachCapture = () => {
-      if (captureAttached || completed) return;
+      if (captureAttached || (state === "done" && performance.now() >= releaseRampUntil)) return;
       captureAttached = true;
       window.addEventListener("wheel", onWheel, { passive: false });
       window.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -318,61 +539,74 @@ function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
     };
 
     const onScroll = () => {
-      if (!inViewport && !completed) {
-        const el = hostRef.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        if (rect.bottom < window.innerHeight * 0.14) {
-          completed = true;
-          targetScrub = 1;
-          targetEntry = 1;
-          displayScrub = 1;
-          displayEntry = 1;
-          applyVisuals(1, 1, false);
-          detachCapture();
-          window.removeEventListener("scroll", onScroll);
-        }
-        return;
-      }
+      const y = window.scrollY;
+      const scrollingDown = y > prevScrollY;
+      const prev = prevScrollY;
+      prevScrollY = y;
+
+      if (state === "done") return;
+
       const el = hostRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight;
+      const lockY = getLockY();
 
-      const rawEntry = (vh - rect.top) / (vh * 0.34);
-      const nextEntry = Math.max(targetEntry, Math.max(0, Math.min(1, rawEntry)));
-      if (nextEntry !== targetEntry) {
-        targetEntry = nextEntry;
-        startLoop();
+      if (performance.now() < anchorJumpUntil) {
+        if (y > lockY + 120) finishInstant();
+        return;
       }
 
-      if (!completed && rect.bottom < vh * 0.14) {
-        completed = true;
-        targetScrub = 1;
-        targetEntry = 1;
-        displayScrub = 1;
-        displayEntry = 1;
-        applyVisuals(1, 1, false);
-        detachCapture();
-        window.removeEventListener("scroll", onScroll);
+      if ((state === "locked" || state === "holding") && !springActive && y > lockY + 1) {
+        engageMagneticLock(lockY, -280);
+        return;
+      }
+
+      if (state === "idle" && scrollingDown && prev <= lockY + 60 && y >= lockY) {
+        attachCapture();
+        engageMagneticLock(lockY, -260);
+        return;
+      }
+
+      // Early pre-roll as the stats band enters the viewport before reaching lockY
+      if (inZone && state === "idle") {
+        const distToLock = lockY - y;
+        if (distToLock > 0 && distToLock <= 260) {
+          const preP = (1 - distToLock / 260) * 0.24;
+          if (preP > targetScrub) {
+            targetScrub = preP;
+            startLoop();
+          }
+        }
+        const rawEntry = (vh - rect.top) / (vh * 0.34);
+        const nextEntry = Math.max(targetEntry, Math.max(0, Math.min(1, rawEntry)));
+        if (nextEntry !== targetEntry) {
+          targetEntry = nextEntry;
+          startLoop();
+        }
+      }
+
+      if (state === "idle" && prev > lockY + 260 && rect.bottom < 0) {
+        finishInstant();
       }
     };
 
-    // Scope non-passive wheel capture strictly to when the stats band is in view!
     const io = new IntersectionObserver(
       ([entry]) => {
-        inViewport = entry.isIntersecting;
-        if (inViewport && !completed) {
+        inZone = entry.isIntersecting;
+        if (inZone && state !== "done") {
           attachCapture();
           onScroll();
-        } else {
+        } else if (!inZone && state === "idle") {
           detachCapture();
         }
       },
-      { rootMargin: "40px 0px" }
+      { rootMargin: "650px 0px" }
     );
     if (hostRef.current) io.observe(hostRef.current);
 
+    document.addEventListener("click", onDocumentClick, true);
+    window.addEventListener("hashchange", onHashChange);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
 
@@ -380,7 +614,11 @@ function ScrollPinnedStats({ stats }: { stats: readonly StatItem[] }) {
       io.disconnect();
       ro.disconnect();
       detachCapture();
+      setElasticOffset(0);
+      document.removeEventListener("click", onDocumentClick, true);
+      window.removeEventListener("hashchange", onHashChange);
       window.removeEventListener("scroll", onScroll);
+      if (releaseTimer) window.clearTimeout(releaseTimer);
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, [reduced, digitMetas]);

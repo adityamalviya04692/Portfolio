@@ -2302,7 +2302,14 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
   const { introPhase } = useIntroState();
   const introPhaseRef = useRef(introPhase);
   introPhaseRef.current = introPhase;
+  const schedulePrebakeRef = useRef<(() => void) | null>(null);
   const sectionVisibleRef = useRef(false);
+
+  useEffect(() => {
+    if (introPhase === "complete") {
+      schedulePrebakeRef.current?.();
+    }
+  }, [introPhase]);
   const cityLayerRef = useRef<HTMLDivElement>(null);
   const cityWrapRef = useRef<HTMLDivElement>(null);
   const cityHeaderRef = useRef<HTMLDivElement>(null);
@@ -2429,17 +2436,20 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
       ground: document.createElement("canvas"),
       slices: Array.from({ length: DEPTH_BANDS }, () => document.createElement("canvas")),
     });
-    let cityCache: { mono: ReturnType<typeof createLayers>; color: ReturnType<typeof createLayers> } | undefined;
+    type CityCachePair = { mono: ReturnType<typeof createLayers>; color: ReturnType<typeof createLayers> };
+    let cityCaches: { light?: CityCachePair; dark?: CityCachePair } = {};
     let baking: Generator<void> | undefined;
+    let bakingDark = false;
     const sliceTop = new WeakMap<HTMLCanvasElement, number>();
     ensureLogoImagesLoaded();
     let cW = 0;
     let cH = 0;
     let cDpr = 0;
-    let cDark = false;
     let cLogoVer = -1;
+    let prevRenderedDark: boolean | null = null;
     let landmarks: LandmarkAtlas | undefined;
     let landmarksSettled = false;
+    let landmarksFailed = false;
     const landmarkRequest = new AbortController();
     // Eagerly load 3D WebGL landmarks right away under the loading curtain so the city bakes once cleanly
     (() => {
@@ -2447,19 +2457,28 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
       updatePrewarmTask("city", 0.08);
       import("./skills-city/landmarkCache").then(async ({ createLandmarkCache }) => {
         if (signal.aborted) return;
-        landmarks = await createLandmarkCache(STRUCTURES.filter(s => s.kind.startsWith("logo_")), signal, () => {
+        landmarks = await createLandmarkCache(STRUCTURES.filter(s => s.kind.startsWith("logo_")), signal, (readyDark) => {
           landmarksSettled = true;
-          cLogoVer = -1;
+          // Invalidate only the theme whose 3D landmark atlas just finished so the other theme stays cached
+          if (readyDark) {
+            delete cityCaches.dark;
+          } else {
+            delete cityCaches.light;
+          }
+          if (baking && bakingDark === readyDark) {
+            baking = undefined;
+          }
           schedulePrebake();
         });
         if (!signal.aborted) {
           updatePrewarmTask("city", 0.25);
           const w = monoCanvas.clientWidth || window.innerWidth;
           const h = monoCanvas.clientHeight || window.innerHeight;
-          landmarks.request(getIso(w, h).tile, document.documentElement.dataset.theme === "dark");
+          landmarks.request(getIso(w, h).tile, document.documentElement.dataset.theme === "dark", true);
         }
       }).catch(error => {
         landmarksSettled = true;
+        landmarksFailed = true;
         if (!signal.aborted) console.warn("Using the canvas landmark models", error);
       });
     })();
@@ -2702,7 +2721,11 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
       const color = createLayers();
       yield* buildCityCache(mono.ground, mono.slices, W, H, dpr, false, dark);
       yield* buildCityCache(color.ground, color.slices, W, H, dpr, true, dark);
-      cityCache = { mono, color };
+      if (dark) {
+        cityCaches.dark = { mono, color };
+      } else {
+        cityCaches.light = { mono, color };
+      }
     }
 
     const drawCanalBridges = (ctx: CanvasRenderingContext2D, iso: IsoFn, tile: number, isColor: boolean, isDark: boolean) => {
@@ -2796,12 +2819,16 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
         const swayY = Math.cos(time * 0.0012 + g.phase) * 0.025;
         const gx = g.gx + swayX;
         const gy = g.gy + swayY;
-        const depth = gx + gy;
+        // Sort south-apron stadium gatherings cleanly in front of the stadium bowl slice
+        const isSouthStadiumApron = gy > 0.45 && gy < 1.35 && Math.abs(gx) < 1.55;
+        const depth = gx + gy + (isSouthStadiumApron ? 1.15 : 0);
         buckets[depthToBand(depth)].push({ kind: "p", depth, x: gx, y: gy, z0: g.z0, coat: g.coat, hat: g.hat, phase: g.phase, speedMult: 0.45 });
       }
 
-      const ferrisBand = depthToBand(FERRIS_POS.gx + FERRIS_POS.gy);
-      const stadiumBand = depthToBand(0.0 + -0.05);
+      // Match the exact depth bands where buildCityCache baked the ferris_base and stadium slices
+      // so the live football match, cheering crowd, floodlights & Ferris wheel draw ON TOP of their bases!
+      const ferrisBand = depthToBand(FERRIS_POS.gx + FERRIS_POS.gy + (0.96 + 0.62) * 0.28);
+      const stadiumBand = depthToBand(0.0 + -0.05 + (1.92 + 1.46) * 0.28);
 
       // 5. Composite back-to-front: entities in band b -> static building slice b (true 3D occlusion!)
       for (let b = 0; b < DEPTH_BANDS; b++) {
@@ -2871,94 +2898,119 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
         }
 
         // Live football match, cheering stadium crowd & dark-mode floodlights inside central stadium
+        // Optimized: color-batched draw calls + zero per-frame array/gradient allocations!
         if (b === stadiumBand) {
           const rim = iso(0.0, -0.05, 34);
           const pitchX = rim[0];
           const pitchY = rim[1] + 5;
           const crowdCols = ["#ed8838", "#38bdf8", "#f5c418", "#ffffff", "#e25241", "#4ade80"];
-          for (let k = 0; k < 64; k++) {
-            const ang = (k / 64) * Math.PI * 2;
-            const ring = k % 2 === 0 ? 0.81 : 0.89;
-            const cheer = Math.max(0, Math.sin(time * 0.0065 - ang * 2.0)) * 2.0;
-            const sx = rim[0] + Math.cos(ang) * tile * ring;
-            const sy = rim[1] + 2 + Math.sin(ang) * tile * (ring * 0.5) - cheer;
-            ctx.beginPath();
-            ctx.arc(sx, sy, 1.55, 0, Math.PI * 2);
-            ctx.fillStyle = isColor ? crowdCols[k % crowdCols.length] : isDark ? "#64748b" : "#94a3b8";
-            ctx.fill();
-          }
-          const tMatch = time * 0.0013;
-          const teamA: Array<[number, number]> = [
-            [-0.48 + Math.sin(tMatch * 1.1) * 0.06, Math.cos(tMatch * 0.9) * 0.08],
-            [-0.24 + Math.cos(tMatch * 1.3) * 0.14, -0.14 + Math.sin(tMatch * 1.2) * 0.08],
-            [-0.18 + Math.sin(tMatch * 1.5 + 1) * 0.16, 0.14 + Math.cos(tMatch * 1.1) * 0.08],
-            [0.06 + Math.cos(tMatch * 1.7 + 2) * 0.18, -0.06 + Math.sin(tMatch * 1.4) * 0.12],
-            [0.14 + Math.sin(tMatch * 1.4 + 3) * 0.15, 0.1 + Math.cos(tMatch * 1.3) * 0.1],
-          ];
-          const teamB: Array<[number, number]> = [
-            [0.48 + Math.cos(tMatch * 1.1) * 0.06, Math.sin(tMatch * 0.9) * 0.08],
-            [0.24 + Math.sin(tMatch * 1.25) * 0.14, 0.13 + Math.cos(tMatch * 1.1) * 0.08],
-            [0.18 + Math.cos(tMatch * 1.45 + 1) * 0.16, -0.14 + Math.sin(tMatch * 1.2) * 0.08],
-            [-0.06 + Math.sin(tMatch * 1.6 + 2) * 0.18, 0.08 + Math.cos(tMatch * 1.5) * 0.11],
-            [-0.14 + Math.cos(tMatch * 1.35 + 3) * 0.15, -0.1 + Math.sin(tMatch * 1.25) * 0.1],
-          ];
-          const drawPlayers = (pts: Array<[number, number]>, col: string) => {
-            ctx.fillStyle = isColor ? col : "#e2e8f0";
-            for (const [ox, oy] of pts) {
+          if (isColor) {
+            for (let ci = 0; ci < 6; ci++) {
               ctx.beginPath();
-              ctx.arc(pitchX + ox * tile, pitchY + oy * tile, 1.9, 0, Math.PI * 2);
+              for (let k = ci; k < 64; k += 6) {
+                const ang = (k / 64) * Math.PI * 2;
+                const ring = k % 2 === 0 ? 0.81 : 0.89;
+                const cheer = Math.max(0, Math.sin(time * 0.0065 - ang * 2.0)) * 2.0;
+                const sx = rim[0] + Math.cos(ang) * tile * ring;
+                const sy = rim[1] + 2 + Math.sin(ang) * tile * (ring * 0.5) - cheer;
+                ctx.moveTo(sx + 1.55, sy);
+                ctx.arc(sx, sy, 1.55, 0, Math.PI * 2);
+              }
+              ctx.fillStyle = crowdCols[ci];
               ctx.fill();
             }
-          };
-          drawPlayers(teamA, "#2563eb");
-          drawPlayers(teamB, "#ff7b29");
-          const allPlayers = [...teamA, ...teamB];
-          const passSlot = (tMatch * 0.9) % allPlayers.length;
-          const idx0 = Math.floor(passSlot);
-          const idx1 = (idx0 + 3) % allPlayers.length;
-          const frac = passSlot - idx0;
-          const bx = pitchX + (allPlayers[idx0][0] + (allPlayers[idx1][0] - allPlayers[idx0][0]) * frac) * tile;
-          const by = pitchY + (allPlayers[idx0][1] + (allPlayers[idx1][1] - allPlayers[idx0][1]) * frac) * tile - Math.sin(frac * Math.PI) * 3.2;
+          } else {
+            ctx.beginPath();
+            for (let k = 0; k < 64; k++) {
+              const ang = (k / 64) * Math.PI * 2;
+              const ring = k % 2 === 0 ? 0.81 : 0.89;
+              const cheer = Math.max(0, Math.sin(time * 0.0065 - ang * 2.0)) * 2.0;
+              const sx = rim[0] + Math.cos(ang) * tile * ring;
+              const sy = rim[1] + 2 + Math.sin(ang) * tile * (ring * 0.5) - cheer;
+              ctx.moveTo(sx + 1.55, sy);
+              ctx.arc(sx, sy, 1.55, 0, Math.PI * 2);
+            }
+            ctx.fillStyle = isDark ? "#64748b" : "#94a3b8";
+            ctx.fill();
+          }
+
+          const tMatch = time * 0.0013;
+          const p0x = -0.48 + Math.sin(tMatch * 1.1) * 0.06, p0y = Math.cos(tMatch * 0.9) * 0.08;
+          const p1x = -0.24 + Math.cos(tMatch * 1.3) * 0.14, p1y = -0.14 + Math.sin(tMatch * 1.2) * 0.08;
+          const p2x = -0.18 + Math.sin(tMatch * 1.5 + 1) * 0.16, p2y = 0.14 + Math.cos(tMatch * 1.1) * 0.08;
+          const p3x = 0.06 + Math.cos(tMatch * 1.7 + 2) * 0.18, p3y = -0.06 + Math.sin(tMatch * 1.4) * 0.12;
+          const p4x = 0.14 + Math.sin(tMatch * 1.4 + 3) * 0.15, p4y = 0.1 + Math.cos(tMatch * 1.3) * 0.1;
+
+          const p5x = 0.48 + Math.cos(tMatch * 1.1) * 0.06, p5y = Math.sin(tMatch * 0.9) * 0.08;
+          const p6x = 0.24 + Math.sin(tMatch * 1.25) * 0.14, p6y = 0.13 + Math.cos(tMatch * 1.1) * 0.08;
+          const p7x = 0.18 + Math.cos(tMatch * 1.45 + 1) * 0.16, p7y = -0.14 + Math.sin(tMatch * 1.2) * 0.08;
+          const p8x = -0.06 + Math.sin(tMatch * 1.6 + 2) * 0.18, p8y = 0.08 + Math.cos(tMatch * 1.5) * 0.11;
+          const p9x = -0.14 + Math.cos(tMatch * 1.35 + 3) * 0.15, p9y = -0.1 + Math.sin(tMatch * 1.25) * 0.1;
+
+          const pxArr = [p0x, p1x, p2x, p3x, p4x, p5x, p6x, p7x, p8x, p9x];
+          const pyArr = [p0y, p1y, p2y, p3y, p4y, p5y, p6y, p7y, p8y, p9y];
+
+          // Batch Team A (5 players -> 1 fill call)
           ctx.beginPath();
-          ctx.arc(bx, by, 1.45, 0, Math.PI * 2);
+          for (let i = 0; i < 5; i++) {
+            const x = pitchX + pxArr[i] * tile;
+            const y = pitchY + pyArr[i] * tile;
+            ctx.moveTo(x + 2.0, y);
+            ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+          }
+          ctx.fillStyle = isColor ? "#2563eb" : "#e2e8f0";
+          ctx.fill();
+
+          // Batch Team B (5 players -> 1 fill call)
+          ctx.beginPath();
+          for (let i = 5; i < 10; i++) {
+            const x = pitchX + pxArr[i] * tile;
+            const y = pitchY + pyArr[i] * tile;
+            ctx.moveTo(x + 2.0, y);
+            ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+          }
+          ctx.fillStyle = isColor ? "#ff7b29" : "#cbd5e1";
+          ctx.fill();
+
+          // Live football pass arc
+          const passSlot = (tMatch * 0.9) % 10;
+          const idx0 = Math.floor(passSlot);
+          const idx1 = (idx0 + 3) % 10;
+          const frac = passSlot - idx0;
+          const bx = pitchX + (pxArr[idx0] + (pxArr[idx1] - pxArr[idx0]) * frac) * tile;
+          const by = pitchY + (pyArr[idx0] + (pyArr[idx1] - pyArr[idx0]) * frac) * tile - Math.sin(frac * Math.PI) * 3.6;
+          ctx.beginPath();
+          ctx.arc(bx, by, 1.55, 0, Math.PI * 2);
           ctx.fillStyle = "#ffffff";
           ctx.fill();
 
+          // Lightweight dark-mode stadium floodlights (flat alpha cones + soft pitch glow — zero per-frame CanvasGradient allocations)
           if (isDark && isColor) {
-            ctx.save();
-            const pitchGlow = ctx.createRadialGradient(pitchX, pitchY, 2, pitchX, pitchY, tile * 0.85);
-            pitchGlow.addColorStop(0, "rgba(255, 246, 214, 0.28)");
-            pitchGlow.addColorStop(0.6, "rgba(255, 224, 155, 0.12)");
-            pitchGlow.addColorStop(1, "rgba(255, 224, 155, 0)");
             ctx.beginPath();
-            ctx.ellipse(pitchX, pitchY, tile * 0.82, tile * 0.4, 0, 0, Math.PI * 2);
-            ctx.fillStyle = pitchGlow;
+            ctx.ellipse(pitchX, pitchY, tile * 0.78, tile * 0.37, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 240, 195, 0.16)";
             ctx.fill();
 
-            [[-0.88, -0.56], [0.88, -0.56], [-0.88, 0.56], [0.88, 0.56]].forEach(([dx, dy]) => {
-              const top = iso(dx, -0.05 + dy, 34 + 19);
-              const beam = ctx.createLinearGradient(top[0], top[1], pitchX, pitchY);
-              beam.addColorStop(0, "rgba(255, 248, 220, 0.36)");
-              beam.addColorStop(0.55, "rgba(255, 236, 182, 0.13)");
-              beam.addColorStop(1, "rgba(255, 236, 182, 0)");
-              ctx.beginPath();
+            ctx.beginPath();
+            const towers: Array<[number, number]> = [[-0.88, -0.56], [0.88, -0.56], [-0.88, 0.56], [0.88, 0.56]];
+            for (let ti = 0; ti < 4; ti++) {
+              const top = iso(towers[ti][0], -0.05 + towers[ti][1], 53);
               ctx.moveTo(top[0], top[1]);
-              ctx.lineTo(pitchX - tile * 0.26, pitchY - tile * 0.1);
-              ctx.lineTo(pitchX + tile * 0.26, pitchY + tile * 0.14);
+              ctx.lineTo(pitchX - tile * 0.24, pitchY - tile * 0.09);
+              ctx.lineTo(pitchX + tile * 0.24, pitchY + tile * 0.12);
               ctx.closePath();
-              ctx.fillStyle = beam;
-              ctx.fill();
+            }
+            ctx.fillStyle = "rgba(255, 242, 200, 0.11)";
+            ctx.fill();
 
-              const bulb = ctx.createRadialGradient(top[0], top[1], 1, top[0], top[1], 16);
-              bulb.addColorStop(0, "rgba(255, 255, 240, 0.98)");
-              bulb.addColorStop(0.32, "rgba(255, 230, 165, 0.62)");
-              bulb.addColorStop(1, "rgba(255, 210, 120, 0)");
-              ctx.beginPath();
-              ctx.arc(top[0], top[1], 16, 0, Math.PI * 2);
-              ctx.fillStyle = bulb;
-              ctx.fill();
-            });
-            ctx.restore();
+            ctx.beginPath();
+            for (let ti = 0; ti < 4; ti++) {
+              const top = iso(towers[ti][0], -0.05 + towers[ti][1], 53);
+              ctx.moveTo(top[0] + 6, top[1]);
+              ctx.arc(top[0], top[1], 6, 0, Math.PI * 2);
+            }
+            ctx.fillStyle = "rgba(255, 244, 210, 0.48)";
+            ctx.fill();
           }
         }
 
@@ -3198,7 +3250,7 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
     let prebakeRaf = 0;
     let bakeStepsDone = 0;
     const EST_BAKE_STEPS = 2 * (DEPTH_BANDS + STRUCTURES.length + LAMPS.length + 18);
-    const stepBaking = (budgetMs: number) => {
+    const stepBaking = (budgetMs: number, allowAlternateTheme = false) => {
       const dpr = Math.min(pan && pan.scrollWidth > pan.clientWidth ? 1 : 1.5, window.devicePixelRatio || 1);
       const W = monoCanvas.clientWidth;
       const H = monoCanvas.clientHeight;
@@ -3210,35 +3262,65 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
         colorCanvas.width = W * dpr;
         colorCanvas.height = H * dpr;
       }
-      landmarks?.request(getIso(W, H).tile, isDark);
-      if (cW !== W || cH !== H || cDpr !== dpr || cDark !== isDark || cLogoVer !== logoLoadVersion) {
+      const tile = getIso(W, H).tile;
+      landmarks?.request(tile, isDark, true);
+      // Invalidate both theme caches only on resize/DPR/landmark-version change (never on theme toggle!)
+      if (cW !== W || cH !== H || cDpr !== dpr || cLogoVer !== logoLoadVersion) {
         cW = W;
         cH = H;
         cDpr = dpr;
-        cDark = isDark;
         cLogoVer = logoLoadVersion;
-        bakeStepsDone = 0;
-        baking = bakeCity(W, H, dpr, isDark);
+        cityCaches = {};
+        baking = undefined;
       }
+
+      const activeCache = isDark ? cityCaches.dark : cityCaches.light;
+      const altCache = isDark ? cityCaches.light : cityCaches.dark;
+      const altLandmarksReady = landmarksFailed || Boolean(landmarks?.has(tile, !isDark));
+
+      // Prioritize active theme first; if user toggles theme while baking the other, switch immediately
+      if (!activeCache) {
+        if (!baking || bakingDark !== isDark) {
+          bakeStepsDone = 0;
+          bakingDark = isDark;
+          baking = bakeCity(W, H, dpr, isDark);
+        }
+      } else if (allowAlternateTheme && !altCache && introPhaseRef.current === "complete") {
+        // Request the opposite theme's 3D landmarks first and wait for them so we never bake 2D fallbacks
+        landmarks?.request(tile, !isDark, false);
+        if (altLandmarksReady && (!baking || bakingDark !== !isDark)) {
+          bakeStepsDone = 0;
+          bakingDark = !isDark;
+          baking = bakeCity(W, H, dpr, !isDark);
+        }
+      }
+
       if (baking) {
         const deadline = performance.now() + budgetMs;
         do {
           bakeStepsDone++;
           if (baking.next().done) {
             baking = undefined;
-            if (landmarksSettled) {
-              completePrewarmTask("city");
-            } else {
-              updatePrewarmTask("city", 0.72);
+            const nowActiveReady = isDark ? Boolean(cityCaches.dark) : Boolean(cityCaches.light);
+            if (nowActiveReady) {
+              if (landmarksSettled) {
+                completePrewarmTask("city");
+              } else {
+                updatePrewarmTask("city", 0.72);
+              }
             }
           }
         } while (baking && performance.now() < deadline);
-        if (baking) {
+        if (baking && bakingDark === isDark) {
           const maxCap = landmarksSettled ? 0.96 : 0.7;
           updatePrewarmTask("city", Math.min(maxCap, 0.25 + (bakeStepsDone / Math.max(1, EST_BAKE_STEPS)) * (maxCap - 0.25)));
         }
       }
-      return Boolean(baking);
+
+      const bothReady = Boolean(cityCaches.light && cityCaches.dark);
+      // Only keep pumping rAF if there is active baking work right now; when waiting on the worker,
+      // onReady() will wake schedulePrebake() cleanly with zero idle rAF spinning.
+      return Boolean(baking) || (!activeCache) || (allowAlternateTheme && !bothReady && altLandmarksReady);
     };
 
     const schedulePrebake = () => {
@@ -3251,15 +3333,23 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
           prebakeRaf = requestAnimationFrame(pump);
           return;
         }
-        const budget = introPhaseRef.current === "loading" ? 5 : 3;
-        const stillBaking = stepBaking(budget);
-        if (stillBaking) {
+        const activeDark = document.documentElement.getAttribute("data-theme") === "dark";
+        const activeReady = activeDark ? Boolean(cityCaches.dark) : Boolean(cityCaches.light);
+        const budget = introPhaseRef.current === "loading" ? 5 : activeReady ? 2 : 4;
+        const stillNeedsWork = stepBaking(budget, true);
+        if (stillNeedsWork) {
           prebakeRaf = requestAnimationFrame(pump);
         }
       };
       prebakeRaf = requestAnimationFrame(pump);
     };
+    schedulePrebakeRef.current = schedulePrebake;
     schedulePrebake();
+
+    const onThemeChange = () => {
+      schedulePrebake();
+    };
+    window.addEventListener("portfolio-theme", onThemeChange);
 
     const render = (now: number) => {
       const dt = Math.min(48, now - lastFrame);
@@ -3287,14 +3377,21 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
 
         if (W > 0 && H > 0) {
-          stepBaking(4);
-          if (cityCache && rect.top < window.innerHeight + 32 && rect.bottom > -32) {
+          const targetCache = isDark ? cityCaches.dark : cityCaches.light;
+          if (!targetCache) stepBaking(6, false);
+          const activeCache = (isDark ? cityCaches.dark : cityCaches.light) ?? (isDark ? cityCaches.light : cityCaches.dark);
+          const renderDark = activeCache === cityCaches.dark;
+          if (prevRenderedDark !== null && prevRenderedDark !== renderDark && cityWrapRef.current) {
+            cityWrapRef.current.animate([{ opacity: 0.72 }, { opacity: 1 }], { duration: 240, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
+          }
+          prevRenderedDark = renderDark;
+          if (activeCache && rect.top < window.innerHeight + 32 && rect.bottom > -32) {
             const fullyColored = irisP >= 0.995;
             if (!fullyColored) {
               const mCtx = monoCanvas.getContext("2d")!;
               mCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
               mCtx.globalCompositeOperation = "source-over";
-              drawDepthSortedScene(mCtx, cityCache.mono.ground, cityCache.mono.slices, W, H, false, isDark, now);
+              drawDepthSortedScene(mCtx, activeCache.mono.ground, activeCache.mono.slices, W, H, false, renderDark, now);
             }
 
             const cCtx = colorCanvas.getContext("2d")!;
@@ -3303,7 +3400,7 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
 
             if (fullyColored) {
               // 100% revealed: draw full color scene directly without expensive destination-in pass
-              drawDepthSortedScene(cCtx, cityCache.color.ground, cityCache.color.slices, W, H, true, isDark, now);
+              drawDepthSortedScene(cCtx, activeCache.color.ground, activeCache.color.slices, W, H, true, renderDark, now);
               if (waveCanvas.width !== Math.floor(W * dpr) || waveCanvas.height !== Math.floor(H * dpr)) {
                 waveCanvas.width = W * dpr;
                 waveCanvas.height = H * dpr;
@@ -3321,7 +3418,7 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
               cCtx.beginPath();
               traceSmoothCurve(cCtx, outerPts, false);
               cCtx.clip();
-              drawDepthSortedScene(cCtx, cityCache.color.ground, cityCache.color.slices, W, H, true, isDark, now);
+              drawDepthSortedScene(cCtx, activeCache.color.ground, activeCache.color.slices, W, H, true, renderDark, now);
               cCtx.restore();
 
               if (waveCanvas.width !== Math.floor(W * dpr) || waveCanvas.height !== Math.floor(H * dpr)) {
@@ -3344,7 +3441,7 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
                 wCtx.strokeStyle = `rgba(237, 136, 56, ${(0.26 * fadeOut).toFixed(3)})`;
                 wCtx.lineWidth = 18;
                 wCtx.stroke();
-                wCtx.strokeStyle = isDark
+                wCtx.strokeStyle = renderDark
                   ? `rgba(142, 180, 245, ${(0.38 * fadeOut).toFixed(3)})`
                   : `rgba(255, 250, 240, ${(0.54 * fadeOut).toFixed(3)})`;
                 wCtx.lineWidth = 7;
@@ -3352,8 +3449,8 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
                 wCtx.restore();
               }
             } else {
-              drawDepthSortedScene(cCtx, cityCache.color.ground, cityCache.color.slices, W, H, true, isDark, now);
-              applyFluidColorWave(W, H, dpr, isDark, now, irisP);
+              drawDepthSortedScene(cCtx, activeCache.color.ground, activeCache.color.slices, W, H, true, renderDark, now);
+              applyFluidColorWave(W, H, dpr, renderDark, now, irisP);
             }
           }
         }
@@ -3435,9 +3532,11 @@ const SkillsShowcase = memo(function SkillsShowcase({ sectionRef }: { sectionRef
       cityVisibility.disconnect();
       document.removeEventListener("visibilitychange", syncFrames);
       cancelAnimationFrame(rafId);
+      schedulePrebakeRef.current = null;
       cancelAnimationFrame(prebakeRaf);
       mapSize.disconnect();
       landmarkRequest.abort();
+      window.removeEventListener("portfolio-theme", onThemeChange);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onPointer);
     };
